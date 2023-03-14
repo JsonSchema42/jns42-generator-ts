@@ -1,23 +1,48 @@
 import ts from "typescript";
 import { SchemaNodeIndexItem } from "./schema-indexer.js";
 import { SchemaTypeNameItem } from "./schema-types.js";
-import { selectNodeType } from "./selectors/node.js";
+import { selectNodeDereferencedUrl, selectNodeType } from "./selectors/node.js";
 
 export function* generateTypes(
     factory: ts.NodeFactory,
     schemaTypeMap: Map<string, SchemaTypeNameItem>,
     schemaNodeIndex: Map<string, SchemaNodeIndexItem>,
 ) {
-    for (const [nodeUrl, typeItem] of schemaTypeMap) {
-        const schemaNodeItem = schemaNodeIndex.get(nodeUrl);
+    for (const [nodeKey, typeItem] of schemaTypeMap) {
+        const schemaNodeItem = schemaNodeIndex.get(nodeKey);
         if (schemaNodeItem == null) {
             throw new Error("node not found");
         }
-        const { node } = schemaNodeItem;
+        const { node, nodeUrl } = schemaNodeItem;
+
+        const nodeDereferencedUrl = selectNodeDereferencedUrl(
+            schemaNodeIndex,
+            nodeUrl,
+            node,
+        );
+
+        if (String(nodeDereferencedUrl) !== String(nodeUrl)) {
+            const dereferencedTypeItem = schemaTypeMap.get(String(nodeDereferencedUrl));
+            if (dereferencedTypeItem == null) {
+                throw new Error("node not found");
+            }
+            yield factory.createTypeAliasDeclaration(
+                [
+                    factory.createToken(ts.SyntaxKind.ExportKeyword),
+                ],
+                typeItem.name,
+                undefined,
+                factory.createTypeReferenceNode(
+                    dereferencedTypeItem.name,
+                ),
+            );
+            continue;
+        }
 
         const types = selectNodeType(node);
         if (types == null) {
-            throw new Error("no type");
+            // throw new Error("no type");
+            continue;
         }
 
         yield factory.createTypeAliasDeclaration(

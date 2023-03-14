@@ -15,12 +15,12 @@ test("schema-types", async t => {
 
     const schemaTypeItems = [...findSchemaTypeItems(
         schemaNodeIndex,
-        schemaUrl,
+        schemaMap,
     )];
-    t.equal(schemaTypeItems.length, 89);
+    t.equal(schemaTypeItems.length, 99);
 
     const schemaTypeMap = new Map(
         schemaTypeItems.map(item => [String(item.nodeUrl), item] as const),
     );
-    t.equal(schemaTypeMap.size, 67);
+    t.equal(schemaTypeMap.size, 99);
 });

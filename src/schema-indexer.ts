@@ -1,5 +1,5 @@
 import { SchemaMapItem } from "./schema-loader.js";
-import { selectNodeAnchorUrl, selectNodeChildEntries, selectNodeIdUrl } from "./selectors/index.js";
+import { selectNodeAnchorUrl, selectNodeChildEntries, selectNodeDynamicAnchorUrl, selectNodeIdUrl } from "./selectors/index.js";
 
 export interface SchemaNodeIndexItem {
     node: unknown;
@@ -33,6 +33,19 @@ export function createSchemaNodeIndex(
         const anchorUrl = selectNodeAnchorUrl(nodeUrl, node);
         if (anchorUrl != null) {
             nodeUrl = anchorUrl;
+        }
+
+        const dynamicAnchorUrl = selectNodeDynamicAnchorUrl(nodeUrl, node);
+        if (dynamicAnchorUrl != null) {
+            schemaNodeIndex.set(
+                String(dynamicAnchorUrl),
+                {
+                    node,
+                    nodeUrl: dynamicAnchorUrl,
+                    schemaUrl,
+                    parentSchemaUrl,
+                },
+            );
         }
 
         if (schemaNodeIndex.has(String(nodeUrl))) {

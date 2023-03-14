@@ -1,3 +1,5 @@
+import { SchemaNodeIndexItem } from "../schema-indexer.js";
+
 export function selectNodeIdUrl(
     node: unknown,
 ) {
@@ -66,6 +68,7 @@ export function selectNodeRefUrl(
 }
 
 export function selectNodeDynamicRefUrl(
+    schemaNodeIndex: Map<string, SchemaNodeIndexItem>,
     nodeUrl: URL,
     node: unknown,
 ) {
@@ -77,7 +80,20 @@ export function selectNodeDynamicRefUrl(
             "$dynamicRef" in node &&
             typeof node.$dynamicRef === "string"
         ) {
-            return new URL(node.$dynamicRef, nodeUrl);
+            let schemaNodeItem = schemaNodeIndex.get(String(nodeUrl));
+            while (schemaNodeItem != null) {
+                const url = new URL(node.$dynamicRef, schemaNodeItem.nodeUrl);
+                if (!schemaNodeIndex.has(String(url))) {
+                    break;
+                }
+                schemaNodeItem = schemaNodeIndex.get(String(schemaNodeItem.parentSchemaUrl));
+            }
+
+            if (schemaNodeItem == null) {
+                throw new Error("node not found");
+            }
+
+            return new URL(node.$dynamicRef, schemaNodeItem.nodeUrl);
         }
     }
 }
@@ -101,6 +117,27 @@ export function selectNodeType(
             node.type.every(type => typeof type === "string")
         ) {
             return node.type;
+        }
+    }
+}
+
+export function* selectNodeDefEntries(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "$defs" in node &&
+            node.$defs != null &&
+            typeof node.$defs === "object"
+        ) {
+            for (const [key, subNode] of Object.entries(node.$defs)) {
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/$defs/${encodeURI(key)}`, nodeUrl);
+                yield [subNodeUrl, subNode] as const;
+            }
         }
     }
 }
@@ -295,13 +332,20 @@ export function* selectNodeChildEntries(
     }
 }
 
-export function selectNodeUnrefUrl(
+export function selectNodeDereferencedUrl(
+    schemaNodeIndex: Map<string, SchemaNodeIndexItem>,
     nodeUrl: URL,
     node: unknown,
 ) {
     const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
-    if (refNodeUrl == null) {
-        return nodeUrl;
+    if (refNodeUrl != null) {
+        return refNodeUrl;
     }
-    return refNodeUrl;
+
+    const dynamicRefNodeUrl = selectNodeDynamicRefUrl(schemaNodeIndex, nodeUrl, node);
+    if (dynamicRefNodeUrl != null) {
+        return dynamicRefNodeUrl;
+    }
+
+    return nodeUrl;
 }
