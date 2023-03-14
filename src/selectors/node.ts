@@ -67,7 +67,7 @@ export function* selectNodePropertyEntries(
             typeof node.properties === "object"
         ) {
             for (const [key, subNode] of Object.entries(node.properties)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/properties/${encodeURIComponent(key)}`, nodeUrl);
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/properties/${encodeURI(key)}`, nodeUrl);
                 yield [subNodeUrl, subNode] as const;
             }
         }
@@ -123,7 +123,7 @@ export function* selectNodeItemEntries(
             Array.isArray(node.items)
         ) {
             for (const [key, subNode] of Object.entries(node.items)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/items/${encodeURIComponent(key)}`, nodeUrl);
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/items/${encodeURI(key)}`, nodeUrl);
                 yield [subNodeUrl, subNode] as const;
             }
         }
@@ -139,6 +139,66 @@ export function* selectNodeItemEntries(
     }
 }
 
+export function* selectNodeAnyOfEntries(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "anyOf" in node &&
+            Array.isArray(node.anyOf)
+        ) {
+            for (const [key, subNode] of Object.entries(node.anyOf)) {
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/anyOf/${encodeURI(key)}`, nodeUrl);
+                yield [subNodeUrl, subNode] as const;
+            }
+        }
+    }
+}
+
+export function* selectNodeOneOfEntries(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "oneOf" in node &&
+            Array.isArray(node.oneOf)
+        ) {
+            for (const [key, subNode] of Object.entries(node.oneOf)) {
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/oneOf/${encodeURI(key)}`, nodeUrl);
+                yield [subNodeUrl, subNode] as const;
+            }
+        }
+    }
+}
+
+export function* selectNodeAllOfEntries(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "allOf" in node &&
+            Array.isArray(node.allOf)
+        ) {
+            for (const [key, subNode] of Object.entries(node.allOf)) {
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/allOf/${encodeURI(key)}`, nodeUrl);
+                yield [subNodeUrl, subNode] as const;
+            }
+        }
+    }
+}
+
 export function* selectNodeChildEntries(
     nodeUrl: URL,
     node: unknown,
@@ -148,8 +208,20 @@ export function* selectNodeChildEntries(
         typeof node === "object"
     ) {
         for (const [key, subNode] of Object.entries(node)) {
-            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/${encodeURIComponent(key)}`, nodeUrl);
+            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/${encodeURI(key)}`, nodeUrl);
             yield [subNodeUrl, subNode] as const;
         }
     }
+}
+
+export function selectNodeUnrefUrl(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    const ref = selectNodeRef(node);
+    if (ref == null) {
+        return nodeUrl;
+    }
+    const refNodeUrl = new URL(ref, nodeUrl);
+    return refNodeUrl;
 }
