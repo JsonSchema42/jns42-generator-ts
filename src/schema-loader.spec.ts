@@ -1,11 +1,9 @@
 import test from "tape-promise/tape.js";
-import { SchemaLoader } from "./schema-loader.js";
+import { loadSchemaIndex } from "./schema-loader.js";
 
 test("schema-loader", async t => {
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
-    const schemaLoader = new SchemaLoader();
-    await schemaLoader.loadSchema(schemaUrl);
+    const schemaIndex = await loadSchemaIndex(schemaUrl);
 
-    // eslint-disable-next-line no-debugger
-    debugger;
+    t.equal(schemaIndex.size, 8);
 });

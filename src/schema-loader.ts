@@ -1,46 +1,46 @@
-export class SchemaLoader {
-    schemas = new Map<string, unknown>();
+export async function loadSchemaIndex(schemaUrl: URL) {
+    const schemas = new Map<string, unknown>();
+    await loadSchema(schemaUrl, schemas);
+    return schemas;
+}
 
-    async fetchSchema(schemaUrl: URL) {
-        const result = await fetch(schemaUrl);
-        const schema = await result.json();
-
-        return schema;
+async function loadSchema(schemaUrl: URL, schemas: Map<string, unknown>) {
+    let schema = schemas.get(String(schemaUrl));
+    if (schema != null) {
+        return;
     }
 
-    async loadSchema(schemaUrl: URL) {
-        let schema = this.schemas.get(String(schemaUrl));
-        if (schema != null) {
-            return schema;
-        }
+    schema = await fetchSchema(schemaUrl);
+    schemas.set(schemaUrl.href, schema);
 
-        schema = await this.fetchSchema(schemaUrl);
-        this.schemas.set(schemaUrl.href, schema);
+    await loadSchemaReferences(schemaUrl, schema, schemas);
+}
 
-        await this.loadSchemaReferences(schemaUrl, schema);
-    }
-
-    async loadSchemaReferences(baseUrl: URL, node: unknown) {
+async function loadSchemaReferences(baseUrl: URL, node: unknown, schemas: Map<string, unknown>) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
         if (
-            node != null &&
-            typeof node === "object"
+            "$ref" in node &&
+            typeof node.$ref === "string"
         ) {
-            if (
-                "$ref" in node &&
-                typeof node.$ref === "string"
-            ) {
-                const referenceSchemaUrl = toServerUrl(new URL(node.$ref, baseUrl));
-                await this.loadSchema(referenceSchemaUrl);
-            }
-
-            const entries = Object.entries(node);
-            for (const [key, childNode] of entries) {
-                await this.loadSchemaReferences(baseUrl, childNode);
-            }
+            const referenceSchemaUrl = toServerUrl(new URL(node.$ref, baseUrl));
+            await loadSchema(referenceSchemaUrl, schemas);
         }
 
+        const entries = Object.entries(node);
+        for (const [key, childNode] of entries) {
+            await loadSchemaReferences(baseUrl, childNode, schemas);
+        }
     }
+}
 
+async function fetchSchema(schemaUrl: URL) {
+    const result = await fetch(schemaUrl);
+    const schema = await result.json();
+
+    return schema;
 }
 
 function toServerUrl(clientUrl: URL) {
