@@ -1,3 +1,5 @@
+import { selectNodeChildEntries, selectNodeId } from "./selectors/index.js";
+
 export function createSchemaNodeIndex(
     schemaMap: Map<string, unknown>,
 ) {
@@ -13,17 +15,9 @@ export function createSchemaNodeIndex(
         nodeUrl: URL,
         node: unknown,
     ) {
-        if (node == null) {
-            return;
-        }
-
-        if (typeof node === "object") {
-            if (
-                "$id" in node &&
-                typeof node.$id === "string"
-            ) {
-                nodeUrl = new URL(node.$id);
-            }
+        const id = selectNodeId(node);
+        if (id != null) {
+            nodeUrl = id;
         }
 
         if (schemaNodeIndex.has(String(nodeUrl))) {
@@ -31,11 +25,8 @@ export function createSchemaNodeIndex(
         }
         schemaNodeIndex.set(String(nodeUrl), node);
 
-        if (typeof node === "object") {
-            for (const [key, subNode] of Object.entries(node)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/${encodeURIComponent(key)}`, nodeUrl);
-                collectNode(subNodeUrl, subNode);
-            }
+        for (const [childNodeUrl, childNode] of selectNodeChildEntries(nodeUrl, node)) {
+            collectNode(childNodeUrl, childNode);
         }
     }
 }

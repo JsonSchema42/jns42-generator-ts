@@ -1,3 +1,5 @@
+import { selectNodeChildEntries, selectNodeRef } from "./selectors/index.js";
+
 export async function loadSchemaMap(
     schemaUrl: URL,
 ) {
@@ -16,32 +18,25 @@ async function loadSchema(
     }
 
     schema = await fetchSchema(schemaUrl);
-    schemaMap.set(schemaUrl.href, schema);
+    schemaMap.set(String(schemaUrl), schema);
 
     await loadSchemaReferences(schemaUrl, schema, schemaMap);
 }
 
 async function loadSchemaReferences(
-    baseUrl: URL,
+    nodeUrl: URL,
     node: unknown,
     schemaMap: Map<string, unknown>,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "$ref" in node &&
-            typeof node.$ref === "string"
-        ) {
-            const referenceSchemaUrl = toServerUrl(new URL(node.$ref, baseUrl));
-            await loadSchema(referenceSchemaUrl, schemaMap);
-        }
+    const ref = selectNodeRef(node);
 
-        const entries = Object.entries(node);
-        for (const [key, childNode] of entries) {
-            await loadSchemaReferences(baseUrl, childNode, schemaMap);
-        }
+    if (ref != null) {
+        const referenceSchemaUrl = toServerUrl(new URL(ref, nodeUrl));
+        await loadSchema(referenceSchemaUrl, schemaMap);
+    }
+
+    for (const [childNodeUrl, childNode] of selectNodeChildEntries(nodeUrl, node)) {
+        await loadSchemaReferences(childNodeUrl, childNode, schemaMap);
     }
 }
 
