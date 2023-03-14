@@ -1,42 +1,69 @@
 import { selectNodeChildEntries, selectNodeRefUrl } from "./selectors/index.js";
 
+export interface SchemaMapItem {
+    schemaNode: unknown;
+    schemaUrl: URL;
+    parentSchemaUrl: URL | null;
+}
+
 export async function loadSchemaMap(
     schemaUrl: URL,
 ) {
-    const schemaMap = new Map<string, unknown>();
-    await loadSchema(schemaUrl, schemaMap);
+    const schemaMap = new Map<string, SchemaMapItem>();
+    await loadSchema(schemaUrl, null, schemaMap);
     return schemaMap;
 }
 
 async function loadSchema(
     schemaUrl: URL,
-    schemaMap: Map<string, unknown>,
+    parentSchemaUrl: URL | null,
+    schemaMap: Map<string, SchemaMapItem>,
 ) {
-    let schema = schemaMap.get(String(schemaUrl));
-    if (schema != null) {
+    let schemaNode = schemaMap.get(String(schemaUrl));
+    if (schemaNode != null) {
         return;
     }
 
-    schema = await fetchSchema(schemaUrl);
-    schemaMap.set(String(schemaUrl), schema);
+    schemaNode = await fetchSchema(schemaUrl);
+    schemaMap.set(
+        String(schemaUrl),
+        {
+            schemaNode,
+            schemaUrl,
+            parentSchemaUrl,
+        },
+    );
 
-    await loadSchemaReferences(schemaUrl, schema, schemaMap);
+    await loadSchemaReferences(
+        schemaUrl,
+        schemaNode,
+        schemaMap,
+    );
 }
 
 async function loadSchemaReferences(
     nodeUrl: URL,
     node: unknown,
-    schemaMap: Map<string, unknown>,
+    schemaMap: Map<string, SchemaMapItem>,
 ) {
     const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
 
     if (refNodeUrl != null) {
         const referenceSchemaUrl = toServerUrl(refNodeUrl);
-        await loadSchema(referenceSchemaUrl, schemaMap);
+        const parentSchemaUrl = toServerUrl(nodeUrl);
+        await loadSchema(
+            referenceSchemaUrl,
+            parentSchemaUrl,
+            schemaMap,
+        );
     }
 
     for (const [childNodeUrl, childNode] of selectNodeChildEntries(nodeUrl, node)) {
-        await loadSchemaReferences(childNodeUrl, childNode, schemaMap);
+        await loadSchemaReferences(
+            childNodeUrl,
+            childNode,
+            schemaMap,
+        );
     }
 }
 

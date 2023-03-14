@@ -1,12 +1,13 @@
+import { SchemaMapItem } from "./schema-loader.js";
 import { selectNodeAnchorUrl, selectNodeChildEntries, selectNodeIdUrl } from "./selectors/index.js";
 
 export function createSchemaNodeIndex(
-    schemaMap: Map<string, unknown>,
+    schemaMap: Map<string, SchemaMapItem>,
 ) {
     const schemaNodeIndex = new Map<string, unknown>();
 
-    for (const [schemaUrl, schemaNode] of schemaMap) {
-        collectNode(new URL(schemaUrl), schemaNode);
+    for (const { schemaUrl, schemaNode } of schemaMap.values()) {
+        collectNode(schemaUrl, schemaNode);
     }
 
     return schemaNodeIndex;
