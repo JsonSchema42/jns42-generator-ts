@@ -1,22 +1,31 @@
-export async function loadSchemaIndex(schemaUrl: URL) {
-    const schemas = new Map<string, unknown>();
-    await loadSchema(schemaUrl, schemas);
-    return schemas;
+export async function loadSchemaMap(
+    schemaUrl: URL,
+) {
+    const schemaMap = new Map<string, unknown>();
+    await loadSchema(schemaUrl, schemaMap);
+    return schemaMap;
 }
 
-async function loadSchema(schemaUrl: URL, schemas: Map<string, unknown>) {
-    let schema = schemas.get(String(schemaUrl));
+async function loadSchema(
+    schemaUrl: URL,
+    schemaMap: Map<string, unknown>,
+) {
+    let schema = schemaMap.get(String(schemaUrl));
     if (schema != null) {
         return;
     }
 
     schema = await fetchSchema(schemaUrl);
-    schemas.set(schemaUrl.href, schema);
+    schemaMap.set(schemaUrl.href, schema);
 
-    await loadSchemaReferences(schemaUrl, schema, schemas);
+    await loadSchemaReferences(schemaUrl, schema, schemaMap);
 }
 
-async function loadSchemaReferences(baseUrl: URL, node: unknown, schemas: Map<string, unknown>) {
+async function loadSchemaReferences(
+    baseUrl: URL,
+    node: unknown,
+    schemaMap: Map<string, unknown>,
+) {
     if (
         node != null &&
         typeof node === "object"
@@ -26,12 +35,12 @@ async function loadSchemaReferences(baseUrl: URL, node: unknown, schemas: Map<st
             typeof node.$ref === "string"
         ) {
             const referenceSchemaUrl = toServerUrl(new URL(node.$ref, baseUrl));
-            await loadSchema(referenceSchemaUrl, schemas);
+            await loadSchema(referenceSchemaUrl, schemaMap);
         }
 
         const entries = Object.entries(node);
         for (const [key, childNode] of entries) {
-            await loadSchemaReferences(baseUrl, childNode, schemas);
+            await loadSchemaReferences(baseUrl, childNode, schemaMap);
         }
     }
 }
