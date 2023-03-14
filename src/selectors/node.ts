@@ -1,4 +1,4 @@
-export function selectNodeId(
+export function selectNodeIdUrl(
     node: unknown,
 ) {
     if (
@@ -10,6 +10,23 @@ export function selectNodeId(
             typeof node.$id === "string"
         ) {
             return new URL(node.$id);
+        }
+    }
+}
+
+export function selectNodeAnchorUrl(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        typeof node === "object" &&
+        node != null
+    ) {
+        if (
+            "$anchor" in node &&
+            typeof node.$anchor === "string"
+        ) {
+            return new URL(`#${node.$anchor}`, nodeUrl);
         }
     }
 }
@@ -105,6 +122,35 @@ export function* selectNodeAdditionalPropertyEntries(
         ) {
             const subNode = node.additionalProperties;
             const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/additionalProperties`, nodeUrl);
+            yield [subNodeUrl, subNode] as const;
+        }
+    }
+}
+
+export function* selectNodePrefixItemEntries(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "prefixItems" in node &&
+            Array.isArray(node.prefixItems)
+        ) {
+            for (const [key, subNode] of Object.entries(node.prefixItems)) {
+                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/prefixItems/${encodeURI(key)}`, nodeUrl);
+                yield [subNodeUrl, subNode] as const;
+            }
+        }
+        else if (
+            "prefixItems" in node &&
+            typeof node.prefixItems === "object" &&
+            node.prefixItems != null
+        ) {
+            const subNode = node.prefixItems;
+            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/prefixItems`, nodeUrl);
             yield [subNodeUrl, subNode] as const;
         }
     }

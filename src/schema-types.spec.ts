@@ -19,4 +19,9 @@ test("schema-types", async t => {
     )];
 
     t.equal(schemaUrls.length, 89);
+
+    const nodes = schemaUrls.map(url => [String(url), schemaNodeIndex.get(String(url))] as const);
+
+    // eslint-disable-next-line no-debugger
+    debugger;
 });

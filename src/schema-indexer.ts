@@ -1,4 +1,4 @@
-import { selectNodeChildEntries, selectNodeId } from "./selectors/index.js";
+import { selectNodeAnchorUrl, selectNodeChildEntries, selectNodeIdUrl } from "./selectors/index.js";
 
 export function createSchemaNodeIndex(
     schemaMap: Map<string, unknown>,
@@ -15,9 +15,14 @@ export function createSchemaNodeIndex(
         nodeUrl: URL,
         node: unknown,
     ) {
-        const id = selectNodeId(node);
-        if (id != null) {
-            nodeUrl = id;
+        const idUrl = selectNodeIdUrl(node);
+        if (idUrl != null) {
+            nodeUrl = idUrl;
+        }
+
+        const anchorUrl = selectNodeAnchorUrl(nodeUrl, node);
+        if (anchorUrl != null) {
+            nodeUrl = anchorUrl;
         }
 
         if (schemaNodeIndex.has(String(nodeUrl))) {
