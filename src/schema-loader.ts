@@ -1,4 +1,4 @@
-import { selectNodeChildEntries, selectNodeRef } from "./selectors/index.js";
+import { selectNodeChildEntries, selectNodeRefUrl } from "./selectors/index.js";
 
 export async function loadSchemaMap(
     schemaUrl: URL,
@@ -28,10 +28,10 @@ async function loadSchemaReferences(
     node: unknown,
     schemaMap: Map<string, unknown>,
 ) {
-    const ref = selectNodeRef(node);
+    const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
 
-    if (ref != null) {
-        const referenceSchemaUrl = toServerUrl(new URL(ref, nodeUrl));
+    if (refNodeUrl != null) {
+        const referenceSchemaUrl = toServerUrl(refNodeUrl);
         await loadSchema(referenceSchemaUrl, schemaMap);
     }
 

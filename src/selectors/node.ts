@@ -31,7 +31,25 @@ export function selectNodeAnchorUrl(
     }
 }
 
-export function selectNodeRef(
+export function selectNodeDynamicAnchorUrl(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        typeof node === "object" &&
+        node != null
+    ) {
+        if (
+            "$dynamicAnchor" in node &&
+            typeof node.$dynamicAnchor === "string"
+        ) {
+            return new URL(`#${node.$dynamicAnchor}`, nodeUrl);
+        }
+    }
+}
+
+export function selectNodeRefUrl(
+    nodeUrl: URL,
     node: unknown,
 ) {
     if (
@@ -42,7 +60,24 @@ export function selectNodeRef(
             "$ref" in node &&
             typeof node.$ref === "string"
         ) {
-            return node.$ref;
+            return new URL(node.$ref, nodeUrl);
+        }
+    }
+}
+
+export function selectNodeDynamicRefUrl(
+    nodeUrl: URL,
+    node: unknown,
+) {
+    if (
+        typeof node === "object" &&
+        node != null
+    ) {
+        if (
+            "$dynamicRef" in node &&
+            typeof node.$dynamicRef === "string"
+        ) {
+            return new URL(node.$dynamicRef, nodeUrl);
         }
     }
 }
@@ -264,10 +299,9 @@ export function selectNodeUnrefUrl(
     nodeUrl: URL,
     node: unknown,
 ) {
-    const ref = selectNodeRef(node);
-    if (ref == null) {
+    const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
+    if (refNodeUrl == null) {
         return nodeUrl;
     }
-    const refNodeUrl = new URL(ref, nodeUrl);
     return refNodeUrl;
 }
