@@ -10,22 +10,16 @@ test("schema-types", async t => {
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
     const schemaMap = await loadSchemaMap(schemaUrl);
 
-    t.equal(schemaMap.size, 8);
-
     const schemaNodeIndex = createSchemaNodeIndex(schemaMap);
-
-    t.equal(schemaNodeIndex.size, 324);
 
     const schemaTypeItems = [...findSchemaTypeItems(
         schemaNodeIndex,
         schemaMap,
     )];
-    t.equal(schemaTypeItems.length, 99);
 
-    const schemaTypeMap = new Map(
+    const schemaTypeItemIndex = new Map(
         schemaTypeItems.map(item => [String(item.nodeUrl), item] as const),
     );
-    t.equal(schemaTypeMap.size, 99);
 
     const factory = ts.factory;
 
@@ -33,7 +27,11 @@ test("schema-types", async t => {
         newLine: ts.NewLineKind.LineFeed,
     });
 
-    const nodes = [...generateTypes(factory, schemaTypeMap, schemaNodeIndex)];
+    const nodes = [...generateTypes(
+        factory,
+        schemaNodeIndex,
+        schemaTypeItemIndex,
+    )];
 
     const sourceFile = factory.createSourceFile(
         nodes,

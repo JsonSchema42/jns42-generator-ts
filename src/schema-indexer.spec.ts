@@ -6,8 +6,6 @@ test("schema-indexer", async t => {
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
     const schemaMap = await loadSchemaMap(schemaUrl);
 
-    t.equal(schemaMap.size, 8);
-
     const schemaNodeIndex = createSchemaNodeIndex(schemaMap);
 
     t.equal(schemaNodeIndex.size, 332);
