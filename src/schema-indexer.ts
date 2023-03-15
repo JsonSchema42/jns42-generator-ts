@@ -9,6 +9,7 @@ export enum SchemaNodeIdentifierType {
 
 export interface SchemaNodeIndexItem {
     node: unknown;
+    idUrl: URL;
     nodeUrl: URL;
     schemaUrl: URL;
     referencingSchemaUrl: URL | null;
@@ -22,7 +23,7 @@ export function createSchemaNodeIndex(
 
     for (const { schemaUrl, referencingSchemaUrl, schemaNode } of schemaMap.values()) {
         for (const item of emitItems(schemaUrl, schemaUrl, referencingSchemaUrl, schemaNode)) {
-            const nodeKey = String(item.nodeUrl);
+            const nodeKey = String(item.idUrl);
             if (schemaNodeIndex.has(nodeKey)) {
                 throw new Error("duplicate identifier");
             }
@@ -49,7 +50,8 @@ function* emitItems(
     if (anchorUrl != null) {
         yield {
             node,
-            nodeUrl: anchorUrl,
+            idUrl: anchorUrl,
+            nodeUrl,
             schemaUrl,
             referencingSchemaUrl: referencingSchemaUrl,
             type: SchemaNodeIdentifierType.anchor,
@@ -61,7 +63,8 @@ function* emitItems(
     if (dynamicAnchorUrl != null) {
         yield {
             node,
-            nodeUrl: dynamicAnchorUrl,
+            idUrl: dynamicAnchorUrl,
+            nodeUrl,
             schemaUrl,
             referencingSchemaUrl: referencingSchemaUrl,
             type: SchemaNodeIdentifierType.dynamicAnchor,
@@ -70,6 +73,7 @@ function* emitItems(
 
     yield {
         node,
+        idUrl: nodeUrl,
         nodeUrl,
         schemaUrl,
         referencingSchemaUrl: referencingSchemaUrl,

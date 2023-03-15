@@ -132,7 +132,7 @@ function generateType(
         schemaTypeItem.name,
         undefined,
         factory.createUnionTypeNode(
-            types.map(type => generateTypeDefinitions(factory, type)),
+            types.map(type => generateTypeDefinitions(factory, type, nodeUrl, node)),
         ),
     );
 }
@@ -155,6 +155,8 @@ function generateTypeReference(
 function generateTypeDefinitions(
     factory: ts.NodeFactory,
     type: string,
+    nodeUrl: URL,
+    node: unknown,
 ): ts.TypeNode {
 
     switch (type) {
