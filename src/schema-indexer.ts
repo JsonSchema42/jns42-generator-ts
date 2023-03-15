@@ -8,6 +8,7 @@ export interface SchemaIndexerNodeItem {
 }
 
 export class SchemaIndexer {
+    private instanceRootMap = new Map<string, URL>();
     private anchorMap = new Map<string, URL>();
     private dynamicAnchorMap = new Map<string, URL>();
     private nodeItemMap = new Map<string, SchemaIndexerNodeItem>();
@@ -38,12 +39,36 @@ export class SchemaIndexer {
         return this.nodeItemMap.get(nodeKey);
     }
 
+    public getInstanceUrl(nodeUrl: URL): URL | undefined {
+        const nodeRootUrl = new URL(nodeUrl);
+        nodeRootUrl.hash = "";
+
+        const nodeItem = this.getNodeItem(nodeRootUrl);
+        return nodeItem?.instanceUrl;
+    }
+
+    public getInstanceRootUrl(instanceUrl: URL): URL | undefined {
+        const instanceKey = String(instanceUrl);
+        return this.instanceRootMap.get(instanceKey);
+    }
+
+    public getAnchorUrl(nodeUrl: URL): URL | undefined {
+        const nodeKey = String(nodeUrl);
+        return this.anchorMap.get(nodeKey);
+    }
+
+    public getDynamicAnchorUrl(nodeUrl: URL): URL | undefined {
+        const nodeKey = String(nodeUrl);
+        return this.dynamicAnchorMap.get(nodeKey);
+    }
+
     private loadFromSchemaCollectionInstanceItems(schemaCollection: SchemaCollection) {
         for (const instanceItem of schemaCollection.getInstanceItems()) {
             this.loadFromSchemaCollectionInstanceItem(
                 instanceItem.instanceUrl,
                 instanceItem.instanceUrl,
                 instanceItem.instanceNode,
+                true,
             );
         }
     }
@@ -52,10 +77,19 @@ export class SchemaIndexer {
         instanceUrl: URL,
         nodeUrl: URL,
         node: unknown,
+        root: boolean,
     ) {
         const idUrl = selectNodeIdUrl(node);
         if (idUrl != null) {
             nodeUrl = idUrl;
+        }
+
+        if (root) {
+            const instanceKey = String(instanceUrl);
+            if (this.instanceRootMap.has(instanceKey)) {
+                throw new Error("duplicate instanceKey");
+            }
+            this.instanceRootMap.set(instanceKey, nodeUrl);
         }
 
         const anchorUrl = selectNodeAnchorUrl(nodeUrl, node);
@@ -91,6 +125,7 @@ export class SchemaIndexer {
                 instanceUrl,
                 childNodeUrl,
                 childNode,
+                false,
             );
         }
 
