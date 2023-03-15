@@ -8,5 +8,5 @@ test("schema-names", async t => {
 
     const schemaNamer = new SchemaNamer(schemaCollection);
 
-    t.equal(schemaNamer.nameCount, 99);
+    t.equal(schemaNamer.nameCount, 101);
 });

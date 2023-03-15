@@ -10,5 +10,5 @@ test("schema-indexer", async t => {
 
     t.equal(schemaIndexer.anchorCount, 0);
     t.equal(schemaIndexer.dynamicAnchorCount, 8);
-    t.equal(schemaIndexer.nodeCount, 99);
+    t.equal(schemaIndexer.nodeCount, 101);
 });
