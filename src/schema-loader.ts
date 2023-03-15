@@ -3,7 +3,7 @@ import { selectNodeChildEntries, selectNodeRefUrl } from "./selectors/index.js";
 export interface SchemaMapItem {
     schemaNode: unknown;
     schemaUrl: URL;
-    parentSchemaUrl: URL | null;
+    referencingSchemaUrl: URL | null;
 }
 
 export async function loadSchemaMap(
@@ -30,7 +30,7 @@ async function loadSchema(
         {
             schemaNode,
             schemaUrl,
-            parentSchemaUrl,
+            referencingSchemaUrl: parentSchemaUrl,
         },
     );
 

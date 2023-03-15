@@ -86,7 +86,7 @@ export function selectNodeDynamicRefUrl(
                 if (!schemaNodeIndex.has(String(url))) {
                     break;
                 }
-                schemaNodeItem = schemaNodeIndex.get(String(schemaNodeItem.parentSchemaUrl));
+                schemaNodeItem = schemaNodeIndex.get(String(schemaNodeItem.referencingSchemaUrl));
             }
 
             if (schemaNodeItem == null) {

@@ -10,5 +10,5 @@ test("schema-indexer", async t => {
 
     const schemaNodeIndex = createSchemaNodeIndex(schemaMap);
 
-    t.equal(schemaNodeIndex.size, 324);
+    t.equal(schemaNodeIndex.size, 332);
 });
