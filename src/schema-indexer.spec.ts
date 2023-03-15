@@ -3,8 +3,8 @@ import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer } from "./schema-indexer.js";
 
 test("schema-indexer", async t => {
-    const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
-    const schemaCollection = await SchemaCollection.loadFromUrl(schemaUrl);
+    const instanceUrl = new URL("https://json-schema.org/draft/2020-12/schema");
+    const schemaCollection = await SchemaCollection.loadFromUrl(instanceUrl);
 
     const schemaIndexer = new SchemaIndexer(schemaCollection);
 

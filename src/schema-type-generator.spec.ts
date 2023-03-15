@@ -7,12 +7,12 @@ import { SchemaNamer } from "./schema-namer.js";
 import { SchemaTypeGenerator } from "./schema-type-generator.js";
 
 test("schema-type-generator", async t => {
-    const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
-    const schemaCollection = await SchemaCollection.loadFromUrl(schemaUrl);
+    const instanceUrl = new URL("https://json-schema.org/draft/2020-12/schema");
+    const schemaCollection = await SchemaCollection.loadFromUrl(instanceUrl);
 
     const schemaIndexer = new SchemaIndexer(schemaCollection);
     const schemaNamer = new SchemaNamer(schemaCollection);
-    const schemaGenerator = new SchemaTypeGenerator(
+    const schemaTypeGenerator = new SchemaTypeGenerator(
         ts.factory,
         schemaCollection,
         schemaIndexer,
@@ -23,7 +23,7 @@ test("schema-type-generator", async t => {
         newLine: ts.NewLineKind.LineFeed,
     });
 
-    const nodes = [...schemaGenerator.generateTypeDeclarations()];
+    const nodes = [...schemaTypeGenerator.generateTypeDeclarations()];
 
     const sourceFile = ts.factory.createSourceFile(
         nodes,
