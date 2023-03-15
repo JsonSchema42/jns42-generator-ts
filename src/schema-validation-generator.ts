@@ -2,7 +2,7 @@ import ts from "typescript";
 import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
-import { selectNodeAdditionalPropertiesUrl, selectNodeItemsUrl, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeType, selectValidationConst, selectValidationEnum, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors/index.js";
+import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeType, selectValidationConst, selectValidationEnum, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors/index.js";
 import { generateLiteral } from "./utils/index.js";
 
 export class SchemaValidationGenerator {
@@ -134,6 +134,29 @@ export class SchemaValidationGenerator {
             yield this.wrapValidationExpression(
                 this.generateCallValidatorExpression("validateEnum", enumValues),
             );
+        }
+
+        const anyOfEntries = selectNodeAnyOfEntries(nodeItem.nodeUrl, nodeItem.node);
+
+        const oneOfEntries = selectNodeOneOfEntries(nodeItem.nodeUrl, nodeItem.node);
+
+        const allOfEntries = selectNodeAllOfEntries(nodeItem.nodeUrl, nodeItem.node);
+        for (const allOfEntry of allOfEntries) {
+            const [url] = allOfEntry;
+            const name = this.schemaNamer.getName(url);
+
+            if (name == null) {
+                throw new Error("name not found");
+            }
+
+            yield this.factory.createExpressionStatement(this.factory.createCallExpression(
+                this.factory.createIdentifier(`validate${name}`),
+                undefined,
+                [
+                    this.factory.createIdentifier("value"),
+                    this.factory.createIdentifier("path"),
+                ],
+            ));
         }
 
     }
