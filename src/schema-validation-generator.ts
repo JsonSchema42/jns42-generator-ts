@@ -31,7 +31,9 @@ export class SchemaValidationGenerator {
         }
 
         return this.factory.createFunctionDeclaration(
-            undefined,
+            [
+                this.factory.createToken(ts.SyntaxKind.ExportKeyword),
+            ],
             undefined,
             `validate${typeName}`,
             undefined,
@@ -82,19 +84,20 @@ export class SchemaValidationGenerator {
         nodeItem: SchemaIndexerNodeItem,
         elseStatement: ts.Statement,
     ) {
-        const { factory } = this;
-
-        const thenBlock = factory.createBlock(
+        const thenBlock = this.factory.createBlock(
             [
                 ...this.generateTypeValidationStatements(type, nodeItem),
             ].map(
-                testExpression => factory.createIfStatement(testExpression, factory.createBlock([
-                    this.factory.createThrowStatement(this.factory.createNewExpression(
-                        this.factory.createIdentifier("Error"),
-                        undefined,
-                        [this.factory.createStringLiteral("validation failed")],
-                    )),
-                ])),
+                testExpression => this.factory.createIfStatement(
+                    testExpression,
+                    this.factory.createBlock([
+                        this.factory.createThrowStatement(this.factory.createNewExpression(
+                            this.factory.createIdentifier("Error"),
+                            undefined,
+                            [this.factory.createStringLiteral("validation failed")],
+                        )),
+                    ]),
+                ),
             ),
             true,
         );
@@ -104,7 +107,7 @@ export class SchemaValidationGenerator {
             type,
         );
 
-        return factory.createIfStatement(
+        return this.factory.createIfStatement(
             testExpression,
             thenBlock,
             elseStatement,
