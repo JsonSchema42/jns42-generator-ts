@@ -2,17 +2,17 @@ import * as fs from "fs";
 import test from "tape-promise/tape.js";
 import ts from "typescript";
 import { SchemaCollection } from "./schema-collection.js";
-import { SchemaGenerator } from "./schema-generator.js";
 import { SchemaIndexer } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
+import { SchemaTypeGenerator } from "./schema-type-generator.js";
 
-test("schema-generator", async t => {
+test("schema-type-generator", async t => {
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
     const schemaCollection = await SchemaCollection.loadFromUrl(schemaUrl);
 
     const schemaIndexer = new SchemaIndexer(schemaCollection);
     const schemaNamer = new SchemaNamer(schemaCollection);
-    const schemaGenerator = new SchemaGenerator(
+    const schemaGenerator = new SchemaTypeGenerator(
         ts.factory,
         schemaCollection,
         schemaIndexer,

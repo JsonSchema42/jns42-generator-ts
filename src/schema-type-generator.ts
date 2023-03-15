@@ -5,7 +5,7 @@ import { SchemaNamer } from "./schema-namer.js";
 import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRefUrl, selectNodeEnum, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/index.js";
 import { generatePrimitiveLiteral } from "./utils/index.js";
 
-export class SchemaGenerator {
+export class SchemaTypeGenerator {
     constructor(
         private readonly factory: ts.NodeFactory,
         private readonly schemaCollection: SchemaCollection,
