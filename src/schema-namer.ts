@@ -40,7 +40,7 @@ export class SchemaNamer {
 
         for (const [childNodeUrl, childNode] of selectNodeInstanceEntries(nodeUrl, node)) {
             const childName = makeTypeName(
-                childNode,
+                childNodeUrl,
                 name,
             );
             this.loadFromSchemaCollectionInstanceItem(
