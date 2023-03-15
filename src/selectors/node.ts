@@ -1,4 +1,3 @@
-import { SchemaNodeIndexItem } from "../schema-indexer.js";
 
 export function selectNodeIdUrl(
     node: unknown,
@@ -68,7 +67,6 @@ export function selectNodeRefUrl(
 }
 
 export function selectNodeDynamicRefUrl(
-    schemaNodeIndex: Map<string, SchemaNodeIndexItem>,
     nodeUrl: URL,
     node: unknown,
 ) {
@@ -80,20 +78,7 @@ export function selectNodeDynamicRefUrl(
             "$dynamicRef" in node &&
             typeof node.$dynamicRef === "string"
         ) {
-            let schemaNodeItem = schemaNodeIndex.get(String(nodeUrl));
-            while (schemaNodeItem != null) {
-                const url = new URL(node.$dynamicRef, schemaNodeItem.nodeUrl);
-                if (!schemaNodeIndex.has(String(url))) {
-                    break;
-                }
-                schemaNodeItem = schemaNodeIndex.get(String(url));
-            }
-
-            if (schemaNodeItem == null) {
-                throw new Error("node not found");
-            }
-
-            return new URL(node.$dynamicRef, schemaNodeItem.nodeUrl);
+            return new URL(node.$dynamicRef, nodeUrl);
         }
     }
 }
@@ -330,22 +315,4 @@ export function* selectNodeChildEntries(
             yield [subNodeUrl, subNode] as const;
         }
     }
-}
-
-export function selectNodeDereferencedUrl(
-    schemaNodeIndex: Map<string, SchemaNodeIndexItem>,
-    nodeUrl: URL,
-    node: unknown,
-) {
-    const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
-    if (refNodeUrl != null) {
-        return refNodeUrl;
-    }
-
-    const dynamicRefNodeUrl = selectNodeDynamicRefUrl(schemaNodeIndex, nodeUrl, node);
-    if (dynamicRefNodeUrl != null) {
-        return dynamicRefNodeUrl;
-    }
-
-    return nodeUrl;
 }
