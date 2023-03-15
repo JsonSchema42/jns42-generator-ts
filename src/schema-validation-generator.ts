@@ -2,7 +2,7 @@ import ts from "typescript";
 import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
-import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeType, selectValidationConst, selectValidationEnum, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors/index.js";
+import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeRefUrl, selectNodeType, selectValidationConst, selectValidationEnum, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors/index.js";
 import { generateLiteral } from "./utils/index.js";
 
 export class SchemaValidationGenerator {
@@ -134,6 +134,40 @@ export class SchemaValidationGenerator {
             yield this.wrapValidationExpression(
                 this.generateCallValidatorExpression("validateEnum", enumValues),
             );
+        }
+
+        const nodeRefUrl = selectNodeRefUrl(nodeItem.nodeUrl, nodeItem.node);
+        if (nodeRefUrl != null) {
+            const resolvedUrl = this.resolveReference(nodeRefUrl);
+            const name = this.schemaNamer.getName(resolvedUrl);
+            if (name == null) {
+                throw new Error("name not found");
+            }
+            yield this.factory.createExpressionStatement(this.factory.createCallExpression(
+                this.factory.createIdentifier(`validate${name}`),
+                undefined,
+                [
+                    this.factory.createIdentifier("value"),
+                    this.factory.createIdentifier("path"),
+                ],
+            ));
+        }
+
+        const nodeDynamicRefUrl = selectNodeDynamicRefUrl(nodeItem.nodeUrl, nodeItem.node);
+        if (nodeDynamicRefUrl != null) {
+            const resolvedUrl = this.resolveDynamicReference(nodeDynamicRefUrl);
+            const name = this.schemaNamer.getName(resolvedUrl);
+            if (name == null) {
+                throw new Error("name not found");
+            }
+            yield this.factory.createExpressionStatement(this.factory.createCallExpression(
+                this.factory.createIdentifier(`validate${name}`),
+                undefined,
+                [
+                    this.factory.createIdentifier("value"),
+                    this.factory.createIdentifier("path"),
+                ],
+            ));
         }
 
         const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodeUrl, nodeItem.node)];
