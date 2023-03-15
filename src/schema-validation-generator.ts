@@ -2,7 +2,7 @@ import ts from "typescript";
 import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
-import { selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors/index.js";
+import { selectNodeType, selectValidationConst, selectValidationEnum, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors/index.js";
 import { generateLiteral } from "./utils/index.js";
 
 export class SchemaValidationGenerator {
@@ -62,6 +62,9 @@ export class SchemaValidationGenerator {
     }
 
     *generateFunctionStatements(nodeItem: SchemaIndexerNodeItem): Iterable<ts.Statement> {
+
+        yield* this.generateCommonValidationStatements(nodeItem);
+
         const types = selectNodeType(nodeItem.node);
         if (types != null) {
             let statement: ts.Statement = this.factory.createBlock([
@@ -79,6 +82,25 @@ export class SchemaValidationGenerator {
 
     }
 
+    generateCommonValidationStatements(
+        nodeItem: SchemaIndexerNodeItem,
+    ) {
+        return [
+            ...this.generateCommonValidationExpressions(nodeItem),
+        ].map(
+            testExpression => this.factory.createIfStatement(
+                testExpression,
+                this.factory.createBlock([
+                    this.factory.createThrowStatement(this.factory.createNewExpression(
+                        this.factory.createIdentifier("Error"),
+                        undefined,
+                        [this.factory.createStringLiteral("validation failed")],
+                    )),
+                ]),
+            ),
+        );
+    }
+
     generateTypeValidationIfStatement(
         type: string,
         nodeItem: SchemaIndexerNodeItem,
@@ -86,7 +108,7 @@ export class SchemaValidationGenerator {
     ) {
         const thenBlock = this.factory.createBlock(
             [
-                ...this.generateTypeValidationStatements(type, nodeItem),
+                ...this.generateTypeValidationExpressions(type, nodeItem),
             ].map(
                 testExpression => this.factory.createIfStatement(
                     testExpression,
@@ -114,8 +136,23 @@ export class SchemaValidationGenerator {
         );
     }
 
+    *generateCommonValidationExpressions(
+        nodeItem: SchemaIndexerNodeItem,
+    ) {
+        const constValue = selectValidationConst(nodeItem.node);
+        const enumValues = selectValidationEnum(nodeItem.node);
+
+        if (constValue != null) {
+            yield this.generateCallValidatorExpression("validateConst", constValue);
+        }
+        if (enumValues != null) {
+            yield this.generateCallValidatorExpression("validateEnum", enumValues);
+        }
+
+    }
+
     // eslint-disable-next-line complexity
-    *generateTypeValidationStatements(
+    *generateTypeValidationExpressions(
         type: string,
         nodeItem: SchemaIndexerNodeItem,
     ) {

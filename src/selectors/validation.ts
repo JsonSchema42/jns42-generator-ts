@@ -137,3 +137,23 @@ export function selectValidationMultipleOf(
         }
     }
 }
+
+export function selectValidationConst(
+    node: unknown,
+) {
+    if (node != null && typeof node === "object") {
+        if ("const" in node) {
+            return node.const;
+        }
+    }
+}
+
+export function selectValidationEnum(
+    node: unknown,
+) {
+    if (node != null && typeof node === "object") {
+        if ("enum" in node) {
+            return node.enum;
+        }
+    }
+}
