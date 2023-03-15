@@ -1,7 +1,7 @@
 import ts from "typescript";
 import { SchemaNodeIndexItem } from "./schema-indexer.js";
 import { SchemaTypeNameItem } from "./schema-types.js";
-import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeOneOfEntries, selectNodeType } from "./selectors/node.js";
+import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeOneOfEntries, selectNodeRefUrl, selectNodeType } from "./selectors/node.js";
 
 export function* generateTypes(
     factory: ts.NodeFactory,
@@ -83,6 +83,18 @@ function generateType(
                     nodeUrl,
                 )),
             ),
+        );
+    }
+
+    const nodeRefUrl = selectNodeRefUrl(nodeUrl, node);
+    if (nodeRefUrl != null) {
+        return factory.createTypeAliasDeclaration(
+            [
+                factory.createToken(ts.SyntaxKind.ExportKeyword),
+            ],
+            schemaTypeItem.name,
+            undefined,
+            generateTypeReference(factory, schemaTypeItemIndex, nodeRefUrl),
         );
     }
 
