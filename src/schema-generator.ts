@@ -2,7 +2,8 @@ import ts from "typescript";
 import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
-import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/index.js";
+import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRefUrl, selectNodeEnum, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/index.js";
+import { generatePrimitiveLiteral } from "./utils/index.js";
 
 export class SchemaGenerator {
     constructor(
@@ -60,6 +61,24 @@ export class SchemaGenerator {
         if (nodeDynamicRefUrl != null) {
             const resolvedUrl = this.resolveDynamicReference(nodeDynamicRefUrl);
             return this.generateTypeReference(resolvedUrl);
+        }
+
+        const constValue = selectNodeConst(nodeItem.node);
+        if (constValue != null) {
+            return this.factory.createLiteralTypeNode(generatePrimitiveLiteral(
+                this.factory,
+                constValue,
+            ));
+        }
+
+        const enumValues = selectNodeEnum(nodeItem.node);
+        if (enumValues != null) {
+            return this.factory.createUnionTypeNode(
+                enumValues.map(value => this.factory.createLiteralTypeNode(generatePrimitiveLiteral(
+                    this.factory,
+                    value,
+                ))),
+            );
         }
 
         const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodeUrl, nodeItem.node)];

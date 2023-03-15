@@ -116,3 +116,36 @@ export function selectNodePrefixItemsUrls(
         }
     }
 }
+
+export function selectNodeEnum(
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "enum" in node &&
+            node.enum != null &&
+            Array.isArray(node.enum)
+        ) {
+            return node.enum;
+        }
+    }
+}
+
+export function selectNodeConst(
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "const" in node &&
+            node.const != null
+        ) {
+            return node.const;
+        }
+    }
+}
