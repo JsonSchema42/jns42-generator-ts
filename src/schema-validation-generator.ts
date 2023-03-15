@@ -271,16 +271,6 @@ export class SchemaValidationGenerator {
         }
     }
 
-    generateTypeReference(
-        nodeUrl: URL,
-    ): ts.TypeNode {
-        const typeName = this.schemaNamer.getName(nodeUrl);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-        return this.factory.createTypeReferenceNode(typeName);
-    }
-
     generateCallValidatorExpression(
         validatorName: string,
         validateArgument: unknown,
@@ -297,6 +287,53 @@ export class SchemaValidationGenerator {
                 generateLiteral(this.factory, validateArgument),
             ],
         );
+    }
+
+    generateTypeReference(
+        nodeUrl: URL,
+    ): ts.TypeNode {
+        const typeName = this.schemaNamer.getName(nodeUrl);
+        if (typeName == null) {
+            throw new Error("typeName not found");
+        }
+        return this.factory.createTypeReferenceNode(typeName);
+    }
+
+    resolveReference(
+        nodeUrl: URL,
+    ) {
+        let resolvedUrl = this.schemaIndexer.getAnchorUrl(nodeUrl);
+
+        if (resolvedUrl == null) {
+            resolvedUrl = nodeUrl;
+        }
+
+        return resolvedUrl;
+    }
+
+    resolveDynamicReference(
+        nodeUrl: URL,
+    ) {
+        let instanceUrl: URL | null = this.schemaIndexer.getInstanceUrl(nodeUrl) ?? null;
+        let resolvedUrl = nodeUrl;
+
+        while (instanceUrl != null) {
+            const instanceItem = this.schemaCollection.getInstanceItem(instanceUrl);
+            if (!instanceItem) {
+                throw new Error("instanceItem not found");
+            }
+
+            const instanceRootUrl = this.schemaIndexer.getInstanceRootUrl(instanceUrl);
+            const maybeResolvedUrl = this.schemaIndexer.getDynamicAnchorUrl(
+                new URL(nodeUrl.hash, instanceRootUrl),
+            );
+            if (maybeResolvedUrl != null) {
+                resolvedUrl = maybeResolvedUrl;
+            }
+            instanceUrl = instanceItem.referencingInstanceUrl;
+        }
+
+        return resolvedUrl;
     }
 
 }

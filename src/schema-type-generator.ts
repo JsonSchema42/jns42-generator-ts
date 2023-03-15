@@ -40,16 +40,6 @@ export class SchemaTypeGenerator {
         );
     }
 
-    generateTypeReference(
-        nodeUrl: URL,
-    ): ts.TypeNode {
-        const typeName = this.schemaNamer.getName(nodeUrl);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-        return this.factory.createTypeReferenceNode(typeName);
-    }
-
     generateTypeNode(nodeItem: SchemaIndexerNodeItem): ts.TypeNode {
         if (nodeItem.node === true) {
             return this.factory.createKeywordTypeNode(
@@ -267,6 +257,16 @@ export class SchemaTypeGenerator {
                 ),
             ],
         );
+    }
+
+    generateTypeReference(
+        nodeUrl: URL,
+    ): ts.TypeNode {
+        const typeName = this.schemaNamer.getName(nodeUrl);
+        if (typeName == null) {
+            throw new Error("typeName not found");
+        }
+        return this.factory.createTypeReferenceNode(typeName);
     }
 
     resolveReference(
