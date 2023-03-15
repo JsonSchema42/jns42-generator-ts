@@ -101,7 +101,7 @@ export function selectNodeType(
             Array.isArray(node.type) &&
             node.type.every(type => typeof type === "string")
         ) {
-            return node.type;
+            return node.type as string[];
         }
     }
 }
@@ -142,7 +142,7 @@ export function* selectNodePropertyEntries(
         ) {
             for (const [key, subNode] of Object.entries(node.properties)) {
                 const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/properties/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                yield [subNodeUrl, subNode, key] as const;
             }
         }
     }
@@ -313,6 +313,23 @@ export function* selectNodeChildEntries(
         for (const [key, subNode] of Object.entries(node)) {
             const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/${encodeURI(key)}`, nodeUrl);
             yield [subNodeUrl, subNode] as const;
+        }
+    }
+}
+
+export function selectNodeRequiredProperties(
+    node: unknown,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "required" in node &&
+            Array.isArray(node.required) &&
+            node.required.every(type => typeof type === "string")
+        ) {
+            return node.required as string[];
         }
     }
 }

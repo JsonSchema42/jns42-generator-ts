@@ -1,7 +1,7 @@
 import ts from "typescript";
 import { SchemaNodeIndexItem } from "./schema-indexer.js";
 import { SchemaTypeNameItem } from "./schema-types.js";
-import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeOneOfEntries, selectNodeRefUrl, selectNodeType } from "./selectors/node.js";
+import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeItemEntries, selectNodeOneOfEntries, selectNodePrefixItemEntries, selectNodePropertyEntries, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/node.js";
 
 export function* generateTypes(
     factory: ts.NodeFactory,
@@ -132,7 +132,13 @@ function generateType(
         schemaTypeItem.name,
         undefined,
         factory.createUnionTypeNode(
-            types.map(type => generateTypeDefinitions(factory, type, nodeUrl, node)),
+            types.map(type => generateTypeDefinition(
+                factory,
+                schemaTypeItemIndex,
+                type,
+                nodeUrl,
+                node,
+            )),
         ),
     );
 }
@@ -152,8 +158,9 @@ function generateTypeReference(
     return factory.createTypeReferenceNode(schemaTypeItem.name);
 }
 
-function generateTypeDefinitions(
+function generateTypeDefinition(
     factory: ts.NodeFactory,
+    schemaTypeItemIndex: Map<string, SchemaTypeNameItem>,
     type: string,
     nodeUrl: URL,
     node: unknown,
@@ -186,24 +193,82 @@ function generateTypeDefinitions(
             );
 
         case "object":
-            return factory.createKeywordTypeNode(
-                ts.SyntaxKind.ObjectKeyword,
+            return generateObjectTypeDefinition(
+                factory,
+                schemaTypeItemIndex,
+                nodeUrl,
+                node,
             );
 
         case "array":
-            return factory.createTypeReferenceNode(
-                "Array",
-                [
-                    factory.createKeywordTypeNode(
-                        ts.SyntaxKind.AnyKeyword,
-                    ),
-                ],
+            return generateArrayTypeDefinition(
+                factory,
+                schemaTypeItemIndex,
+                nodeUrl,
+                node,
             );
 
         default:
             throw new Error("type not supported");
 
     }
+}
+
+function generateObjectTypeDefinition(
+    factory: ts.NodeFactory,
+    schemaTypeItemIndex: Map<string, SchemaTypeNameItem>,
+    nodeUrl: URL,
+    node: unknown,
+): ts.TypeNode {
+    const properties = [...selectNodePropertyEntries(nodeUrl, node)];
+    const requiredProperties = new Set(selectNodeRequiredProperties(node) ?? []);
+
+    return factory.createTypeLiteralNode(properties.map(
+        ([nodeUrl, node, key]) => factory.createPropertySignature(
+            undefined,
+            key,
+            requiredProperties.has(key) ?
+                undefined :
+                factory.createToken(ts.SyntaxKind.QuestionToken),
+            generateTypeReference(factory, schemaTypeItemIndex, nodeUrl),
+        )),
+    );
+}
+
+function generateArrayTypeDefinition(
+    factory: ts.NodeFactory,
+    schemaTypeItemIndex: Map<string, SchemaTypeNameItem>,
+    nodeUrl: URL,
+    node: unknown,
+): ts.TypeNode {
+    const prefixItemEntries = [...selectNodePrefixItemEntries(
+        nodeUrl,
+        node,
+    )];
+
+    const itemEntries = [...selectNodeItemEntries(
+        nodeUrl,
+        node,
+    )];
+
+    if (itemEntries.length === 1) {
+        const [itemNodeUrl, itemNode] = itemEntries[0];
+        return factory.createTypeReferenceNode(
+            "Array",
+            [
+                generateTypeReference(factory, schemaTypeItemIndex, itemNodeUrl),
+            ],
+        );
+    }
+
+    return factory.createTypeReferenceNode(
+        "Array",
+        [
+            factory.createKeywordTypeNode(
+                ts.SyntaxKind.UnknownKeyword,
+            ),
+        ],
+    );
 }
 
 function resolveDynamicReference(
