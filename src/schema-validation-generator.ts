@@ -136,9 +136,69 @@ export class SchemaValidationGenerator {
             );
         }
 
-        const anyOfEntries = selectNodeAnyOfEntries(nodeItem.nodeUrl, nodeItem.node);
+        const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodeUrl, nodeItem.node)];
+        if (anyOfEntries.length > 0) {
+            yield this.factory.createBlock([
+                this.factory.createVariableStatement(
+                    undefined,
+                    this.factory.createVariableDeclarationList([
+                        this.factory.createVariableDeclaration(
+                            this.factory.createIdentifier("validCount"),
+                            undefined,
+                            undefined,
+                            this.factory.createNumericLiteral("0"),
+                        ),
+                    ], ts.NodeFlags.Let),
+                ),
+                this.factory.createIfStatement(
+                    this.factory.createBinaryExpression(
+                        this.factory.createIdentifier("validCount"),
+                        this.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                        this.factory.createNumericLiteral("0"),
+                    ),
+                    this.factory.createBlock([
+                        this.factory.createThrowStatement(this.factory.createNewExpression(
+                            this.factory.createIdentifier("Error"),
+                            undefined,
+                            [this.factory.createStringLiteral("invalid")],
+                        )),
+                    ], true),
+                    undefined,
+                ),
+            ], true);
+        }
 
-        const oneOfEntries = selectNodeOneOfEntries(nodeItem.nodeUrl, nodeItem.node);
+        const oneOfEntries = [...selectNodeOneOfEntries(nodeItem.nodeUrl, nodeItem.node)];
+        if (oneOfEntries.length > 0) {
+            yield this.factory.createBlock([
+                this.factory.createVariableStatement(
+                    undefined,
+                    this.factory.createVariableDeclarationList([
+                        this.factory.createVariableDeclaration(
+                            this.factory.createIdentifier("validCount"),
+                            undefined,
+                            undefined,
+                            this.factory.createNumericLiteral("0"),
+                        ),
+                    ], ts.NodeFlags.Let),
+                ),
+                this.factory.createIfStatement(
+                    this.factory.createBinaryExpression(
+                        this.factory.createIdentifier("validCount"),
+                        this.factory.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                        this.factory.createNumericLiteral("1"),
+                    ),
+                    this.factory.createBlock([
+                        this.factory.createThrowStatement(this.factory.createNewExpression(
+                            this.factory.createIdentifier("Error"),
+                            undefined,
+                            [this.factory.createStringLiteral("invalid")],
+                        )),
+                    ], true),
+                    undefined,
+                ),
+            ], true);
+        }
 
         const allOfEntries = selectNodeAllOfEntries(nodeItem.nodeUrl, nodeItem.node);
         for (const allOfEntry of allOfEntries) {
