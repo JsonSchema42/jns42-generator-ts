@@ -5,8 +5,9 @@ import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
 import { SchemaTypeGenerator } from "./schema-type-generator.js";
+import { SchemaValidationGenerator } from "./schema-validation-generator.js";
 
-test("schema-type-generator", async t => {
+test("schema-generator", async t => {
     const instanceUrl = new URL("https://json-schema.org/draft/2020-12/schema");
     const schemaCollection = await SchemaCollection.loadFromUrl(instanceUrl);
 
@@ -18,12 +19,30 @@ test("schema-type-generator", async t => {
         schemaIndexer,
         schemaNamer,
     );
+    const schemaValidationGenerator = new SchemaValidationGenerator(
+        ts.factory,
+        schemaCollection,
+        schemaIndexer,
+        schemaNamer,
+    );
 
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,
     });
 
-    const nodes = [...schemaTypeGenerator.generateTypeDeclarations()];
+    const nodes = [
+        ts.factory.createImportDeclaration(
+            undefined,
+            ts.factory.createImportClause(
+                false,
+                undefined,
+                ts.factory.createNamespaceImport(ts.factory.createIdentifier("validation")),
+            ),
+            ts.factory.createStringLiteral("./utils/validation.js"),
+        ),
+        ...schemaTypeGenerator.generateTypeDeclarations(),
+        ...schemaValidationGenerator.generateFunctionDeclarations(),
+    ];
 
     const sourceFile = ts.factory.createSourceFile(
         nodes,
@@ -33,5 +52,5 @@ test("schema-type-generator", async t => {
 
     const content = printer.printFile(sourceFile);
 
-    fs.writeFileSync(".schema.ts", content);
+    fs.writeFileSync("src/.schema.ts", content);
 });
