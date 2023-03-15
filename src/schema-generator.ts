@@ -2,7 +2,7 @@ import ts from "typescript";
 import { SchemaCollection } from "./schema-collection.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./schema-indexer.js";
 import { SchemaNamer } from "./schema-namer.js";
-import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeItemEntries, selectNodeOneOfEntries, selectNodePrefixItemEntries, selectNodePropertyEntries, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/node.js";
+import { selectNodeAdditionalPropertiesUrl, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeItemsUrl, selectNodeOneOfEntries, selectNodePrefixItemsUrls, selectNodeProperties, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/index.js";
 
 export class SchemaGenerator {
     constructor(
@@ -154,41 +154,79 @@ export class SchemaGenerator {
     generateObjectTypeDefinition(
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        const properties = [...selectNodePropertyEntries(nodeItem.nodeUrl, nodeItem.node)];
+        const additionalPropertiesUrl = selectNodeAdditionalPropertiesUrl(
+            nodeItem.nodeUrl,
+            nodeItem.node,
+        );
+
+        if (additionalPropertiesUrl != null) {
+            return this.factory.createTypeReferenceNode(
+                "Record",
+                [
+                    this.factory.createKeywordTypeNode(
+                        ts.SyntaxKind.StringKeyword,
+                    ),
+                    this.generateTypeReference(additionalPropertiesUrl),
+                ],
+            );
+        }
+
+        const properties = Object.fromEntries(
+            selectNodeProperties(nodeItem.nodeUrl, nodeItem.node) ?? [],
+        );
         const requiredProperties = new Set(selectNodeRequiredProperties(nodeItem.node) ?? []);
 
-        return this.factory.createTypeLiteralNode(properties.map(
-            ([nodeUrl, node, key]) => this.factory.createPropertySignature(
-                undefined,
-                key,
-                requiredProperties.has(key) ?
-                    undefined :
-                    this.factory.createToken(ts.SyntaxKind.QuestionToken),
-                this.generateTypeReference(nodeUrl),
-            )),
-        );
+        return this.factory.createTypeLiteralNode([
+            ...Object.entries(properties).map(
+                ([propertyName, propertyNodeUrl]) => this.factory.createPropertySignature(
+                    undefined,
+                    propertyName,
+                    requiredProperties.has(propertyName) ?
+                        undefined :
+                        this.factory.createToken(ts.SyntaxKind.QuestionToken),
+                    this.generateTypeReference(propertyNodeUrl),
+                ),
+            ),
+            ...[...requiredProperties].
+                filter(propertyName => properties[String(propertyName)] == null).
+                map(propertyName => this.factory.createPropertySignature(
+                    undefined,
+                    propertyName,
+                    undefined,
+                    this.factory.createKeywordTypeNode(
+                        ts.SyntaxKind.UnknownKeyword,
+                    ),
+                )),
+        ]);
     }
 
     generateArrayTypeDefinition(
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        const prefixItemEntries = [...selectNodePrefixItemEntries(
+        const prefixItemsUrls = selectNodePrefixItemsUrls(
             nodeItem.nodeUrl,
             nodeItem.node,
-        )];
+        );
 
-        const itemEntries = [...selectNodeItemEntries(
+        const itemsUrl = selectNodeItemsUrl(
             nodeItem.nodeUrl,
             nodeItem.node,
-        )];
+        );
 
-        if (itemEntries.length === 1) {
-            const [itemNodeUrl, itemNode] = itemEntries[0];
+        if (itemsUrl != null) {
             return this.factory.createTypeReferenceNode(
                 "Array",
                 [
-                    this.generateTypeReference(itemNodeUrl),
+                    this.generateTypeReference(itemsUrl),
                 ],
+            );
+        }
+
+        if (prefixItemsUrls != null) {
+            return this.factory.createTupleTypeNode(
+                prefixItemsUrls.map(
+                    prefixItemsUrl => this.generateTypeReference(prefixItemsUrl),
+                ),
             );
         }
 
