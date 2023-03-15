@@ -2,9 +2,9 @@ import * as fs from "fs";
 import test from "tape-promise/tape.js";
 import ts from "typescript";
 import { generateTypes } from "./generate.js";
+import { loadSchemaMap } from "./schema-collection.js";
 import { createSchemaNodeIndex } from "./schema-indexer.js";
-import { loadSchemaMap } from "./schema-loader.js";
-import { findSchemaTypeItems } from "./schema-types.js";
+import { findSchemaTypeItems } from "./schema-namer.js";
 
 test("schema-types", async t => {
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");

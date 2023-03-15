@@ -1,12 +1,14 @@
 import test from "tape-promise/tape.js";
-import { createSchemaNodeIndex } from "./schema-indexer.js";
-import { loadSchemaMap } from "./schema-loader.js";
+import { SchemaCollection } from "./schema-collection.js";
+import { SchemaIndexer } from "./schema-indexer.js";
 
 test("schema-indexer", async t => {
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
-    const schemaMap = await loadSchemaMap(schemaUrl);
+    const schemaCollection = await SchemaCollection.loadFromUrl(schemaUrl);
 
-    const schemaNodeIndex = createSchemaNodeIndex(schemaMap);
+    const schemaIndexer = new SchemaIndexer(schemaCollection);
 
-    t.equal(schemaNodeIndex.size, 332);
+    t.equal(schemaIndexer.anchorCount, 0);
+    t.equal(schemaIndexer.dynamicAnchorCount, 8);
+    t.equal(schemaIndexer.nodeCount, 99);
 });

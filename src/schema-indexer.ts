@@ -1,92 +1,99 @@
-import { SchemaMapItem } from "./schema-loader.js";
-import { selectNodeAnchorUrl, selectNodeChildEntries, selectNodeDynamicAnchorUrl, selectNodeIdUrl } from "./selectors/index.js";
+import { SchemaCollection } from "./schema-collection.js";
+import { selectNodeAnchorUrl, selectNodeDynamicAnchorUrl, selectNodeIdUrl, selectNodeInstanceEntries } from "./selectors/index.js";
 
-export enum SchemaNodeIdentifierType {
-    id,
-    anchor,
-    dynamicAnchor
-}
-
-export interface SchemaNodeIndexItem {
-    node: unknown;
-    idUrl: URL;
+export interface SchemaIndexerNodeItem {
+    instanceUrl: URL;
     nodeUrl: URL;
-    schemaUrl: URL;
-    referencingSchemaUrl: URL | null;
-    type: SchemaNodeIdentifierType;
+    node: unknown,
 }
 
-export function createSchemaNodeIndex(
-    schemaMap: Map<string, SchemaMapItem>,
-) {
-    const schemaNodeIndex = new Map<string, SchemaNodeIndexItem>();
+export class SchemaIndexer {
+    private anchorMap = new Map<string, URL>();
+    private dynamicAnchorMap = new Map<string, URL>();
+    private nodeItemMap = new Map<string, SchemaIndexerNodeItem>();
 
-    for (const { schemaUrl, referencingSchemaUrl, schemaNode } of schemaMap.values()) {
-        for (const item of emitItems(schemaUrl, schemaUrl, referencingSchemaUrl, schemaNode)) {
-            const nodeKey = String(item.idUrl);
-            if (schemaNodeIndex.has(nodeKey)) {
-                throw new Error("duplicate identifier");
-            }
-            schemaNodeIndex.set(nodeKey, item);
+    constructor(schemaCollection: SchemaCollection) {
+        this.loadFromSchemaCollectionInstanceItems(schemaCollection);
+    }
+
+    public get anchorCount() {
+        return this.anchorMap.size;
+    }
+
+    public get dynamicAnchorCount() {
+        return this.dynamicAnchorMap.size;
+    }
+
+    public get nodeCount() {
+        return this.nodeItemMap.size;
+    }
+
+    public getNodeItems(): Iterable<SchemaIndexerNodeItem> {
+        return this.nodeItemMap.values();
+    }
+
+    public getNodeItem(nodeUrl: URL): SchemaIndexerNodeItem | undefined {
+        const nodeKey = String(nodeUrl);
+
+        return this.nodeItemMap.get(nodeKey);
+    }
+
+    private loadFromSchemaCollectionInstanceItems(schemaCollection: SchemaCollection) {
+        for (const instanceItem of schemaCollection.getInstanceItems()) {
+            this.loadFromSchemaCollectionInstanceItem(
+                instanceItem.instanceUrl,
+                instanceItem.instanceUrl,
+                instanceItem.instanceNode,
+            );
         }
     }
 
-    return schemaNodeIndex;
+    private loadFromSchemaCollectionInstanceItem(
+        instanceUrl: URL,
+        nodeUrl: URL,
+        node: unknown,
+    ) {
+        const idUrl = selectNodeIdUrl(node);
+        if (idUrl != null) {
+            nodeUrl = idUrl;
+        }
 
-}
+        const anchorUrl = selectNodeAnchorUrl(nodeUrl, node);
+        if (anchorUrl != null) {
+            const anchorKey = String(anchorUrl);
+            if (this.anchorMap.has(anchorKey)) {
+                throw new Error("duplicate identifier");
+            }
+            this.anchorMap.set(anchorKey, nodeUrl);
+        }
 
-function* emitItems(
-    nodeUrl: URL,
-    schemaUrl: URL,
-    referencingSchemaUrl: URL | null,
-    node: unknown,
-): Iterable<SchemaNodeIndexItem> {
-    const idUrl = selectNodeIdUrl(node);
-    if (idUrl != null) {
-        nodeUrl = idUrl;
-    }
+        const dynamicAnchorUrl = selectNodeDynamicAnchorUrl(nodeUrl, node);
+        if (dynamicAnchorUrl != null) {
+            const dynamicAnchorKey = String(dynamicAnchorUrl);
+            if (this.dynamicAnchorMap.has(dynamicAnchorKey)) {
+                throw new Error("duplicate identifier");
+            }
+            this.dynamicAnchorMap.set(dynamicAnchorKey, nodeUrl);
+        }
 
-    const anchorUrl = selectNodeAnchorUrl(nodeUrl, node);
-    if (anchorUrl != null) {
-        yield {
-            node,
-            idUrl: anchorUrl,
+        const nodeKey = String(nodeUrl);
+        if (this.nodeItemMap.has(nodeKey)) {
+            throw new Error("duplicate identifier");
+        }
+        this.nodeItemMap.set(nodeKey, {
+            instanceUrl,
             nodeUrl,
-            schemaUrl,
-            referencingSchemaUrl: referencingSchemaUrl,
-            type: SchemaNodeIdentifierType.anchor,
-        };
-
-    }
-
-    const dynamicAnchorUrl = selectNodeDynamicAnchorUrl(nodeUrl, node);
-    if (dynamicAnchorUrl != null) {
-        yield {
             node,
-            idUrl: dynamicAnchorUrl,
-            nodeUrl,
-            schemaUrl,
-            referencingSchemaUrl: referencingSchemaUrl,
-            type: SchemaNodeIdentifierType.dynamicAnchor,
-        };
-    }
+        });
 
-    yield {
-        node,
-        idUrl: nodeUrl,
-        nodeUrl,
-        schemaUrl,
-        referencingSchemaUrl: referencingSchemaUrl,
-        type: SchemaNodeIdentifierType.id,
-    };
+        for (const [childNodeUrl, childNode] of selectNodeInstanceEntries(nodeUrl, node)) {
+            this.loadFromSchemaCollectionInstanceItem(
+                instanceUrl,
+                childNodeUrl,
+                childNode,
+            );
+        }
 
-    for (const [childNodeUrl, childNode] of selectNodeChildEntries(nodeUrl, node)) {
-        yield* emitItems(
-            childNodeUrl,
-            schemaUrl,
-            referencingSchemaUrl,
-            childNode,
-        );
     }
 
 }

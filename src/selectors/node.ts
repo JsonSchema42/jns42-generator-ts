@@ -302,19 +302,18 @@ export function* selectNodeAllOfEntries(
     }
 }
 
-export function* selectNodeChildEntries(
+export function* selectNodeInstanceEntries(
     nodeUrl: URL,
     node: unknown,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        for (const [key, subNode] of Object.entries(node)) {
-            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/${encodeURI(key)}`, nodeUrl);
-            yield [subNodeUrl, subNode] as const;
-        }
-    }
+    yield* selectNodeDefEntries(nodeUrl, node);
+    yield* selectNodePropertyEntries(nodeUrl, node);
+    yield* selectNodeAdditionalPropertyEntries(nodeUrl, node);
+    yield* selectNodePrefixItemEntries(nodeUrl, node);
+    yield* selectNodeItemEntries(nodeUrl, node);
+    yield* selectNodeAllOfEntries(nodeUrl, node);
+    yield* selectNodeAnyOfEntries(nodeUrl, node);
+    yield* selectNodeOneOfEntries(nodeUrl, node);
 }
 
 export function selectNodeRequiredProperties(

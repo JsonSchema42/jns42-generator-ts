@@ -1,6 +1,6 @@
 import ts from "typescript";
 import { SchemaNodeIndexItem } from "./schema-indexer.js";
-import { SchemaTypeNameItem } from "./schema-types.js";
+import { SchemaTypeNameItem } from "./schema-namer.js";
 import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDynamicRefUrl, selectNodeItemEntries, selectNodeOneOfEntries, selectNodePrefixItemEntries, selectNodePropertyEntries, selectNodeRefUrl, selectNodeRequiredProperties, selectNodeType } from "./selectors/node.js";
 
 export function* generateTypes(
