@@ -51,6 +51,18 @@ export class SchemaTypeGenerator {
     }
 
     generateTypeNode(nodeItem: SchemaIndexerNodeItem): ts.TypeNode {
+        if (nodeItem.node === true) {
+            return this.factory.createKeywordTypeNode(
+                ts.SyntaxKind.AnyKeyword,
+            );
+        }
+
+        if (nodeItem.node === false) {
+            return this.factory.createKeywordTypeNode(
+                ts.SyntaxKind.NeverKeyword,
+            );
+        }
+
         const nodeRefUrl = selectNodeRefUrl(nodeItem.nodeUrl, nodeItem.node);
         if (nodeRefUrl != null) {
             const resolvedUrl = this.resolveReference(nodeRefUrl);
@@ -109,17 +121,17 @@ export class SchemaTypeGenerator {
         }
 
         const types = selectNodeType(nodeItem.node);
-        if (types == null) {
-            return this.factory.createKeywordTypeNode(
-                ts.SyntaxKind.UnknownKeyword,
+        if (types != null) {
+            return this.factory.createUnionTypeNode(
+                types.map(type => this.generateTypeDefinition(
+                    type,
+                    nodeItem,
+                )),
             );
         }
 
-        return this.factory.createUnionTypeNode(
-            types.map(type => this.generateTypeDefinition(
-                type,
-                nodeItem,
-            )),
+        return this.factory.createKeywordTypeNode(
+            ts.SyntaxKind.UnknownKeyword,
         );
     }
 
@@ -213,7 +225,7 @@ export class SchemaTypeGenerator {
                     propertyName,
                     undefined,
                     this.factory.createKeywordTypeNode(
-                        ts.SyntaxKind.UnknownKeyword,
+                        ts.SyntaxKind.AnyKeyword,
                     ),
                 )),
         ]);
@@ -231,7 +243,6 @@ export class SchemaTypeGenerator {
             nodeItem.nodeUrl,
             nodeItem.node,
         );
-
         if (itemsUrl != null) {
             return this.factory.createTypeReferenceNode(
                 "Array",

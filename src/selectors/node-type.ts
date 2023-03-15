@@ -8,8 +8,7 @@ export function* selectNodeDefEntries(
     ) {
         if (
             "$defs" in node &&
-            node.$defs != null &&
-            typeof node.$defs === "object"
+            node.$defs != null && typeof node.$defs === "object"
         ) {
             for (const [key, subNode] of Object.entries(node.$defs)) {
                 const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/$defs/${encodeURI(key)}`, nodeUrl);
@@ -29,8 +28,7 @@ export function* selectNodePropertyEntries(
     ) {
         if (
             "properties" in node &&
-            node.properties != null &&
-            typeof node.properties === "object"
+            node.properties != null && typeof node.properties === "object"
         ) {
             for (const [key, subNode] of Object.entries(node.properties)) {
                 const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/properties/${encodeURI(key)}`, nodeUrl);
@@ -50,24 +48,11 @@ export function* selectNodeAdditionalPropertyEntries(
     ) {
         if (
             "additionalProperties" in node &&
-            node.additionalProperties != null &&
-            typeof node.additionalProperties === "object"
-        ) {
-            const subNode = node.additionalProperties;
-            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/additionalProperties`, nodeUrl);
-            yield [subNodeUrl, subNode] as const;
-        }
-        else if (
-            "additionalProperties" in node &&
-            node.additionalProperties === true
-        ) {
-            const subNode = node.additionalProperties;
-            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/additionalProperties`, nodeUrl);
-            yield [subNodeUrl, subNode] as const;
-        }
-        else if (
-            "additionalProperties" in node &&
-            node.additionalProperties === false
+            (
+                node.additionalProperties != null && typeof node.additionalProperties === "object" ||
+                typeof node.additionalProperties === "boolean"
+            )
+
         ) {
             const subNode = node.additionalProperties;
             const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/additionalProperties`, nodeUrl);
@@ -106,8 +91,10 @@ export function* selectNodeItemEntries(
     ) {
         if (
             "items" in node &&
-            typeof node.items === "object" &&
-            node.items != null
+            (
+                typeof node.items === "object" && node.items != null ||
+                typeof node.items === "boolean"
+            )
         ) {
             const subNode = node.items;
             const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/items`, nodeUrl);

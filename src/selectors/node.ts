@@ -88,8 +88,11 @@ export function selectNodeItemsUrl(
     ) {
         if (
             "items" in node &&
-            node.items != null &&
-            typeof node.items === "object"
+            (
+                node.items != null && typeof node.items === "object" ||
+                typeof node.items === "boolean"
+            )
+
         ) {
             return new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/items`, nodeUrl);
         }
@@ -106,8 +109,7 @@ export function selectNodePrefixItemsUrls(
     ) {
         if (
             "prefixItems" in node &&
-            node.prefixItems != null &&
-            Array.isArray(node.prefixItems)
+            node.prefixItems != null && Array.isArray(node.prefixItems)
         ) {
             return Object.entries(node.prefixItems).map(([key]) =>
                 new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/prefixItems/${encodeURI(key)}`, nodeUrl),
