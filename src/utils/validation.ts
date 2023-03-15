@@ -103,7 +103,7 @@ export function validateMinimum(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.2.5
  */
-export function validateExclusiveMimimun(
+export function validateExclusiveMinimum(
     value: number,
     argument: number,
 ) {
