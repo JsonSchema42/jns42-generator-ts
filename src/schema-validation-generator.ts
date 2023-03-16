@@ -174,218 +174,92 @@ export class SchemaValidationGenerator {
             );
         }
 
-        yield* this.generateAnyOfValidationStatements(nodeItem);
-        yield* this.generateOneOfValidationStatements(nodeItem);
-        yield* this.generateAllOfValidationStatements(nodeItem);
-    }
-
-    *generateAnyOfValidationStatements(
-        nodeItem: SchemaIndexerNodeItem,
-    ) {
         const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodeUrl, nodeItem.node)];
         if (anyOfEntries.length > 0) {
-            yield this.factory.createBlock([
-                this.factory.createVariableStatement(
-                    undefined,
-                    this.factory.createVariableDeclarationList([
-                        this.factory.createVariableDeclaration(
-                            this.factory.createIdentifier("validCount"),
-                            undefined,
-                            undefined,
-                            this.factory.createNumericLiteral("0"),
-                        ),
-                    ], ts.NodeFlags.Let),
-                ),
-
-                ...anyOfEntries.map(anyOfEntry => {
-                    const [url] = anyOfEntry;
-                    const name = this.schemaNamer.getName(url);
-
-                    if (name == null) {
-                        throw new Error("name not found");
-                    }
-
-                    return this.factory.createBlock([
-                        this.factory.createVariableStatement(
-                            undefined,
-                            this.factory.createVariableDeclarationList([
-                                this.factory.createVariableDeclaration(
-                                    this.factory.createIdentifier("invalidPaths"),
-                                    undefined,
-                                    undefined,
-                                    this.factory.createArrayLiteralExpression([
-                                        this.factory.createSpreadElement(
-                                            this.factory.createCallExpression(
-                                                this.factory.createIdentifier(`validate${name}`),
-                                                undefined,
-                                                [
-                                                    this.factory.createAsExpression(
-                                                        this.factory.createIdentifier("value"),
-                                                        this.factory.createTypeReferenceNode(name),
-                                                    ),
-                                                    this.factory.createIdentifier("path"),
-                                                ],
-                                            ),
-                                        ),
-                                    ], true),
-                                ),
-                            ], ts.NodeFlags.Const),
-                        ),
-                        this.factory.createIfStatement(
-                            this.factory.createBinaryExpression(
-                                this.factory.createPropertyAccessExpression(
-                                    this.factory.createIdentifier("invalidPaths"),
-                                    this.factory.createIdentifier("length"),
-                                ),
-                                this.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-                                this.factory.createNumericLiteral(0),
-                            ),
-                            this.factory.createBlock([
-                                this.factory.createExpressionStatement(
-                                    this.factory.createPostfixUnaryExpression(
-                                        this.factory.createIdentifier("validCount"),
-                                        ts.SyntaxKind.PlusPlusToken,
-                                    ),
-                                ),
-                            ], true),
-                        ),
-                    ], true);
-                }),
-
-                this.factory.createIfStatement(
-                    this.factory.createBinaryExpression(
-                        this.factory.createIdentifier("validCount"),
-                        this.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-                        this.factory.createNumericLiteral("0"),
-                    ),
-                    this.factory.createBlock([
-                        this.factory.createExpressionStatement(this.factory.createYieldExpression(
-                            undefined,
-                            this.factory.createIdentifier("path"),
-                        )),
-                    ], true),
-                    undefined,
-                ),
-            ], true);
-        }
-    }
-
-    *generateOneOfValidationStatements(
-        nodeItem: SchemaIndexerNodeItem,
-    ) {
-        const oneOfEntries = [...selectNodeOneOfEntries(nodeItem.nodeUrl, nodeItem.node)];
-        if (oneOfEntries.length > 0) {
-            yield this.factory.createBlock([
-                this.factory.createVariableStatement(
-                    undefined,
-                    this.factory.createVariableDeclarationList([
-                        this.factory.createVariableDeclaration(
-                            this.factory.createIdentifier("validCount"),
-                            undefined,
-                            undefined,
-                            this.factory.createNumericLiteral("0"),
-                        ),
-                    ], ts.NodeFlags.Let),
-                ),
-
-                ...oneOfEntries.map(oneOfEntry => {
-                    const [url] = oneOfEntry;
-                    const name = this.schemaNamer.getName(url);
-
-                    if (name == null) {
-                        throw new Error("name not found");
-                    }
-
-                    return this.factory.createBlock([
-                        this.factory.createVariableStatement(
-                            undefined,
-                            this.factory.createVariableDeclarationList([
-                                this.factory.createVariableDeclaration(
-                                    this.factory.createIdentifier("invalidPaths"),
-                                    undefined,
-                                    undefined,
-                                    this.factory.createArrayLiteralExpression([
-                                        this.factory.createSpreadElement(
-                                            this.factory.createCallExpression(
-                                                this.factory.createIdentifier(`validate${name}`),
-                                                undefined,
-                                                [
-                                                    this.factory.createAsExpression(
-                                                        this.factory.createIdentifier("value"),
-                                                        this.factory.createTypeReferenceNode(name),
-                                                    ),
-                                                    this.factory.createIdentifier("path"),
-                                                ],
-                                            ),
-                                        ),
-                                    ], true),
-                                ),
-                            ], ts.NodeFlags.Const),
-                        ),
-                        this.factory.createIfStatement(
-                            this.factory.createBinaryExpression(
-                                this.factory.createPropertyAccessExpression(
-                                    this.factory.createIdentifier("invalidPaths"),
-                                    this.factory.createIdentifier("length"),
-                                ),
-                                this.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-                                this.factory.createNumericLiteral(0),
-                            ),
-                            this.factory.createBlock([
-                                this.factory.createExpressionStatement(
-                                    this.factory.createPostfixUnaryExpression(
-                                        this.factory.createIdentifier("validCount"),
-                                        ts.SyntaxKind.PlusPlusToken,
-                                    ),
-                                ),
-                            ], true),
-                        ),
-                    ], true);
-                }),
-
-                this.factory.createIfStatement(
-                    this.factory.createBinaryExpression(
-                        this.factory.createIdentifier("validCount"),
-                        this.factory.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
-                        this.factory.createNumericLiteral("1"),
-                    ),
-                    this.factory.createBlock([
-                        this.factory.createExpressionStatement(this.factory.createYieldExpression(
-                            undefined,
-                            this.factory.createIdentifier("path"),
-                        )),
-                    ], true),
-                    undefined,
-                ),
-            ], true);
-        }
-    }
-
-    *generateAllOfValidationStatements(
-        nodeItem: SchemaIndexerNodeItem,
-    ) {
-        const allOfEntries = selectNodeAllOfEntries(nodeItem.nodeUrl, nodeItem.node);
-        for (const allOfEntry of allOfEntries) {
-            const [url] = allOfEntry;
-            const name = this.schemaNamer.getName(url);
-
-            if (name == null) {
-                throw new Error("name not found");
-            }
-
             yield this.factory.createExpressionStatement(this.factory.createYieldExpression(
                 this.factory.createToken(ts.SyntaxKind.AsteriskToken),
                 this.factory.createCallExpression(
-                    this.factory.createIdentifier(`validate${name}`),
+                    this.factory.createPropertyAccessExpression(
+                        this.factory.createIdentifier("validation"),
+                        this.factory.createIdentifier("validateAnyOf"),
+                    ),
                     undefined,
                     [
                         this.factory.createIdentifier("value"),
-                        this.factory.createIdentifier("path"),
+                        this.factory.createArrayLiteralExpression(
+                            anyOfEntries.map(entry => {
+                                const [url] = entry;
+                                const name = this.schemaNamer.getName(url);
+
+                                if (name == null) {
+                                    throw new Error("name not found");
+                                }
+                                return this.factory.createIdentifier(`validate${name}`);
+                            }),
+                            true,
+                        ),
                     ],
                 )),
             );
         }
 
+        const oneOfEntries = [...selectNodeOneOfEntries(nodeItem.nodeUrl, nodeItem.node)];
+        if (oneOfEntries.length > 0) {
+            yield this.factory.createExpressionStatement(this.factory.createYieldExpression(
+                this.factory.createToken(ts.SyntaxKind.AsteriskToken),
+                this.factory.createCallExpression(
+                    this.factory.createPropertyAccessExpression(
+                        this.factory.createIdentifier("validation"),
+                        this.factory.createIdentifier("validateOneOf"),
+                    ),
+                    undefined,
+                    [
+                        this.factory.createIdentifier("value"),
+                        this.factory.createArrayLiteralExpression(
+                            oneOfEntries.map(entry => {
+                                const [url] = entry;
+                                const name = this.schemaNamer.getName(url);
+
+                                if (name == null) {
+                                    throw new Error("name not found");
+                                }
+                                return this.factory.createIdentifier(`validate${name}`);
+                            }),
+                            true,
+                        ),
+                    ],
+                )),
+            );
+        }
+
+        const allOfEntries = [...selectNodeAllOfEntries(nodeItem.nodeUrl, nodeItem.node)];
+        if (allOfEntries.length > 0) {
+            yield this.factory.createExpressionStatement(this.factory.createYieldExpression(
+                this.factory.createToken(ts.SyntaxKind.AsteriskToken),
+                this.factory.createCallExpression(
+                    this.factory.createPropertyAccessExpression(
+                        this.factory.createIdentifier("validation"),
+                        this.factory.createIdentifier("validateAllOf"),
+                    ),
+                    undefined,
+                    [
+                        this.factory.createIdentifier("value"),
+                        this.factory.createArrayLiteralExpression(
+                            allOfEntries.map(entry => {
+                                const [url] = entry;
+                                const name = this.schemaNamer.getName(url);
+
+                                if (name == null) {
+                                    throw new Error("name not found");
+                                }
+                                return this.factory.createIdentifier(`validate${name}`);
+                            }),
+                            true,
+                        ),
+                    ],
+                )),
+            );
+        }
     }
 
     *generateTypeValidationStatements(
