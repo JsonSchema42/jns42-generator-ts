@@ -249,3 +249,42 @@ export function validateDependentRequired(
 ) {
     throw new Error("Not implemented");
 }
+
+export function* validateAnyOf<V, E>(
+    value: V,
+    validators: Array<(value: V) => Iterable<E>>,
+): Iterable<E> {
+    const errorLists = new Array<E[]>();
+    for (const validator of validators) {
+        errorLists.push([...validator(value)]);
+    }
+    if (validators.length === errorLists.length) {
+        for (const errorList of errorLists) {
+            yield* errorList;
+        }
+    }
+}
+
+export function* validateOneOf<V, E>(
+    value: V,
+    validators: Array<(value: V) => Iterable<E>>,
+): Iterable<E> {
+    const errorLists = new Array<E[]>();
+    for (const validator of validators) {
+        errorLists.push([...validator(value)]);
+    }
+    if (validators.length !== errorLists.length - 1) {
+        for (const errorList of errorLists) {
+            yield* errorList;
+        }
+    }
+}
+
+export function* validateAllOf<V, E>(
+    value: V,
+    validators: Array<(value: V) => Iterable<E>>,
+): Iterable<E> {
+    for (const validator of validators) {
+        yield* validator(value);
+    }
+}
