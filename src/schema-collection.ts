@@ -4,6 +4,7 @@ export interface SchemaCollectionInstanceItem {
     instanceNode: unknown;
     instanceUrl: URL;
     referencingInstanceUrl: URL | null;
+    schemaUrl: URL;
 }
 
 export class SchemaCollection {
@@ -43,15 +44,17 @@ export class SchemaCollection {
 
     public static async loadFromUrl(
         instanceUrl: URL,
+        schemaUrl: URL,
     ) {
         const instance = new SchemaCollection();
-        await instance.loadInstance(instanceUrl, null);
+        await instance.loadInstance(instanceUrl, null, schemaUrl);
         return instance;
     }
 
     private async loadInstance(
         instanceUrl: URL,
         referencingInstanceUrl: URL | null,
+        defaultSchemaUrl: URL,
     ) {
         const instanceKey = String(instanceUrl);
         const instanceMapItem = this.instanceItemMap.get(instanceKey);
@@ -60,24 +63,38 @@ export class SchemaCollection {
         }
 
         const instanceNode = await fetchInstance(instanceUrl);
+        let schemaUrl;
+        if (
+            "$schema" in instanceNode &&
+            typeof instanceNode.$schema === "string"
+        ) {
+            schemaUrl = new URL(instanceNode.$schema);
+        }
+        else {
+            schemaUrl = new URL(defaultSchemaUrl);
+        }
+
         this.instanceItemMap.set(
             instanceKey,
             {
-                instanceNode: instanceNode,
-                instanceUrl: instanceUrl,
-                referencingInstanceUrl: referencingInstanceUrl,
+                instanceNode,
+                instanceUrl,
+                referencingInstanceUrl,
+                schemaUrl,
             },
         );
 
         await this.loadInstanceReferences(
             instanceUrl,
             instanceNode,
+            schemaUrl,
         );
     }
 
     private async loadInstanceReferences(
         nodeUrl: URL,
         node: unknown,
+        schemaUrl: URL,
     ) {
         const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
 
@@ -87,6 +104,7 @@ export class SchemaCollection {
             await this.loadInstance(
                 referenceInstanceUrl,
                 referencingInstanceUrl,
+                schemaUrl,
             );
         }
 
@@ -94,6 +112,7 @@ export class SchemaCollection {
             await this.loadInstanceReferences(
                 childNodeUrl,
                 childNode,
+                schemaUrl,
             );
         }
     }
