@@ -259,10 +259,9 @@ export class SchemaValidationGenerator {
                         this.factory.createNumericLiteral("0"),
                     ),
                     this.factory.createBlock([
-                        this.factory.createThrowStatement(this.factory.createNewExpression(
-                            this.factory.createIdentifier("Error"),
+                        this.factory.createExpressionStatement(this.factory.createYieldExpression(
                             undefined,
-                            [this.factory.createStringLiteral("invalid")],
+                            this.factory.createIdentifier("path"),
                         )),
                     ], true),
                     undefined,
@@ -351,10 +350,9 @@ export class SchemaValidationGenerator {
                         this.factory.createNumericLiteral("1"),
                     ),
                     this.factory.createBlock([
-                        this.factory.createThrowStatement(this.factory.createNewExpression(
-                            this.factory.createIdentifier("Error"),
+                        this.factory.createExpressionStatement(this.factory.createYieldExpression(
                             undefined,
-                            [this.factory.createStringLiteral("invalid")],
+                            this.factory.createIdentifier("path"),
                         )),
                     ], true),
                     undefined,
