@@ -198,6 +198,7 @@ export class SchemaValidationGenerator {
                             }),
                             true,
                         ),
+                        this.factory.createIdentifier("path"),
                     ],
                 )),
             );
@@ -227,6 +228,7 @@ export class SchemaValidationGenerator {
                             }),
                             true,
                         ),
+                        this.factory.createIdentifier("path"),
                     ],
                 )),
             );
@@ -256,6 +258,7 @@ export class SchemaValidationGenerator {
                             }),
                             true,
                         ),
+                        this.factory.createIdentifier("path"),
                     ],
                 )),
             );

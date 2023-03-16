@@ -252,11 +252,12 @@ export function validateDependentRequired(
 
 export function* validateAnyOf<E>(
     value: unknown,
-    validators: Array<(value: any) => Iterable<E>>,
+    validators: Array<(value: any, path: string[]) => Iterable<E>>,
+    path: string[],
 ): Iterable<E> {
     const errorLists = new Array<E[]>();
     for (const validator of validators) {
-        errorLists.push([...validator(value)]);
+        errorLists.push([...validator(value, path)]);
     }
     if (validators.length === errorLists.length) {
         for (const errorList of errorLists) {
@@ -267,11 +268,12 @@ export function* validateAnyOf<E>(
 
 export function* validateOneOf<E>(
     value: unknown,
-    validators: Array<(value: any) => Iterable<E>>,
+    validators: Array<(value: any, path: string[]) => Iterable<E>>,
+    path: string[],
 ): Iterable<E> {
     const errorLists = new Array<E[]>();
     for (const validator of validators) {
-        errorLists.push([...validator(value)]);
+        errorLists.push([...validator(value, path)]);
     }
     if (validators.length !== errorLists.length - 1) {
         for (const errorList of errorLists) {
@@ -282,9 +284,10 @@ export function* validateOneOf<E>(
 
 export function* validateAllOf<E>(
     value: unknown,
-    validators: Array<(value: any) => Iterable<E>>,
+    validators: Array<(value: any, path: string[]) => Iterable<E>>,
+    path: string[],
 ): Iterable<E> {
     for (const validator of validators) {
-        yield* validator(value);
+        yield* validator(value, path);
     }
 }
