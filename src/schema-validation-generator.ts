@@ -106,7 +106,7 @@ export class SchemaValidationGenerator {
         );
 
         const testExpression = this.generateCallValidatorExpression(
-            "validateType",
+            "isValidType",
             type,
         );
 
@@ -125,12 +125,12 @@ export class SchemaValidationGenerator {
 
         if (constValue != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateConst", constValue),
+                this.generateCallValidatorExpression("isValidConst", constValue),
             );
         }
         if (enumValues != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateEnum", enumValues),
+                this.generateCallValidatorExpression("isValidEnum", enumValues),
             );
         }
 
@@ -310,17 +310,17 @@ export class SchemaValidationGenerator {
 
         if (minItems != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMinItems", minItems),
+                this.generateCallValidatorExpression("isValidMinItems", minItems),
             );
         }
         if (maxItems != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMaxItems", maxItems),
+                this.generateCallValidatorExpression("isValidMaxItems", maxItems),
             );
         }
         if (uniqueItems != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateUniqueItems", uniqueItems),
+                this.generateCallValidatorExpression("isValidUniqueItems", uniqueItems),
             );
         }
 
@@ -432,17 +432,17 @@ export class SchemaValidationGenerator {
 
         if (minProperties != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMinProperties", minProperties),
+                this.generateCallValidatorExpression("isValidMinProperties", minProperties),
             );
         }
         if (maxProperties != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMaxProperties", maxProperties),
+                this.generateCallValidatorExpression("isValidMaxProperties", maxProperties),
             );
         }
         if (required != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateRequired", required),
+                this.generateCallValidatorExpression("isValidRequired", required),
             );
         }
 
@@ -556,17 +556,17 @@ export class SchemaValidationGenerator {
 
         if (minLength != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMinLength", minLength),
+                this.generateCallValidatorExpression("isValidMinLength", minLength),
             );
         }
         if (maxLength != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMaxLength", maxLength),
+                this.generateCallValidatorExpression("isValidMaxLength", maxLength),
             );
         }
         if (pattern != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validatePattern", pattern),
+                this.generateCallValidatorExpression("isValidPattern", pattern),
             );
         }
     }
@@ -582,27 +582,27 @@ export class SchemaValidationGenerator {
 
         if (minimum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMinimum", minimum),
+                this.generateCallValidatorExpression("isValidMinimum", minimum),
             );
         }
         if (exclusiveMinimum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateExclusiveMinimum", exclusiveMinimum),
+                this.generateCallValidatorExpression("isValidExclusiveMinimum", exclusiveMinimum),
             );
         }
         if (maximum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMaximum", maximum),
+                this.generateCallValidatorExpression("isValidMaximum", maximum),
             );
         }
         if (exclusiveMaximum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateExclusiveMaximum", exclusiveMaximum),
+                this.generateCallValidatorExpression("isValidExclusiveMaximum", exclusiveMaximum),
             );
         }
         if (multipleOf != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMultipleOf", multipleOf),
+                this.generateCallValidatorExpression("isValidMultipleOf", multipleOf),
             );
         }
     }
@@ -618,27 +618,27 @@ export class SchemaValidationGenerator {
 
         if (minimum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMinimum", minimum),
+                this.generateCallValidatorExpression("isValidMinimum", minimum),
             );
         }
         if (exclusiveMinimum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateExclusiveMinimum", exclusiveMinimum),
+                this.generateCallValidatorExpression("isValidExclusiveMinimum", exclusiveMinimum),
             );
         }
         if (maximum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMaximum", maximum),
+                this.generateCallValidatorExpression("isValidMaximum", maximum),
             );
         }
         if (exclusiveMaximum != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateExclusiveMaximum", exclusiveMaximum),
+                this.generateCallValidatorExpression("isValidExclusiveMaximum", exclusiveMaximum),
             );
         }
         if (multipleOf != null) {
             yield this.wrapValidationExpression(
-                this.generateCallValidatorExpression("validateMultipleOf", multipleOf),
+                this.generateCallValidatorExpression("isValidMultipleOf", multipleOf),
             );
         }
     }

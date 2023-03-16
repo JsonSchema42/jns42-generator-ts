@@ -2,7 +2,7 @@
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.1.1
  */
-export function validateType(
+export function isValidType(
     value: unknown,
     argument: "null" | "array" | "object" | "string" | "number" | "integer" | "boolean",
 ) {
@@ -34,7 +34,7 @@ export function validateType(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.1.2
  */
-export function validateEnum(
+export function isValidEnum(
     value: unknown,
     argument: unknown[],
 ) {
@@ -48,7 +48,7 @@ export function validateEnum(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.1.3
  */
-export function validateConst(
+export function isValidConst(
     value: unknown,
     argument: unknown,
 ) {
@@ -59,7 +59,7 @@ export function validateConst(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.2.1
  */
-export function validateMultipleOf(
+export function isValidMultipleOf(
     value: number,
     argument: number,
 ) {
@@ -70,7 +70,7 @@ export function validateMultipleOf(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.2.2
  */
-export function validateMaximum(
+export function isValidMaximum(
     value: number,
     argument: number,
 ) {
@@ -81,7 +81,7 @@ export function validateMaximum(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.2.3
  */
-export function validateExclusiveMaximum(
+export function isValidExclusiveMaximum(
     value: number,
     argument: number,
 ) {
@@ -92,7 +92,7 @@ export function validateExclusiveMaximum(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.2.4
  */
-export function validateMinimum(
+export function isValidMinimum(
     value: number,
     argument: number,
 ) {
@@ -103,7 +103,7 @@ export function validateMinimum(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.2.5
  */
-export function validateExclusiveMinimum(
+export function isValidExclusiveMinimum(
     value: number,
     argument: number,
 ) {
@@ -114,7 +114,7 @@ export function validateExclusiveMinimum(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.3.1
  */
-export function validateMaxLength(
+export function isValidMaxLength(
     value: string,
     argument: number,
 ) {
@@ -125,7 +125,7 @@ export function validateMaxLength(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.3.2
  */
-export function validateMinLength(
+export function isValidMinLength(
     value: string,
     argument: number,
 ) {
@@ -136,7 +136,7 @@ export function validateMinLength(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.3.3
  */
-export function validatePattern(
+export function isValidPattern(
     value: string,
     argument: string,
 ) {
@@ -149,7 +149,7 @@ export function validatePattern(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.4.1
  */
-export function validateMaxItems(
+export function isValidMaxItems(
     value: Array<unknown>,
     argument: number,
 ) {
@@ -160,7 +160,7 @@ export function validateMaxItems(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.4.2
  */
-export function validateMinItems(
+export function isValidMinItems(
     value: Array<unknown>,
     argument: number,
 ) {
@@ -171,7 +171,7 @@ export function validateMinItems(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.4.3
  */
-export function validateUniqueItems(
+export function isValidUniqueItems(
     value: Array<unknown>,
     argument: boolean,
 ) {
@@ -185,7 +185,7 @@ export function validateUniqueItems(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.4.4
  */
-export function validateMaxContains(
+export function isValidMaxContains(
     value: unknown,
     argument: unknown,
 ) {
@@ -196,7 +196,7 @@ export function validateMaxContains(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.4.5
  */
-export function validateMinContains(
+export function isValidMinContains(
     value: unknown,
     argument: unknown,
 ) {
@@ -207,7 +207,7 @@ export function validateMinContains(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.5.1
  */
-export function validateMaxProperties(
+export function isValidMaxProperties(
     value: object,
     argument: number,
 ) {
@@ -218,7 +218,7 @@ export function validateMaxProperties(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.5.2
  */
-export function validateMinProperties(
+export function isValidMinProperties(
     value: object,
     argument: number,
 ) {
@@ -229,7 +229,7 @@ export function validateMinProperties(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.5.3
  */
-export function validateRequired<T extends Record<string, unknown>>(
+export function isValidRequired<T extends Record<string, unknown>>(
     value: T,
     argument: Array<keyof T>,
 ) {
@@ -243,7 +243,7 @@ export function validateRequired<T extends Record<string, unknown>>(
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.5.4
  */
-export function validateDependentRequired(
+export function isValidDependentRequired(
     value: unknown,
     type: string,
 ) {
