@@ -26,6 +26,8 @@ test("schema-generator", async t => {
         schemaNamer,
     );
 
+    const banner = "/* eslint-disable */\n\n";
+
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,
     });
@@ -50,7 +52,7 @@ test("schema-generator", async t => {
         ts.NodeFlags.None,
     );
 
-    const content = printer.printFile(sourceFile);
+    const content = banner + printer.printFile(sourceFile);
 
     fs.writeFileSync("src/.schema.ts", content);
 });
