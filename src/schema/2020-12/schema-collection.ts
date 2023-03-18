@@ -1,7 +1,8 @@
 import { selectNodeInstanceEntries, selectNodeRefUrl } from "../../selectors/index.js";
+import { SchemaNode } from "./node.js";
 
 export interface SchemaCollectionInstanceItem {
-    instanceNode: unknown;
+    instanceNode: SchemaNode;
     instanceUrl: URL;
     referencingInstanceUrl: URL | null;
     schemaUrl: URL;
@@ -28,20 +29,6 @@ export class SchemaCollection {
         return this.instanceItemMap.get(instanceKey);
     }
 
-    public *getReferenceChainUrls(instanceUrl: URL): Iterable<URL> {
-        let maybeInstanceUrl: URL | null = instanceUrl;
-        while (maybeInstanceUrl != null) {
-            yield maybeInstanceUrl;
-
-            const instanceMapItem = this.getInstanceItem(instanceUrl);
-            if (instanceMapItem == null) {
-                throw new Error("instance item not found");
-            }
-
-            maybeInstanceUrl = instanceMapItem.referencingInstanceUrl;
-        }
-    }
-
     public static async loadFromUrl(
         instanceUrl: URL,
         schemaUrl: URL,
@@ -65,6 +52,8 @@ export class SchemaCollection {
         const instanceNode = await fetchInstance(instanceUrl);
         let schemaUrl;
         if (
+            typeof instanceNode === "object" &&
+            instanceNode != null &&
             "$schema" in instanceNode &&
             typeof instanceNode.$schema === "string"
         ) {
@@ -93,7 +82,7 @@ export class SchemaCollection {
 
     private async loadInstanceReferences(
         nodeUrl: URL,
-        node: unknown,
+        node: SchemaNode,
         schemaUrl: URL,
     ) {
         const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
@@ -122,7 +111,7 @@ async function fetchInstance(instanceUrl: URL) {
     const result = await fetch(instanceUrl);
     const instanceNode = await result.json();
 
-    return instanceNode;
+    return instanceNode as SchemaNode;
 }
 
 function toInstanceUrl(nodeUrl: URL) {
