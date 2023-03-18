@@ -15,7 +15,7 @@ export abstract class SchemaLoaderBase {
         schemaRootNode: unknown,
         instanceUrl: URL,
         referencingInstanceUrl: URL | null,
-    ): void;
+    ): Promise<void>;
 
 }
 
@@ -42,6 +42,7 @@ export class CommonSchemaLoader {
 
     public async loadFromURL(
         instanceUrl: URL,
+        referencingInstanceUrl: URL | null,
         defaultMetaSchemaUrl: URL,
     ) {
         const result = await fetch(instanceUrl);
@@ -50,7 +51,7 @@ export class CommonSchemaLoader {
         this.loadFromNode(
             schemaRootNode,
             instanceUrl,
-            null,
+            referencingInstanceUrl,
             defaultMetaSchemaUrl,
         );
     }

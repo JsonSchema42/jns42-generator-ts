@@ -10,11 +10,11 @@ export interface SchemaLoaderInstanceItem {
 export class SchemaLoader extends common.SchemaLoaderBase {
     private readonly instanceItemMap = new Map<string, SchemaLoaderInstanceItem>();
 
-    public loadFromNode(
+    public async loadFromNode(
         instanceNode: SchemaNode,
         instanceUrl: URL,
         referencingInstanceUrl: URL | null,
-    ): void {
+    ): Promise<void> {
         const item: SchemaLoaderInstanceItem = {
             instanceNode,
             instanceUrl,
