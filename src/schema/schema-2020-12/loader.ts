@@ -24,13 +24,14 @@ export class SchemaLoader extends common.SchemaLoaderBase {
             referencingInstanceUrl,
         };
 
-        const instanceKey = String(instanceUrl);
+        const idUrl = selectNodeIdUrl(instanceNode) ?? instanceUrl;
+        const idKey = String(idUrl);
 
-        if (this.instanceItemMap.has(instanceKey)) {
+        if (this.instanceItemMap.has(idKey)) {
             return;
         }
 
-        this.instanceItemMap.set(instanceKey, item);
+        this.instanceItemMap.set(idKey, item);
 
         await this.loadInstanceReferences(
             instanceUrl,
