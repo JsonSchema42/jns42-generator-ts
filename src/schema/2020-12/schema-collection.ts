@@ -1,4 +1,4 @@
-import { selectNodeInstanceEntries, selectNodeRefUrl } from "./selectors/index.js";
+import { selectNodeInstanceEntries, selectNodeRefUrl } from "../../selectors/index.js";
 
 export interface SchemaCollectionInstanceItem {
     instanceNode: unknown;
