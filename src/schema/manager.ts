@@ -29,7 +29,7 @@ export class SchemaManager {
         const result = await fetch(instanceUrl);
         const schemaRootNode = await result.json() as unknown;
 
-        this.loadFromNode(
+        await this.loadFromNode(
             schemaRootNode,
             instanceUrl,
             referencingInstanceUrl,
@@ -37,7 +37,7 @@ export class SchemaManager {
         );
     }
 
-    public loadFromNode(
+    public async loadFromNode(
         schemaRootNode: unknown,
         instanceUrl: URL,
         referencingInstanceUrl: URL | null,
@@ -54,7 +54,7 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const loader = this.loaders[rootNodeSchemaMetaKey];
-        loader.loadFromNode(
+        await loader.loadFromNode(
             schemaRootNode,
             instanceUrl,
             referencingInstanceUrl,
