@@ -1,12 +1,13 @@
 import { schemaMeta } from "./meta.js";
+import { selectNodeSchemaUrl } from "./selectors.js";
 
 export type SchemaNode = unknown;
 
 export function isSchemaRootNode(node: unknown): node is SchemaNode {
-    return (
-        typeof node === "object" &&
-        node != null &&
-        "$schema" in node &&
-        node.$schema === schemaMeta.metaSchemaKey
-    );
+    const schemaUrl = selectNodeSchemaUrl(node);
+    if (schemaUrl == null) {
+        return false;
+    }
+    const schemaKey = String(schemaUrl);
+    return schemaKey === schemaMeta.metaSchemaKey;
 }
