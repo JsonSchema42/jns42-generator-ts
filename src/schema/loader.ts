@@ -4,12 +4,19 @@ import * as schemaDraft04 from "./draft-04/index.js";
 import * as schemaDraft07 from "./draft-06/index.js";
 import * as schemaDraft06 from "./draft-07/index.js";
 
-export class SchemaLoaderBase {
+export abstract class SchemaLoaderBase {
     constructor(
         protected readonly commonSchemaLoader: CommonSchemaLoader,
     ) {
         //
     }
+
+    public abstract loadFromNode(
+        schemaRootNode: unknown,
+        instanceUrl: URL,
+        referencingInstanceUrl: URL | null,
+    ): void;
+
 }
 
 export class CommonSchemaLoader {
@@ -22,41 +29,63 @@ export class CommonSchemaLoader {
         [schemaDraft04.schemaMeta.metaSchemaKey]: schemaDraft04.schemaMeta,
     };
 
+    private readonly loaders = Object.fromEntries(
+        Object.entries(this.schemaMetaMap).
+            map(([key, value]) => [key, value.newSchemaLoader(this)] as const),
+    ) as {
+            [K in keyof typeof this.schemaMetaMap]: ReturnType<typeof this.schemaMetaMap[K]["newSchemaLoader"]>
+        };
+
     constructor() {
         //
     }
 
-    async loadFromURL(
-        schemaUrl: URL,
+    public async loadFromURL(
+        instanceUrl: URL,
         defaultMetaSchemaUrl: URL,
     ) {
-        const result = await fetch(schemaUrl);
+        const result = await fetch(instanceUrl);
         const schemaRootNode = await result.json() as unknown;
 
-        this.loadFromNode(schemaRootNode, defaultMetaSchemaUrl);
+        this.loadFromNode(
+            schemaRootNode,
+            instanceUrl,
+            null,
+            defaultMetaSchemaUrl,
+        );
     }
 
-    loadFromNode(
+    public loadFromNode(
         schemaRootNode: unknown,
+        instanceUrl: URL,
+        referencingInstanceUrl: URL | null,
         defaultMetaSchemaUrl: URL,
     ) {
-        const rootNodeSchemaMeta = this.getRootNodeMetaSchema(
+        const rootNodeSchemaMetaKey = this.getRootNodeMetaSchemaKey(
             schemaRootNode,
             defaultMetaSchemaUrl,
         );
 
-        if (rootNodeSchemaMeta == null) {
+        if (rootNodeSchemaMetaKey == null) {
             throw new Error("meta schema not supported");
         }
+
+        // eslint-disable-next-line security/detect-object-injection
+        const loader = this.loaders[rootNodeSchemaMetaKey];
+        loader.loadFromNode(
+            schemaRootNode,
+            instanceUrl,
+            referencingInstanceUrl,
+        );
     }
 
-    private getRootNodeMetaSchema(
+    private getRootNodeMetaSchemaKey(
         schemaRootNode: unknown,
         defaultMetaSchemaUrl: URL,
     ) {
-        for (const schemaMeta of Object.values(this.schemaMetaMap)) {
+        for (const [schemaKey, schemaMeta] of Object.entries(this.schemaMetaMap)) {
             if (schemaMeta.isSchemaRootNode(schemaRootNode)) {
-                return schemaMeta;
+                return schemaKey as keyof typeof this.schemaMetaMap;
             }
         }
 
@@ -64,7 +93,7 @@ export class CommonSchemaLoader {
             String(defaultMetaSchemaUrl) as keyof typeof this.schemaMetaMap;
         if (defaultMetaSchemaKey in this.schemaMetaMap) {
             // eslint-disable-next-line security/detect-object-injection
-            return this.schemaMetaMap[defaultMetaSchemaKey];
+            return defaultMetaSchemaKey;
         }
 
         return null;
