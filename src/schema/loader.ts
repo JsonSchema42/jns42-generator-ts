@@ -4,20 +4,27 @@ import * as schemaDraft04 from "./draft-04/index.js";
 import * as schemaDraft07 from "./draft-06/index.js";
 import * as schemaDraft06 from "./draft-07/index.js";
 
-export class SchemaLoader {
+export class SchemaLoaderBase {
+    constructor(
+        protected readonly commonSchemaLoader: CommonSchemaLoader,
+    ) {
+        //
+    }
+}
 
-    schemaMetaMap = Object.fromEntries(
-        [
-            schema202012.schemaMeta,
-            schema201909.schemaMeta,
-            schemaDraft07.schemaMeta,
-            schemaDraft06.schemaMeta,
-            schemaDraft04.schemaMeta,
-        ].
-            map(
-                schemaMeta => [String(schemaMeta.metaSchemaUrl), schemaMeta] as const,
-            ),
-    );
+export class CommonSchemaLoader {
+
+    private readonly schemaMetaMap = {
+        [schema202012.schemaMeta.metaSchemaKey]: schema202012.schemaMeta,
+        [schema201909.schemaMeta.metaSchemaKey]: schema201909.schemaMeta,
+        [schemaDraft07.schemaMeta.metaSchemaKey]: schemaDraft07.schemaMeta,
+        [schemaDraft06.schemaMeta.metaSchemaKey]: schemaDraft06.schemaMeta,
+        [schemaDraft04.schemaMeta.metaSchemaKey]: schemaDraft04.schemaMeta,
+    };
+
+    constructor() {
+        //
+    }
 
     async loadFromURL(
         schemaUrl: URL,
@@ -53,9 +60,11 @@ export class SchemaLoader {
             }
         }
 
-        const defaultMetaSchemaKey = String(defaultMetaSchemaUrl);
+        const defaultMetaSchemaKey =
+            String(defaultMetaSchemaUrl) as keyof typeof this.schemaMetaMap;
         if (defaultMetaSchemaKey in this.schemaMetaMap) {
-            return this.schemaMetaMap[String(defaultMetaSchemaKey)];
+            // eslint-disable-next-line security/detect-object-injection
+            return this.schemaMetaMap[defaultMetaSchemaKey];
         }
 
         return null;

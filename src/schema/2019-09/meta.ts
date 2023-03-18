@@ -1,8 +1,12 @@
 import { SchemaMeta } from "../meta.js";
+import { SchemaLoader } from "./loader.js";
 import { SchemaNode } from "./node.js";
 
-export const schemaMeta: SchemaMeta<SchemaNode> = {
-    metaSchemaUrl: new URL("https://json-schema.org/draft/2019-09/schema"),
+const metaSchemaKey = "https://json-schema.org/draft/2019-09/schema";
+
+export const schemaMeta: SchemaMeta<typeof metaSchemaKey, SchemaNode> = {
+    metaSchemaKey,
+    metaSchemaUrl: new URL(metaSchemaKey),
 
     isSchemaRootNode(node: unknown): node is SchemaNode {
         return (
@@ -12,5 +16,7 @@ export const schemaMeta: SchemaMeta<SchemaNode> = {
             typeof node.$schema === String(schemaMeta.metaSchemaUrl)
         );
     },
+
+    newSchemaLoader: commonSchemaLoader => new SchemaLoader(commonSchemaLoader),
 };
 
