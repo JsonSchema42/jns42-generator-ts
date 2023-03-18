@@ -74,7 +74,6 @@ export class SchemaManager {
         const defaultMetaSchemaKey =
             String(defaultMetaSchemaUrl) as keyof typeof this.schemaMetaMap;
         if (defaultMetaSchemaKey in this.schemaMetaMap) {
-            // eslint-disable-next-line security/detect-object-injection
             return defaultMetaSchemaKey;
         }
 
