@@ -6,33 +6,59 @@ import * as schemaDraft06 from "./draft-07/index.js";
 
 export class SchemaLoader {
 
-    loaders = [
-        new schema202012.SchemaLoader(this),
-        new schema201909.SchemaLoader(this),
-        new schemaDraft07.SchemaLoader(this),
-        new schemaDraft06.SchemaLoader(this),
-        new schemaDraft04.SchemaLoader(this),
-    ];
+    schemaMetaMap = Object.fromEntries(
+        [
+            schema202012.schemaMeta,
+            schema201909.schemaMeta,
+            schemaDraft07.schemaMeta,
+            schemaDraft06.schemaMeta,
+            schemaDraft04.schemaMeta,
+        ].
+            map(
+                schemaMeta => [String(schemaMeta.metaSchemaUrl), schemaMeta] as const,
+            ),
+    );
 
-    loadFromFile(
-        path: string,
+    async loadFromURL(
+        schemaUrl: URL,
         defaultMetaSchemaUrl: URL,
     ) {
-        throw new Error("not implemented");
-    }
+        const result = await fetch(schemaUrl);
+        const schemaRootNode = await result.json() as unknown;
 
-    loadFromURL(
-        url: URL,
-        defaultMetaSchemaUrl: URL,
-    ) {
-        throw new Error("not implemented");
+        this.loadFromNode(schemaRootNode, defaultMetaSchemaUrl);
     }
 
     loadFromNode(
-        node: unknown,
+        schemaRootNode: unknown,
         defaultMetaSchemaUrl: URL,
     ) {
-        throw new Error("not implemented");
+        const rootNodeSchemaMeta = this.getRootNodeMetaSchema(
+            schemaRootNode,
+            defaultMetaSchemaUrl,
+        );
+
+        if (rootNodeSchemaMeta == null) {
+            throw new Error("meta schema not supported");
+        }
+    }
+
+    private getRootNodeMetaSchema(
+        schemaRootNode: unknown,
+        defaultMetaSchemaUrl: URL,
+    ) {
+        for (const schemaMeta of Object.values(this.schemaMetaMap)) {
+            if (schemaMeta.isSchemaRootNode(schemaRootNode)) {
+                return schemaMeta;
+            }
+        }
+
+        const defaultMetaSchemaKey = String(defaultMetaSchemaUrl);
+        if (defaultMetaSchemaKey in this.schemaMetaMap) {
+            return this.schemaMetaMap[String(defaultMetaSchemaKey)];
+        }
+
+        return null;
     }
 
 }
