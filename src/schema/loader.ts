@@ -2,7 +2,7 @@ import { SchemaManager } from "./manager.js";
 
 export abstract class SchemaLoaderBase {
     constructor(
-        protected readonly commonSchemaLoader: SchemaManager,
+        protected readonly manager: SchemaManager,
     ) {
         //
     }
