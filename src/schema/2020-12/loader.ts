@@ -26,6 +26,10 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         const instanceKey = String(instanceUrl);
 
+        if (this.instanceItemMap.has(instanceKey)) {
+            return;
+        }
+
         this.instanceItemMap.set(instanceKey, item);
 
         await this.loadInstanceReferences(
@@ -44,7 +48,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
         const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
 
         if (idNodeUrl != null) {
-            this.manager.loadFromNode(
+            await this.manager.loadFromNode(
                 node,
                 idNodeUrl,
                 referencingInstanceUrl,
