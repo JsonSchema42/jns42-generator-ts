@@ -49,7 +49,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
         const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
 
         if (idNodeUrl != null) {
-            await this.manager.loadFromNode(
+            await this.federatedLoader.loadFromNode(
                 node,
                 idNodeUrl,
                 referencingInstanceUrl,
@@ -59,7 +59,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         if (refNodeUrl != null) {
             const referenceInstanceUrl = toServerUrl(refNodeUrl);
-            await this.manager.loadFromURL(
+            await this.federatedLoader.loadFromURL(
                 referenceInstanceUrl,
                 referencingInstanceUrl,
                 schemaMeta.metaSchemaUrl,

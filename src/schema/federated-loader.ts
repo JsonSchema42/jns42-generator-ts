@@ -4,7 +4,7 @@ import * as schemaDraft04 from "./schema-draft-04/index.js";
 import * as schemaDraft07 from "./schema-draft-06/index.js";
 import * as schemaDraft06 from "./schema-draft-07/index.js";
 
-export class SchemaManager {
+export class FederatedSchemaLoader {
 
     private readonly schemaMetaMap = {
         [schema202012.schemaMeta.metaSchemaKey]: schema202012.schemaMeta,

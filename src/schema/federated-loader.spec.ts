@@ -1,12 +1,12 @@
 import test from "tape-promise/tape.js";
-import { SchemaManager } from "./manager.js";
+import { FederatedSchemaLoader } from "./federated-loader.js";
 
-test("schema-manager", async t => {
-    const manager = new SchemaManager();
+test("federated-loader", async t => {
+    const loader = new FederatedSchemaLoader();
 
     const instanceUrl = new URL("https://json-schema.org/draft/2020-12/schema");
     const schemaUrl = new URL("https://json-schema.org/draft/2020-12/schema");
-    await manager.loadFromURL(
+    await loader.loadFromURL(
         instanceUrl,
         null,
         schemaUrl,
