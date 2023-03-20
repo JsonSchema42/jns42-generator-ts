@@ -8,9 +8,9 @@ export abstract class SchemaLoaderBase {
     }
 
     public abstract loadFromNode(
-        schemaRootNode: unknown,
-        instanceUrl: URL,
-        referencingInstanceUrl: URL | null,
+        node: unknown,
+        nodeUrl: URL,
+        referencingNodeUrl: URL | null,
     ): Promise<void>;
 
 }

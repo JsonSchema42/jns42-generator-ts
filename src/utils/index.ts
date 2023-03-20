@@ -1,4 +1,4 @@
 export * from "./literal.js";
-export * from "./url.js";
+export * from "./pointer.js";
 export * from "./validation.js";
 

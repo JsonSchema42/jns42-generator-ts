@@ -1,76 +1,69 @@
-import { toServerUrl } from "../../utils/index.js";
 import * as common from "../index.js";
-import { schemaMeta } from "./meta.js";
+import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeIdUrl, selectNodeInstanceEntries, selectNodeRefUrl } from "./selectors.js";
+import { selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
 
-export interface SchemaLoaderInstanceItem {
-    instanceNode: SchemaNode;
-    instanceUrl: URL;
-    referencingInstanceUrl: URL | null;
+export interface SchemaLoaderRootNodeItem {
+    node: SchemaNode;
+    nodeUrl: URL;
+    referencingNodeUrl: URL | null;
 }
 
 export class SchemaLoader extends common.SchemaLoaderBase {
-    private readonly instanceItemMap = new Map<string, SchemaLoaderInstanceItem>();
+    private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem>();
 
     public async loadFromNode(
-        instanceNode: SchemaNode,
-        instanceUrl: URL,
-        referencingInstanceUrl: URL | null,
+        node: SchemaNode,
+        nodeUrl: URL,
+        referencingNodeUrl: URL | null,
     ): Promise<void> {
-        const item: SchemaLoaderInstanceItem = {
-            instanceNode,
-            instanceUrl,
-            referencingInstanceUrl,
+        let nodeId = selectNodeId(node);
+        if (nodeId != null) {
+            nodeUrl = new URL(nodeId);
+        }
+        nodeId ??= String(nodeUrl);
+
+        const item: SchemaLoaderRootNodeItem = {
+            node,
+            nodeUrl,
+            referencingNodeUrl,
         };
 
-        const idUrl = selectNodeIdUrl(instanceNode) ?? instanceUrl;
-        const idKey = String(idUrl);
-
-        if (this.instanceItemMap.has(idKey)) {
+        if (this.rootNodeMap.has(nodeId)) {
             return;
         }
 
-        this.instanceItemMap.set(idKey, item);
+        this.rootNodeMap.set(nodeId, item);
 
-        this.manager.registerInstanceMetaSchema(idKey, schemaMeta.metaSchemaKey);
+        this.manager.registerRootNodeMetaSchema(nodeId, metaSchema.metaSchemaKey);
 
         await this.loadInstanceReferences(
-            instanceUrl,
-            instanceNode,
+            nodeUrl,
+            nodeId,
+            node,
         );
     }
 
     private async loadInstanceReferences(
         nodeUrl: URL,
+        nodePointer: string,
         node: SchemaNode,
     ) {
-        const referencingInstanceUrl = toServerUrl(nodeUrl);
+        const nodeRef = selectNodeRef(node);
 
-        const idNodeUrl = selectNodeIdUrl(node);
-        const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
-
-        if (idNodeUrl != null) {
-            await this.manager.loadFromNode(
-                node,
-                idNodeUrl,
-                referencingInstanceUrl,
-                schemaMeta.metaSchemaUrl,
-            );
-        }
-
-        if (refNodeUrl != null) {
-            const referenceInstanceUrl = toServerUrl(refNodeUrl);
+        if (nodeRef != null) {
+            const nodeRefUrl = new URL(nodeRef, nodeUrl);
             await this.manager.loadFromURL(
-                referenceInstanceUrl,
-                referencingInstanceUrl,
-                schemaMeta.metaSchemaUrl,
+                nodeRefUrl,
+                nodeUrl,
+                metaSchema.metaSchemaKey,
             );
         }
 
-        for (const [subNodeUrl, subNode] of selectNodeInstanceEntries(nodeUrl, node)) {
+        for (const [subNodePointer, subNode] of selectNodeInstanceEntries(nodePointer, node)) {
             await this.loadInstanceReferences(
-                subNodeUrl,
+                nodeUrl,
+                subNodePointer,
                 subNode,
             );
         }

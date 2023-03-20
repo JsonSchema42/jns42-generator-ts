@@ -1,91 +1,68 @@
-import * as schema201909 from "./schema-2019-09/index.js";
-import * as schema202012 from "./schema-2020-12/index.js";
-import * as schemaDraft04 from "./schema-draft-04/index.js";
-import * as schemaDraft07 from "./schema-draft-06/index.js";
-import * as schemaDraft06 from "./schema-draft-07/index.js";
+import { MetaSchemaKey, metaSchemaMap } from "./meta.js";
 
 export class SchemaManager {
-    private readonly schemaMetaMap = {
-        [schema202012.schemaMeta.metaSchemaKey]: schema202012.schemaMeta,
-        [schema201909.schemaMeta.metaSchemaKey]: schema201909.schemaMeta,
-        [schemaDraft07.schemaMeta.metaSchemaKey]: schemaDraft07.schemaMeta,
-        [schemaDraft06.schemaMeta.metaSchemaKey]: schemaDraft06.schemaMeta,
-        [schemaDraft04.schemaMeta.metaSchemaKey]: schemaDraft04.schemaMeta,
-    };
 
-    private readonly instanceMetaMap = new Map<string, keyof typeof this.schemaMetaMap>();
+    private readonly rootNodeMetaMap = new Map<string, MetaSchemaKey>();
 
-    public registerInstanceMetaSchema(
-        schemaKey: string,
-        schemaMetaKey: keyof typeof this.schemaMetaMap,
+    public registerRootNodeMetaSchema(
+        nodeId: string,
+        schemaMetaKey: MetaSchemaKey,
     ) {
-        this.instanceMetaMap.set(schemaKey, schemaMetaKey);
+        this.rootNodeMetaMap.set(nodeId, schemaMetaKey);
     }
 
     private readonly loaders = Object.fromEntries(
-        Object.entries(this.schemaMetaMap).
+        Object.entries(metaSchemaMap).
             map(([key, value]) => [key, value.newSchemaLoader(this)] as const),
-    ) as {
-            [K in keyof typeof this.schemaMetaMap]: ReturnType<typeof this.schemaMetaMap[K]["newSchemaLoader"]>
-        };
+    );
 
     public async loadFromURL(
-        instanceUrl: URL,
-        referencingInstanceUrl: URL | null,
-        defaultMetaSchemaUrl: URL,
+        url: URL,
+        referencingUrl: URL | null,
+        defaultMetaSchemaKey: MetaSchemaKey,
     ) {
-        const result = await fetch(instanceUrl);
+        const result = await fetch(url);
         const schemaRootNode = await result.json() as unknown;
 
         await this.loadFromNode(
             schemaRootNode,
-            instanceUrl,
-            referencingInstanceUrl,
-            defaultMetaSchemaUrl,
+            url,
+            referencingUrl,
+            defaultMetaSchemaKey,
         );
     }
 
     public async loadFromNode(
-        schemaRootNode: unknown,
-        instanceUrl: URL,
-        referencingInstanceUrl: URL | null,
-        defaultMetaSchemaUrl: URL,
+        rootNode: unknown,
+        rootNodeUrl: URL,
+        referencingUrl: URL | null,
+        defaultMetaSchemaKey: MetaSchemaKey,
     ) {
         const rootNodeSchemaMetaKey = this.getRootNodeMetaSchemaKey(
-            schemaRootNode,
-            defaultMetaSchemaUrl,
+            rootNode,
+            defaultMetaSchemaKey,
         );
-
-        if (rootNodeSchemaMetaKey == null) {
-            throw new Error("meta schema not supported");
-        }
 
         // eslint-disable-next-line security/detect-object-injection
         const loader = this.loaders[rootNodeSchemaMetaKey];
         await loader.loadFromNode(
-            schemaRootNode,
-            instanceUrl,
-            referencingInstanceUrl,
+            rootNode,
+            rootNodeUrl,
+            referencingUrl,
         );
     }
 
     private getRootNodeMetaSchemaKey(
         schemaRootNode: unknown,
-        defaultMetaSchemaUrl: URL,
+        defaultMetaSchemaKey: MetaSchemaKey,
     ) {
-        for (const [schemaKey, schemaMeta] of Object.entries(this.schemaMetaMap)) {
+        for (const [schemaKey, schemaMeta] of Object.entries(metaSchemaMap)) {
             if (schemaMeta.isSchemaRootNode(schemaRootNode)) {
-                return schemaKey as keyof typeof this.schemaMetaMap;
+                return schemaKey as MetaSchemaKey;
             }
         }
 
-        const defaultMetaSchemaKey =
-            String(defaultMetaSchemaUrl) as keyof typeof this.schemaMetaMap;
-        if (defaultMetaSchemaKey in this.schemaMetaMap) {
-            return defaultMetaSchemaKey;
-        }
-
-        return null;
+        return defaultMetaSchemaKey;
     }
 
 }

@@ -1,8 +1,9 @@
+import { appendJsonPointer } from "../../utils/index.js";
 import { SchemaNode } from "./node.js";
 
 //#region core
 
-export function selectNodeSchemaUrl(
+export function selectNodeSchema(
     node: SchemaNode,
 ) {
     if (
@@ -13,12 +14,12 @@ export function selectNodeSchemaUrl(
             "$schema" in node &&
             typeof node.$schema === "string"
         ) {
-            return new URL(node.$schema);
+            return node.$schema;
         }
     }
 }
 
-export function selectNodeIdUrl(
+export function selectNodeId(
     node: SchemaNode,
 ) {
     if (
@@ -29,13 +30,12 @@ export function selectNodeIdUrl(
             "$id" in node &&
             typeof node.$id === "string"
         ) {
-            return new URL(node.$id);
+            return node.$id;
         }
     }
 }
 
-export function selectNodeAnchorUrl(
-    nodeUrl: URL,
+export function selectNodeAnchor(
     node: SchemaNode,
 ) {
     if (
@@ -46,13 +46,12 @@ export function selectNodeAnchorUrl(
             "$anchor" in node &&
             typeof node.$anchor === "string"
         ) {
-            return new URL(`#${node.$anchor}`, nodeUrl);
+            return node.$anchor;
         }
     }
 }
 
-export function selectNodeDynamicAnchorUrl(
-    nodeUrl: URL,
+export function selectNodeDynamicAnchor(
     node: SchemaNode,
 ) {
     if (
@@ -63,13 +62,12 @@ export function selectNodeDynamicAnchorUrl(
             "$dynamicAnchor" in node &&
             typeof node.$dynamicAnchor === "string"
         ) {
-            return new URL(`#${node.$dynamicAnchor}`, nodeUrl);
+            return node.$dynamicAnchor;
         }
     }
 }
 
-export function selectNodeRefUrl(
-    nodeUrl: URL,
+export function selectNodeRef(
     node: SchemaNode,
 ) {
     if (
@@ -80,13 +78,12 @@ export function selectNodeRefUrl(
             "$ref" in node &&
             typeof node.$ref === "string"
         ) {
-            return new URL(node.$ref, nodeUrl);
+            return node.$ref;
         }
     }
 }
 
-export function selectNodeDynamicRefUrl(
-    nodeUrl: URL,
+export function selectNodeDynamicRef(
     node: SchemaNode,
 ) {
     if (
@@ -97,7 +94,7 @@ export function selectNodeDynamicRefUrl(
             "$dynamicRef" in node &&
             typeof node.$dynamicRef === "string"
         ) {
-            return new URL(node.$dynamicRef, nodeUrl);
+            return node.$dynamicRef;
         }
     }
 }
@@ -107,7 +104,7 @@ export function selectNodeDynamicRefUrl(
 //#region schema
 
 export function* selectNodeDefEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -116,18 +113,18 @@ export function* selectNodeDefEntries(
     ) {
         if (
             "$defs" in node &&
-            node.$defs != null && typeof node.$defs === "object"
+            typeof node.$defs === "object" && node.$defs != null
         ) {
             for (const [key, subNode] of Object.entries(node.$defs)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/$defs/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                const subNodePointer = appendJsonPointer(nodePointer, "$defs", key);
+                yield [subNodePointer, subNode] as const;
             }
         }
     }
 }
 
 export function* selectNodePropertyEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -136,18 +133,18 @@ export function* selectNodePropertyEntries(
     ) {
         if (
             "properties" in node &&
-            node.properties != null && typeof node.properties === "object"
+            typeof node.properties === "object" && node.properties != null
         ) {
             for (const [key, subNode] of Object.entries(node.properties)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/properties/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
+                yield [subNodePointer, subNode] as const;
             }
         }
     }
 }
 
 export function* selectNodeAdditionalPropertyEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -156,21 +153,17 @@ export function* selectNodeAdditionalPropertyEntries(
     ) {
         if (
             "additionalProperties" in node &&
-            (
-                node.additionalProperties != null && typeof node.additionalProperties === "object" ||
-                typeof node.additionalProperties === "boolean"
-            )
-
+            node.additionalProperties != null
         ) {
             const subNode = node.additionalProperties;
-            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/additionalProperties`, nodeUrl);
-            yield [subNodeUrl, subNode] as const;
+            const subNodePointer = appendJsonPointer(nodePointer, "additionalProperties");
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodePrefixItemEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -179,18 +172,18 @@ export function* selectNodePrefixItemEntries(
     ) {
         if (
             "prefixItems" in node &&
-            Array.isArray(node.prefixItems)
+            typeof node.prefixItems === "object" && node.prefixItems != null
         ) {
             for (const [key, subNode] of Object.entries(node.prefixItems)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/prefixItems/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                const subNodePointer = appendJsonPointer(nodePointer, "prefixItems", key);
+                yield [subNodePointer, subNode] as const;
             }
         }
     }
 }
 
 export function* selectNodeItemEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -199,20 +192,17 @@ export function* selectNodeItemEntries(
     ) {
         if (
             "items" in node &&
-            (
-                typeof node.items === "object" && node.items != null ||
-                typeof node.items === "boolean"
-            )
+            node.items != null
         ) {
             const subNode = node.items;
-            const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/items`, nodeUrl);
-            yield [subNodeUrl, subNode] as const;
+            const subNodePointer = appendJsonPointer(nodePointer, "items");
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodeAnyOfEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -221,18 +211,18 @@ export function* selectNodeAnyOfEntries(
     ) {
         if (
             "anyOf" in node &&
-            Array.isArray(node.anyOf)
+            typeof node.anyOf === "object" && node.anyOf != null
         ) {
             for (const [key, subNode] of Object.entries(node.anyOf)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/anyOf/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                const subNodePointer = appendJsonPointer(nodePointer, "anyOf", key);
+                yield [subNodePointer, subNode] as const;
             }
         }
     }
 }
 
 export function* selectNodeOneOfEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -241,18 +231,18 @@ export function* selectNodeOneOfEntries(
     ) {
         if (
             "oneOf" in node &&
-            Array.isArray(node.oneOf)
+            typeof node.oneOf === "object" && node.oneOf != null
         ) {
             for (const [key, subNode] of Object.entries(node.oneOf)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/oneOf/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                const subNodePointer = appendJsonPointer(nodePointer, "oneOf", key);
+                yield [subNodePointer, subNode] as const;
             }
         }
     }
 }
 
 export function* selectNodeAllOfEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
     if (
@@ -261,28 +251,28 @@ export function* selectNodeAllOfEntries(
     ) {
         if (
             "allOf" in node &&
-            Array.isArray(node.allOf)
+            typeof node.allOf === "object" && node.allOf != null
         ) {
             for (const [key, subNode] of Object.entries(node.allOf)) {
-                const subNodeUrl = new URL(`${nodeUrl.hash === "" ? "#" : nodeUrl.hash}/allOf/${encodeURI(key)}`, nodeUrl);
-                yield [subNodeUrl, subNode] as const;
+                const subNodePointer = appendJsonPointer(nodePointer, "allOf", key);
+                yield [subNodePointer, subNode] as const;
             }
         }
     }
 }
 
 export function* selectNodeInstanceEntries(
-    nodeUrl: URL,
+    nodePointer: string,
     node: SchemaNode,
 ) {
-    yield* selectNodeDefEntries(nodeUrl, node);
-    yield* selectNodePropertyEntries(nodeUrl, node);
-    yield* selectNodeAdditionalPropertyEntries(nodeUrl, node);
-    yield* selectNodePrefixItemEntries(nodeUrl, node);
-    yield* selectNodeItemEntries(nodeUrl, node);
-    yield* selectNodeAllOfEntries(nodeUrl, node);
-    yield* selectNodeAnyOfEntries(nodeUrl, node);
-    yield* selectNodeOneOfEntries(nodeUrl, node);
+    yield* selectNodeDefEntries(nodePointer, node);
+    yield* selectNodePropertyEntries(nodePointer, node);
+    yield* selectNodeAdditionalPropertyEntries(nodePointer, node);
+    yield* selectNodePrefixItemEntries(nodePointer, node);
+    yield* selectNodeItemEntries(nodePointer, node);
+    yield* selectNodeAllOfEntries(nodePointer, node);
+    yield* selectNodeAnyOfEntries(nodePointer, node);
+    yield* selectNodeOneOfEntries(nodePointer, node);
 }
 
 //#endregion
