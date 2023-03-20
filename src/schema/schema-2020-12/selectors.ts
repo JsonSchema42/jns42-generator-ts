@@ -302,7 +302,7 @@ export function selectNodeType(
     }
 }
 
-export function selectNodeRequiredProperties(
+export function* selectNodeRequiredProperties(
     node: SchemaNode,
 ) {
     if (
@@ -314,7 +314,7 @@ export function selectNodeRequiredProperties(
             Array.isArray(node.required) &&
             node.required.every(type => typeof type === "string")
         ) {
-            return node.required as string[];
+            yield* node.required as string[];
         }
     }
 }

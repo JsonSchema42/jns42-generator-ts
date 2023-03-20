@@ -4,7 +4,7 @@ import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemEntries, selectNodeProperties, selectNodeRef, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -885,9 +885,68 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        return factory.createKeywordTypeNode(
-            ts.SyntaxKind.ObjectKeyword,
+        const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
         );
+
+        for (const [subNodePointer] of additionalPropertiesEntries) {
+            const subNodeUrl = new URL(
+                pointerToHash(subNodePointer),
+                nodeItem.nodeBaseUrl,
+            );
+            const subNodeId = String(subNodeUrl);
+
+            return factory.createTypeReferenceNode(
+                "Record",
+                [
+                    factory.createKeywordTypeNode(
+                        ts.SyntaxKind.StringKeyword,
+                    ),
+                    this.generateTypeReference(
+                        factory,
+                        subNodeId,
+                    ),
+                ],
+            );
+        }
+
+        const propertiesEntries = [...selectNodeProperties(nodeItem.nodePointer, nodeItem.node)];
+        const propertiesSet = new Set(propertiesEntries.map(([name]) => name));
+        const requiredPropertiesSet = new Set(selectNodeRequiredProperties(nodeItem.node));
+
+        return factory.createTypeLiteralNode([
+            ...propertiesEntries.map(
+                ([propertyName, subNodePointer]) => {
+                    const subNodeUrl = new URL(
+                        pointerToHash(subNodePointer),
+                        nodeItem.nodeBaseUrl,
+                    );
+                    const subNodeId = String(subNodeUrl);
+                    return factory.createPropertySignature(
+                        undefined,
+                        propertyName,
+                        requiredPropertiesSet.has(propertyName) ?
+                            undefined :
+                            factory.createToken(ts.SyntaxKind.QuestionToken),
+                        this.generateTypeReference(
+                            factory,
+                            subNodeId,
+                        ),
+                    );
+                },
+            ),
+            ...[...requiredPropertiesSet].
+                filter(propertyName => !propertiesSet.has(propertyName)).
+                map(propertyName => factory.createPropertySignature(
+                    undefined,
+                    propertyName,
+                    undefined,
+                    factory.createKeywordTypeNode(
+                        ts.SyntaxKind.AnyKeyword,
+                    ),
+                )),
+        ]);
     }
 
     private generateArrayTypeDefinition(
