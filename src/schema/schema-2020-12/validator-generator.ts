@@ -1,11 +1,11 @@
 import ts from "typescript";
+import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
-import { SchemaValidatorGeneratorBase } from "../validator-generator.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeType } from "./selectors.js";
 
-export class SchemaValidatorGenerator extends SchemaValidatorGeneratorBase {
+export class SchemaValidatorGenerator extends SchemaCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -14,10 +14,10 @@ export class SchemaValidatorGenerator extends SchemaValidatorGeneratorBase {
         super(manager);
     }
 
-    public generateFunctionDeclarationStatement(
+    public *generateStatements(
         factory: ts.NodeFactory,
         nodeId: string,
-    ): ts.FunctionDeclaration {
+    ) {
         const typeName = this.manager.getName(nodeId);
         if (typeName == null) {
             throw new Error("typeName not found");
@@ -28,6 +28,20 @@ export class SchemaValidatorGenerator extends SchemaValidatorGeneratorBase {
             throw new Error("nodeItem not found");
         }
 
+        yield this.generateFunctionDeclarationStatement(
+            factory,
+            nodeId,
+            nodeItem,
+            typeName,
+        );
+    }
+
+    public generateFunctionDeclarationStatement(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        nodeItem: SchemaIndexerNodeItem,
+        typeName: string,
+    ): ts.FunctionDeclaration {
         return factory.createFunctionDeclaration(
             [
                 factory.createToken(ts.SyntaxKind.ExportKeyword),

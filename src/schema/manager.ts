@@ -133,7 +133,7 @@ export class SchemaManager {
         for (const [nodeId, metaSchemaKey] of this.nodeMetaMap) {
             const typeGenerator =
                 this.typeGenerators[metaSchemaKey as keyof typeof this.typeGenerators];
-            yield typeGenerator.generateTypeDeclarationStatement(
+            yield* typeGenerator.generateStatements(
                 factory,
                 nodeId,
             );
@@ -142,7 +142,7 @@ export class SchemaManager {
         for (const [nodeId, metaSchemaKey] of this.nodeMetaMap) {
             const validatorGenerator =
                 this.validatorGenerators[metaSchemaKey as keyof typeof this.validatorGenerators];
-            yield validatorGenerator.generateFunctionDeclarationStatement(
+            yield* validatorGenerator.generateStatements(
                 factory,
                 nodeId,
             );

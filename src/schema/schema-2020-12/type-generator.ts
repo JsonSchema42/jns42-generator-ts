@@ -1,12 +1,12 @@
 import ts from "typescript";
 import { generatePrimitiveLiteral, pointerToHash } from "../../utils/index.js";
+import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
-import { SchemaTypeGeneratorBase } from "../type-generator.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeOneOfEntries, selectNodeRef, selectNodeType } from "./selectors.js";
 
-export class SchemaTypeGenerator extends SchemaTypeGeneratorBase {
+export class SchemaTypeGenerator extends SchemaCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -15,10 +15,10 @@ export class SchemaTypeGenerator extends SchemaTypeGeneratorBase {
         super(manager);
     }
 
-    public generateTypeDeclarationStatement(
+    public *generateStatements(
         factory: ts.NodeFactory,
         nodeId: string,
-    ): ts.Statement {
+    ) {
         const typeName = this.manager.getName(nodeId);
         if (typeName == null) {
             throw new Error("typeName not found");
@@ -29,6 +29,20 @@ export class SchemaTypeGenerator extends SchemaTypeGeneratorBase {
             throw new Error("nodeItem not found");
         }
 
+        yield this.generateTypeDeclarationStatement(
+            factory,
+            nodeId,
+            nodeItem,
+            typeName,
+        );
+    }
+
+    private generateTypeDeclarationStatement(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        nodeItem: SchemaIndexerNodeItem,
+        typeName: string,
+    ) {
         return factory.createTypeAliasDeclaration(
             [
                 factory.createToken(ts.SyntaxKind.ExportKeyword),
