@@ -6,7 +6,7 @@ import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeOneOfEntries, selectNodeRef, selectNodeType } from "./selectors.js";
 
-export class SchemaTypeGenerator extends SchemaCodeGeneratorBase {
+export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -29,7 +29,14 @@ export class SchemaTypeGenerator extends SchemaCodeGeneratorBase {
             throw new Error("nodeItem not found");
         }
 
-        yield this.generateTypeDeclarationStatement(
+        yield this.generateSchemaTypeDeclarationStatement(
+            factory,
+            nodeId,
+            nodeItem,
+            typeName,
+        );
+
+        yield this.generateValidatorFunctionDeclarationStatement(
             factory,
             nodeId,
             nodeItem,
@@ -37,7 +44,70 @@ export class SchemaTypeGenerator extends SchemaCodeGeneratorBase {
         );
     }
 
-    private generateTypeDeclarationStatement(
+    private generateValidatorFunctionDeclarationStatement(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        nodeItem: SchemaIndexerNodeItem,
+        typeName: string,
+    ): ts.FunctionDeclaration {
+        return factory.createFunctionDeclaration(
+            [
+                factory.createToken(ts.SyntaxKind.ExportKeyword),
+            ],
+            factory.createToken(ts.SyntaxKind.AsteriskToken),
+            `validate${typeName}`,
+            undefined,
+            [
+                factory.createParameterDeclaration(
+                    undefined,
+                    undefined,
+                    "value",
+                    undefined,
+                    this.generateTypeReference(factory, nodeId),
+                ),
+                factory.createParameterDeclaration(
+                    undefined,
+                    undefined,
+                    "path",
+                    undefined,
+                    factory.createArrayTypeNode(
+                        factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                    ),
+                    factory.createArrayLiteralExpression([]),
+                ),
+            ],
+            undefined,
+            factory.createBlock(
+                [...this.generateValidatorFunctionBodyStatements(factory, nodeItem)],
+                true,
+            ),
+        );
+    }
+
+    private *generateValidatorFunctionBodyStatements(
+        factory: ts.NodeFactory,
+        nodeItem: SchemaIndexerNodeItem,
+    ): Iterable<ts.Statement> {
+
+        // yield* this.generateCommonValidationStatements(nodeItem);
+
+        const types = selectNodeType(nodeItem.node);
+        if (types != null) {
+            const statement: ts.Statement = factory.createBlock([
+                factory.createExpressionStatement(factory.createYieldExpression(
+                    undefined,
+                    factory.createIdentifier("path"),
+                )),
+            ]);
+            for (const type of types) {
+                // statement = this.generateTypeValidationIfStatement(type, nodeItem, statement);
+            }
+            yield statement;
+        }
+
+    }
+
+    private generateSchemaTypeDeclarationStatement(
         factory: ts.NodeFactory,
         nodeId: string,
         nodeItem: SchemaIndexerNodeItem,
