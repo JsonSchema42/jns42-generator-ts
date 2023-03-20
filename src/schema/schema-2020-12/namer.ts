@@ -49,7 +49,7 @@ export class SchemaNamer extends SchemaNamerBase {
         yield [nodeId, name] as const;
 
         for (
-            const [subNodePointer, subNode] of
+            const [subNodePointer] of
             selectNodeInstanceEntries(nodeItem.nodePointer, nodeItem.node)
         ) {
             const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
