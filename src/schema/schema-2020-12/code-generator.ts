@@ -242,7 +242,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         {
             let index = 0;
             for (const [subNodePointer] of prefixItemsEntries) {
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+                const subNodeUrl = new URL(
+                    pointerToHash(subNodePointer),
+                    nodeItem.nodeBaseUrl,
+                );
                 const subNodeId = String(subNodeUrl);
 
                 const typeName = this.manager.getName(subNodeId);
@@ -279,7 +282,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             nodeItem.node,
         );
         for (const [subNodePointer] of itemsEntries) {
-            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeUrl = new URL(
+                pointerToHash(subNodePointer),
+                nodeItem.nodeBaseUrl,
+            );
             const subNodeId = String(subNodeUrl);
 
             const typeName = this.manager.getName(subNodeId);
@@ -392,7 +398,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             nodeItem.node,
         );
         for (const [subNodePointer] of additionalPropertiesEntries) {
-            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeUrl = new URL(
+                pointerToHash(subNodePointer),
+                nodeItem.nodeBaseUrl,
+            );
             const subNodeId = String(subNodeUrl);
 
             const typeName = this.manager.getName(subNodeId);
@@ -464,7 +473,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             nodeItem.node,
         );
         for (const [propertyName, subNodePointer] of properties) {
-            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeUrl = new URL(
+                pointerToHash(subNodePointer),
+                nodeItem.nodeBaseUrl,
+            );
             const subNodeId = String(subNodeUrl);
 
             const typeName = this.manager.getName(subNodeId);
@@ -757,7 +769,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         if (anyOfEntries.length > 0) {
             return factory.createUnionTypeNode(
                 anyOfEntries.map(([subNodePointer]) => {
-                    const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+                    const subNodeUrl = new URL(
+                        pointerToHash(subNodePointer),
+                        nodeItem.nodeBaseUrl,
+                    );
                     const subNodeId = String(subNodeUrl);
                     return this.generateTypeReference(
                         factory,
@@ -771,7 +786,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         if (oneOfEntries.length > 0) {
             return factory.createUnionTypeNode(
                 oneOfEntries.map(([subNodePointer]) => {
-                    const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+                    const subNodeUrl = new URL(
+                        pointerToHash(subNodePointer),
+                        nodeItem.nodeBaseUrl,
+                    );
                     const subNodeId = String(subNodeUrl);
                     return this.generateTypeReference(
                         factory,
@@ -785,7 +803,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         if (allOfEntries.length > 0) {
             return factory.createIntersectionTypeNode(
                 allOfEntries.map(([subNodePointer]) => {
-                    const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+                    const subNodeUrl = new URL(
+                        pointerToHash(subNodePointer),
+                        nodeItem.nodeBaseUrl,
+                    );
                     const subNodeId = String(subNodeUrl);
                     return this.generateTypeReference(
                         factory,
@@ -864,13 +885,8 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        return factory.createTypeReferenceNode(
-            "Array",
-            [
-                factory.createKeywordTypeNode(
-                    ts.SyntaxKind.UnknownKeyword,
-                ),
-            ],
+        return factory.createKeywordTypeNode(
+            ts.SyntaxKind.ObjectKeyword,
         );
     }
 
@@ -880,10 +896,13 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     ): ts.TypeNode {
         const itemsEntries = selectNodeItemsEntries(
             nodeItem.nodePointer,
-            nodeItem.nodeBaseUrl,
+            nodeItem.node,
         );
         for (const [subNodePointer] of itemsEntries) {
-            const subNodeUrl = new URL(subNodePointer, nodeItem.nodeBaseUrl);
+            const subNodeUrl = new URL(
+                pointerToHash(subNodePointer),
+                nodeItem.nodeBaseUrl,
+            );
             const subNodeId = String(subNodeUrl);
             return factory.createTypeReferenceNode(
                 "Array",
@@ -895,14 +914,17 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const prefixItemsEntries = [...selectNodePrefixItemEntries(
             nodeItem.nodePointer,
-            nodeItem.nodeBaseUrl,
+            nodeItem.node,
         )];
 
         if (prefixItemsEntries.length > 0) {
             return factory.createTupleTypeNode(
                 prefixItemsEntries.map(
                     ([subNodePointer]) => {
-                        const subNodeUrl = new URL(subNodePointer, nodeItem.nodeBaseUrl);
+                        const subNodeUrl = new URL(
+                            pointerToHash(subNodePointer),
+                            nodeItem.nodeBaseUrl,
+                        );
                         const subNodeId = String(subNodeUrl);
                         return this.generateTypeReference(factory, subNodeId);
                     },
