@@ -17,11 +17,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
         nodeUrl: URL,
         referencingNodeUrl: URL | null,
     ): Promise<void> {
-        let nodeId = selectNodeId(node);
-        if (nodeId != null) {
-            nodeUrl = new URL(nodeId);
-        }
-        nodeId ??= String(nodeUrl);
+        const nodeId = String(nodeUrl);
 
         const item: SchemaLoaderRootNodeItem = {
             node,
@@ -37,22 +33,24 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         this.manager.registerRootNodeMetaSchema(nodeId, metaSchema.metaSchemaKey);
 
-        await this.loadInstanceReferences(
+        await this.loadFromReferences(
             nodeUrl,
             nodeId,
             node,
         );
     }
 
-    private async loadInstanceReferences(
+    private async loadFromReferences(
         nodeUrl: URL,
         nodePointer: string,
         node: SchemaNode,
     ) {
         const nodeRef = selectNodeRef(node);
+        const nodeId = selectNodeId(node);
 
         if (nodeRef != null) {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
+            nodeRefUrl.hash = "";
             await this.manager.loadFromURL(
                 nodeRefUrl,
                 nodeUrl,
@@ -60,8 +58,18 @@ export class SchemaLoader extends common.SchemaLoaderBase {
             );
         }
 
+        if (nodeId != null) {
+            const nodeIdUrl = new URL(nodeId);
+            await this.manager.loadFromNode(
+                node,
+                nodeIdUrl,
+                nodeUrl,
+                metaSchema.metaSchemaKey,
+            );
+        }
+
         for (const [subNodePointer, subNode] of selectNodeInstanceEntries(nodePointer, node)) {
-            await this.loadInstanceReferences(
+            await this.loadFromReferences(
                 nodeUrl,
                 subNodePointer,
                 subNode,

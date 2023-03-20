@@ -33,22 +33,22 @@ export class SchemaManager {
     }
 
     public async loadFromNode(
-        rootNode: unknown,
-        rootNodeUrl: URL,
-        referencingUrl: URL | null,
+        node: unknown,
+        nodeUrl: URL,
+        referencingNodeUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
         const rootNodeSchemaMetaKey = this.getRootNodeMetaSchemaKey(
-            rootNode,
+            node,
             defaultMetaSchemaKey,
         );
 
         // eslint-disable-next-line security/detect-object-injection
         const loader = this.loaders[rootNodeSchemaMetaKey];
         await loader.loadFromNode(
-            rootNode,
-            rootNodeUrl,
-            referencingUrl,
+            node,
+            nodeUrl,
+            referencingNodeUrl,
         );
     }
 
