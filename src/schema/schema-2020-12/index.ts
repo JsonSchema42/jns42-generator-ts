@@ -5,4 +5,5 @@ export * from "./namer.js";
 export * from "./node.js";
 export * from "./selectors.js";
 export * from "./type-generator.js";
+export * from "./validator-generator.js";
 

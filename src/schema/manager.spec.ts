@@ -33,7 +33,7 @@ test("schema-manager", async t => {
             ),
             ts.factory.createStringLiteral("./utils/validation.js"),
         ),
-        ...manager.generateTypeDeclarations(ts.factory),
+        ...manager.generateStatements(ts.factory),
     ];
 
     const sourceFile = ts.factory.createSourceFile(

@@ -42,6 +42,14 @@ export class SchemaManager {
         ),
     };
 
+    private readonly validatorGenerators = {
+        [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaValidatorGenerator(
+            this,
+            this.loaders[schema202012.metaSchema.metaSchemaKey],
+            this.indexers[schema202012.metaSchema.metaSchemaKey],
+        ),
+    };
+
     public registerRootNodeMetaSchema(
         nodeId: string,
         schemaMetaKey: MetaSchemaKey,
@@ -119,13 +127,22 @@ export class SchemaManager {
         return this.nameMap.get(nodeId);
     }
 
-    public *generateTypeDeclarations(
+    public *generateStatements(
         factory: ts.NodeFactory,
     ) {
         for (const [nodeId, metaSchemaKey] of this.nodeMetaMap) {
             const typeGenerator =
                 this.typeGenerators[metaSchemaKey as keyof typeof this.typeGenerators];
-            yield typeGenerator.generateTypeDeclaration(
+            yield typeGenerator.generateTypeDeclarationStatement(
+                factory,
+                nodeId,
+            );
+        }
+
+        for (const [nodeId, metaSchemaKey] of this.nodeMetaMap) {
+            const validatorGenerator =
+                this.validatorGenerators[metaSchemaKey as keyof typeof this.validatorGenerators];
+            yield validatorGenerator.generateFunctionDeclarationStatement(
                 factory,
                 nodeId,
             );

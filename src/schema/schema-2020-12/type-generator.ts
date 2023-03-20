@@ -15,7 +15,7 @@ export class SchemaTypeGenerator extends SchemaTypeGeneratorBase {
         super(manager);
     }
 
-    public generateTypeDeclaration(
+    public generateTypeDeclarationStatement(
         factory: ts.NodeFactory,
         nodeId: string,
     ): ts.Statement {
