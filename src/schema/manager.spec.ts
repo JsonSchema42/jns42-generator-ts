@@ -12,6 +12,8 @@ test("schema-manager", async t => {
         schemaKey,
     );
 
+    manager.indexNodes();
+
     // eslint-disable-next-line no-debugger
     debugger;
 });

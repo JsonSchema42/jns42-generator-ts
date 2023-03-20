@@ -12,7 +12,11 @@ export interface SchemaLoaderRootNodeItem {
 export class SchemaLoader extends common.SchemaLoaderBase {
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem>();
 
-    public async loadFromNode(
+    public getRootNodeItems() {
+        return this.rootNodeMap.values();
+    }
+
+    public async loadFromRootNode(
         node: SchemaNode,
         nodeUrl: URL,
         referencingNodeUrl: URL | null,
@@ -33,17 +37,17 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         this.manager.registerRootNodeMetaSchema(nodeId, metaSchema.metaSchemaKey);
 
-        await this.loadFromReferences(
-            nodeUrl,
-            nodeId,
+        await this.loadFromSubNodes(
             node,
+            nodeUrl,
+            "",
         );
     }
 
-    private async loadFromReferences(
+    private async loadFromSubNodes(
+        node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        node: SchemaNode,
     ) {
         const nodeRef = selectNodeRef(node);
         const nodeId = selectNodeId(node);
@@ -60,7 +64,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         if (nodeId != null) {
             const nodeIdUrl = new URL(nodeId);
-            await this.manager.loadFromNode(
+            await this.manager.loadFromRootNode(
                 node,
                 nodeIdUrl,
                 nodeUrl,
@@ -69,10 +73,10 @@ export class SchemaLoader extends common.SchemaLoaderBase {
         }
 
         for (const [subNodePointer, subNode] of selectNodeInstanceEntries(nodePointer, node)) {
-            await this.loadFromReferences(
+            await this.loadFromSubNodes(
+                subNode,
                 nodeUrl,
                 subNodePointer,
-                subNode,
             );
         }
     }

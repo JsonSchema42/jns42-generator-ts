@@ -7,7 +7,7 @@ export abstract class SchemaLoaderBase {
         //
     }
 
-    public abstract loadFromNode(
+    public abstract loadFromRootNode(
         node: unknown,
         nodeUrl: URL,
         referencingNodeUrl: URL | null,

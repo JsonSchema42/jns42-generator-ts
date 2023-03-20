@@ -3,3 +3,11 @@ export function appendJsonPointer(basePointer: string, ...subPointerParts: strin
         map(part => "/" + encodeURI(part)).
         join("");
 }
+
+export function pointerToHash(pointer: string) {
+    if (pointer === "") {
+        return "";
+    }
+
+    return "#" + pointer;
+}
