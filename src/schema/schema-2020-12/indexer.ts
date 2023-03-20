@@ -1,6 +1,6 @@
-import { pointerToHash } from "../../utils/pointer.js";
-import * as common from "../index.js";
-import { SchemaManager } from "../index.js";
+import { pointerToHash } from "../../utils/index.js";
+import { SchemaIndexerBase } from "../indexer.js";
+import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
@@ -12,7 +12,7 @@ export interface SchemaIndexerNodeItem {
     nodePointer: string;
 }
 
-export class SchemaIndexer extends common.SchemaIndexerBase {
+export class SchemaIndexer extends SchemaIndexerBase {
     private readonly nodeMap = new Map<string, SchemaIndexerNodeItem>();
     private readonly anchorMap = new Map<string, string>();
     private readonly dynamicAnchorMap = new Map<string, string>();

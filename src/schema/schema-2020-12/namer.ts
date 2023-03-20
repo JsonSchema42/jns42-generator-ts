@@ -1,5 +1,5 @@
 import camelcase from "camelcase";
-import { pointerToHash } from "../../utils/pointer.js";
+import { pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaNamerBase } from "../namer.js";
 import { SchemaIndexer } from "./indexer.js";

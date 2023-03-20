@@ -1,4 +1,4 @@
-import * as common from "../index.js";
+import { SchemaLoaderBase } from "../loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
 import { selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
@@ -9,7 +9,7 @@ export interface SchemaLoaderRootNodeItem {
     referencingNodeUrl: URL | null;
 }
 
-export class SchemaLoader extends common.SchemaLoaderBase {
+export class SchemaLoader extends SchemaLoaderBase {
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem>();
 
     public getRootNodeItem(nodeId: string) {
