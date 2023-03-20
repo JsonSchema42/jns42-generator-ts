@@ -12,6 +12,10 @@ export interface SchemaLoaderRootNodeItem {
 export class SchemaLoader extends common.SchemaLoaderBase {
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem>();
 
+    public getRootNodeItem(nodeId: string) {
+        return this.rootNodeMap.get(nodeId);
+    }
+
     public getRootNodeItems() {
         return this.rootNodeMap.values();
     }

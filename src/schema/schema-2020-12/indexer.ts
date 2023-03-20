@@ -28,6 +28,15 @@ export class SchemaIndexer extends common.SchemaIndexerBase {
         return this.nodeMap.get(nodeId);
     }
 
+    public getAnchorNodeId(nodeId: string) {
+        return this.anchorMap.get(nodeId);
+    }
+
+    public getDynamicAnchorNodeId(nodeId: string) {
+        const nodeKey = String(nodeId);
+        return this.dynamicAnchorMap.get(nodeKey);
+    }
+
     public indexNodes() {
         for (const item of this.loader.getRootNodeItems()) {
             this.indexNode(

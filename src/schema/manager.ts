@@ -1,3 +1,4 @@
+import ts from "typescript";
 import { discoverRootNodeMetaSchemaKey, MetaSchemaKey } from "./meta.js";
 import * as schema201909 from "./schema-2019-09/index.js";
 import * as schema202012 from "./schema-2020-12/index.js";
@@ -10,26 +11,6 @@ export class SchemaManager {
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nameMap = new Map<string, string>();
-
-    public registerRootNodeMetaSchema(
-        nodeId: string,
-        schemaMetaKey: MetaSchemaKey,
-    ) {
-        if (this.rootNodeMetaMap.has(nodeId)) {
-            throw new Error("duplicate root nodeId");
-        }
-        this.rootNodeMetaMap.set(nodeId, schemaMetaKey);
-    }
-
-    public registerNodeMetaSchema(
-        nodeId: string,
-        schemaMetaKey: MetaSchemaKey,
-    ) {
-        if (this.nodeMetaMap.has(nodeId)) {
-            throw new Error("duplicate nodeId");
-        }
-        this.nodeMetaMap.set(nodeId, schemaMetaKey);
-    }
 
     private readonly loaders = {
         [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaLoader(this),
@@ -52,6 +33,34 @@ export class SchemaManager {
             this.indexers[schema202012.metaSchema.metaSchemaKey],
         ),
     };
+
+    private readonly typeGenerators = {
+        [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaTypeGenerator(
+            this,
+            this.loaders[schema202012.metaSchema.metaSchemaKey],
+            this.indexers[schema202012.metaSchema.metaSchemaKey],
+        ),
+    };
+
+    public registerRootNodeMetaSchema(
+        nodeId: string,
+        schemaMetaKey: MetaSchemaKey,
+    ) {
+        if (this.rootNodeMetaMap.has(nodeId)) {
+            throw new Error("duplicate root nodeId");
+        }
+        this.rootNodeMetaMap.set(nodeId, schemaMetaKey);
+    }
+
+    public registerNodeMetaSchema(
+        nodeId: string,
+        schemaMetaKey: MetaSchemaKey,
+    ) {
+        if (this.nodeMetaMap.has(nodeId)) {
+            throw new Error("duplicate nodeId");
+        }
+        this.nodeMetaMap.set(nodeId, schemaMetaKey);
+    }
 
     public async loadFromURL(
         url: URL,
@@ -103,6 +112,23 @@ export class SchemaManager {
                 }
                 this.nameMap.set(nodeId, name);
             }
+        }
+    }
+
+    public getName(nodeId: string) {
+        return this.nameMap.get(nodeId);
+    }
+
+    public *generateTypeDeclarations(
+        factory: ts.NodeFactory,
+    ) {
+        for (const [nodeId, metaSchemaKey] of this.nodeMetaMap) {
+            const typeGenerator =
+                this.typeGenerators[metaSchemaKey as keyof typeof this.typeGenerators];
+            yield typeGenerator.generateTypeDeclaration(
+                factory,
+                nodeId,
+            );
         }
     }
 

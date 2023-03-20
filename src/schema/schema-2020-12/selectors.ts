@@ -276,3 +276,80 @@ export function* selectNodeInstanceEntries(
 }
 
 //#endregion
+
+//#region type
+
+export function selectNodeType(
+    node: SchemaNode,
+) {
+    if (
+        typeof node === "object" &&
+        node != null
+    ) {
+        if (
+            "type" in node &&
+            typeof node.type === "string"
+        ) {
+            return [node.type];
+        }
+        else if (
+            "type" in node &&
+            Array.isArray(node.type) &&
+            node.type.every(type => typeof type === "string")
+        ) {
+            return node.type as string[];
+        }
+    }
+}
+
+export function selectNodeRequiredProperties(
+    node: SchemaNode,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "required" in node &&
+            Array.isArray(node.required) &&
+            node.required.every(type => typeof type === "string")
+        ) {
+            return node.required as string[];
+        }
+    }
+}
+
+export function selectNodeEnum(
+    node: SchemaNode,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "enum" in node &&
+            node.enum != null &&
+            Array.isArray(node.enum)
+        ) {
+            return node.enum;
+        }
+    }
+}
+
+export function selectNodeConst(
+    node: SchemaNode,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "const" in node &&
+            node.const != null
+        ) {
+            return node.const;
+        }
+    }
+}
+
+//#endregion
