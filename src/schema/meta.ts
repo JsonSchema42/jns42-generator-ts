@@ -21,3 +21,13 @@ export const metaSchemaMap = {
 };
 
 export type MetaSchemaKey = keyof typeof metaSchemaMap;
+
+export function discoverRootNodeMetaSchemaKey(
+    schemaRootNode: unknown,
+) {
+    for (const [schemaKey, schemaMeta] of Object.entries(metaSchemaMap)) {
+        if (schemaMeta.isSchemaRootNode(schemaRootNode)) {
+            return schemaKey as MetaSchemaKey;
+        }
+    }
+}

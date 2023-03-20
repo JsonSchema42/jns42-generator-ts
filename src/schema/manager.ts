@@ -1,4 +1,4 @@
-import { MetaSchemaKey, metaSchemaMap } from "./meta.js";
+import { discoverRootNodeMetaSchemaKey, MetaSchemaKey, metaSchemaMap } from "./meta.js";
 
 export class SchemaManager {
 
@@ -38,10 +38,8 @@ export class SchemaManager {
         referencingNodeUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
-        const rootNodeSchemaMetaKey = this.getRootNodeMetaSchemaKey(
-            node,
-            defaultMetaSchemaKey,
-        );
+        const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaKey(node) ??
+            defaultMetaSchemaKey;
 
         // eslint-disable-next-line security/detect-object-injection
         const loader = this.loaders[rootNodeSchemaMetaKey];
@@ -50,19 +48,6 @@ export class SchemaManager {
             nodeUrl,
             referencingNodeUrl,
         );
-    }
-
-    private getRootNodeMetaSchemaKey(
-        schemaRootNode: unknown,
-        defaultMetaSchemaKey: MetaSchemaKey,
-    ) {
-        for (const [schemaKey, schemaMeta] of Object.entries(metaSchemaMap)) {
-            if (schemaMeta.isSchemaRootNode(schemaRootNode)) {
-                return schemaKey as MetaSchemaKey;
-            }
-        }
-
-        return defaultMetaSchemaKey;
     }
 
 }
