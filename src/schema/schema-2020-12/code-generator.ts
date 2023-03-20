@@ -878,6 +878,38 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
+        const itemsEntries = selectNodeItemsEntries(
+            nodeItem.nodePointer,
+            nodeItem.nodeBaseUrl,
+        );
+        for (const [subNodePointer] of itemsEntries) {
+            const subNodeUrl = new URL(subNodePointer, nodeItem.nodeBaseUrl);
+            const subNodeId = String(subNodeUrl);
+            return factory.createTypeReferenceNode(
+                "Array",
+                [
+                    this.generateTypeReference(factory, subNodeId),
+                ],
+            );
+        }
+
+        const prefixItemsEntries = [...selectNodePrefixItemEntries(
+            nodeItem.nodePointer,
+            nodeItem.nodeBaseUrl,
+        )];
+
+        if (prefixItemsEntries.length > 0) {
+            return factory.createTupleTypeNode(
+                prefixItemsEntries.map(
+                    ([subNodePointer]) => {
+                        const subNodeUrl = new URL(subNodePointer, nodeItem.nodeBaseUrl);
+                        const subNodeId = String(subNodeUrl);
+                        return this.generateTypeReference(factory, subNodeId);
+                    },
+                ),
+            );
+        }
+
         return factory.createTypeReferenceNode(
             "Array",
             [
@@ -930,3 +962,4 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     //#endregion
 
 }
+
