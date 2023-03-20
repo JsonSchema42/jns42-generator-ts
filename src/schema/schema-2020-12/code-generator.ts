@@ -181,11 +181,8 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                 break;
 
             case "number":
-                yield* this.generateNumberTypeValidationStatements(factory, nodeItem);
-                break;
-
             case "integer":
-                yield* this.generateIntegerTypeValidationStatements(factory, nodeItem);
+                yield* this.generateNumericTypeValidationStatements(factory, nodeItem);
                 break;
 
             case "boolean":
@@ -547,69 +544,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         }
     }
 
-    private * generateNumberTypeValidationStatements(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ) {
-        const minimum = selectValidationMinimum(nodeItem.node);
-        const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
-        const maximum = selectValidationMaximum(nodeItem.node);
-        const exclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
-        const multipleOf = selectValidationMultipleOf(nodeItem.node);
-
-        if (minimum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
-                    factory,
-                    "isValidMinimum",
-                    minimum,
-                ),
-            );
-        }
-        if (exclusiveMinimum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
-                    factory,
-                    "isValidExclusiveMinimum",
-                    exclusiveMinimum,
-                ),
-            );
-        }
-        if (maximum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
-                    factory,
-                    "isValidMaximum",
-                    maximum,
-                ),
-            );
-        }
-        if (exclusiveMaximum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
-                    factory,
-                    "isValidExclusiveMaximum",
-                    exclusiveMaximum,
-                ),
-            );
-        }
-        if (multipleOf != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
-                    factory,
-                    "isValidMultipleOf",
-                    multipleOf,
-                ),
-            );
-        }
-    }
-
-    private * generateIntegerTypeValidationStatements(
+    private * generateNumericTypeValidationStatements(
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ) {
@@ -849,10 +784,6 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                 );
 
             case "number":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.NumberKeyword,
-                );
-
             case "integer":
                 return factory.createKeywordTypeNode(
                     ts.SyntaxKind.NumberKeyword,
