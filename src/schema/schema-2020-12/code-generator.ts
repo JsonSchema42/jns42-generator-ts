@@ -4,7 +4,7 @@ import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeOneOfEntries, selectNodeRef, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemEntries, selectNodeProperties, selectNodeRef, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -235,41 +235,55 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const prefixItemsUrls = selectNodePrefixItemsUrls(nodeItem.nodeUrl, nodeItem.node);
-        if (prefixItemsUrls != null) {
-            for (const [key, prefixItemsUrl] of Object.entries(prefixItemsUrls)) {
-                const prefixItemName = this.schemaNamer.getName(prefixItemsUrl);
-                if (prefixItemName == null) {
+        const prefixItemsEntries = selectNodePrefixItemEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        {
+            let index = 0;
+            for (const [subNodePointer] of prefixItemsEntries) {
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+                const subNodeId = String(subNodeUrl);
+
+                const typeName = this.manager.getName(subNodeId);
+                if (typeName == null) {
                     throw new Error("name not found");
                 }
 
                 yield factory.createExpressionStatement(factory.createYieldExpression(
                     factory.createToken(ts.SyntaxKind.AsteriskToken),
                     factory.createCallExpression(
-                        factory.createIdentifier(`validate${prefixItemName}`),
+                        factory.createIdentifier(`validate${typeName}`),
                         undefined,
                         [
                             factory.createElementAccessExpression(
                                 factory.createIdentifier("value"),
-                                factory.createNumericLiteral(key),
+                                factory.createNumericLiteral(index),
                             ),
                             factory.createArrayLiteralExpression(
                                 [
                                     factory.createSpreadElement(factory.createIdentifier("path")),
-                                    factory.createStringLiteral(key),
+                                    factory.createNumericLiteral(index),
                                 ],
                                 false,
                             ),
                         ],
                     )),
                 );
+                index++;
             }
         }
 
-        const itemsUrl = selectNodeItemsUrl(nodeItem.nodeUrl, nodeItem.node);
-        if (itemsUrl != null) {
-            const itemsName = this.schemaNamer.getName(itemsUrl);
-            if (itemsName == null) {
+        const itemsEntries = selectNodeItemsEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        for (const [subNodePointer] of itemsEntries) {
+            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeId = String(subNodeUrl);
+
+            const typeName = this.manager.getName(subNodeId);
+            if (typeName == null) {
                 throw new Error("name not found");
             }
 
@@ -314,7 +328,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                     factory.createExpressionStatement(factory.createYieldExpression(
                         factory.createToken(ts.SyntaxKind.AsteriskToken),
                         factory.createCallExpression(
-                            factory.createIdentifier(`validate${itemsName}`),
+                            factory.createIdentifier(`validate${typeName}`),
                             undefined,
                             [
                                 factory.createIdentifier("value"),
@@ -373,13 +387,16 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const additionalPropertiesUrl = selectNodeAdditionalPropertiesUrl(
-            nodeItem.nodeUrl,
+        const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
+            nodeItem.nodePointer,
             nodeItem.node,
         );
-        if (additionalPropertiesUrl != null) {
-            const additionalPropertiesName = this.schemaNamer.getName(additionalPropertiesUrl);
-            if (additionalPropertiesName == null) {
+        for (const [subNodePointer] of additionalPropertiesEntries) {
+            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeId = String(subNodeUrl);
+
+            const typeName = this.manager.getName(subNodeId);
+            if (typeName == null) {
                 throw new Error("name not found");
             }
 
@@ -424,7 +441,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                     factory.createExpressionStatement(factory.createYieldExpression(
                         factory.createToken(ts.SyntaxKind.AsteriskToken),
                         factory.createCallExpression(
-                            factory.createIdentifier(`validate${additionalPropertiesName}`),
+                            factory.createIdentifier(`validate${typeName}`),
                             undefined,
                             [
                                 factory.createIdentifier("value"),
@@ -442,39 +459,43 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const propertiesEntries = selectNodeProperties(nodeItem.nodeUrl, nodeItem.node);
-        if (propertiesEntries != null) {
-            for (const [key, propertyUrl] of propertiesEntries) {
-                const propertyName = this.schemaNamer.getName(propertyUrl);
-                if (propertyName == null) {
-                    throw new Error("name not found");
-                }
+        const properties = selectNodeProperties(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        for (const [propertyName, subNodePointer] of properties) {
+            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeId = String(subNodeUrl);
 
-                yield factory.createExpressionStatement(factory.createYieldExpression(
-                    factory.createToken(ts.SyntaxKind.AsteriskToken),
-                    factory.createCallExpression(
-                        factory.createIdentifier(`validate${propertyName}`),
-                        undefined,
-                        [
-                            factory.createElementAccessExpression(
-                                factory.createIdentifier("value"),
-                                factory.createStringLiteral(key),
-                            ),
-                            factory.createArrayLiteralExpression(
-                                [
-                                    factory.createSpreadElement(factory.createIdentifier("path")),
-                                    factory.createStringLiteral(key),
-                                ],
-                                false,
-                            ),
-                        ],
-                    )),
-                );
+            const typeName = this.manager.getName(subNodeId);
+            if (typeName == null) {
+                throw new Error("name not found");
             }
+
+            yield factory.createExpressionStatement(factory.createYieldExpression(
+                factory.createToken(ts.SyntaxKind.AsteriskToken),
+                factory.createCallExpression(
+                    factory.createIdentifier(`validate${typeName}`),
+                    undefined,
+                    [
+                        factory.createElementAccessExpression(
+                            factory.createIdentifier("value"),
+                            factory.createStringLiteral(propertyName),
+                        ),
+                        factory.createArrayLiteralExpression(
+                            [
+                                factory.createSpreadElement(factory.createIdentifier("path")),
+                                factory.createStringLiteral(propertyName),
+                            ],
+                            false,
+                        ),
+                    ],
+                )),
+            );
         }
     }
 
-    private *generateStringTypeValidationStatements(
+    private * generateStringTypeValidationStatements(
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ) {
@@ -514,7 +535,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         }
     }
 
-    private *generateNumberTypeValidationStatements(
+    private * generateNumberTypeValidationStatements(
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ) {
@@ -576,7 +597,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         }
     }
 
-    private *generateIntegerTypeValidationStatements(
+    private * generateIntegerTypeValidationStatements(
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ) {

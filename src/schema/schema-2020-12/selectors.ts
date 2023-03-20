@@ -143,7 +143,7 @@ export function* selectNodePropertyEntries(
     }
 }
 
-export function* selectNodeAdditionalPropertyEntries(
+export function* selectNodeAdditionalPropertiesEntries(
     nodePointer: string,
     node: SchemaNode,
 ) {
@@ -182,7 +182,7 @@ export function* selectNodePrefixItemEntries(
     }
 }
 
-export function* selectNodeItemEntries(
+export function* selectNodeItemsEntries(
     nodePointer: string,
     node: SchemaNode,
 ) {
@@ -267,9 +267,9 @@ export function* selectNodeInstanceEntries(
 ) {
     yield* selectNodeDefEntries(nodePointer, node);
     yield* selectNodePropertyEntries(nodePointer, node);
-    yield* selectNodeAdditionalPropertyEntries(nodePointer, node);
+    yield* selectNodeAdditionalPropertiesEntries(nodePointer, node);
     yield* selectNodePrefixItemEntries(nodePointer, node);
-    yield* selectNodeItemEntries(nodePointer, node);
+    yield* selectNodeItemsEntries(nodePointer, node);
     yield* selectNodeAllOfEntries(nodePointer, node);
     yield* selectNodeAnyOfEntries(nodePointer, node);
     yield* selectNodeOneOfEntries(nodePointer, node);
@@ -315,6 +315,26 @@ export function selectNodeRequiredProperties(
             node.required.every(type => typeof type === "string")
         ) {
             return node.required as string[];
+        }
+    }
+}
+
+export function* selectNodeProperties(
+    nodePointer: string,
+    node: SchemaNode,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "properties" in node &&
+            typeof node.properties === "object" && node.properties != null
+        ) {
+            for (const [key, subNode] of Object.entries(node.properties)) {
+                const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
+                yield [key, subNodePointer] as const;
+            }
         }
     }
 }
