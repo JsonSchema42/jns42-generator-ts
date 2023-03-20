@@ -4,8 +4,7 @@ import * as schemaDraft04 from "./schema-draft-04/index.js";
 import * as schemaDraft07 from "./schema-draft-06/index.js";
 import * as schemaDraft06 from "./schema-draft-07/index.js";
 
-export class FederatedSchemaLoader {
-
+export class SchemaManager {
     private readonly schemaMetaMap = {
         [schema202012.schemaMeta.metaSchemaKey]: schema202012.schemaMeta,
         [schema201909.schemaMeta.metaSchemaKey]: schema201909.schemaMeta,
@@ -13,6 +12,15 @@ export class FederatedSchemaLoader {
         [schemaDraft06.schemaMeta.metaSchemaKey]: schemaDraft06.schemaMeta,
         [schemaDraft04.schemaMeta.metaSchemaKey]: schemaDraft04.schemaMeta,
     };
+
+    private readonly instanceMetaMap = new Map<string, keyof typeof this.schemaMetaMap>();
+
+    public registerInstanceMetaSchema(
+        schemaKey: string,
+        schemaMetaKey: keyof typeof this.schemaMetaMap,
+    ) {
+        this.instanceMetaMap.set(schemaKey, schemaMetaKey);
+    }
 
     private readonly loaders = Object.fromEntries(
         Object.entries(this.schemaMetaMap).

@@ -1,8 +1,8 @@
-import { FederatedSchemaLoader } from "./federated-loader.js";
+import { SchemaManager } from "./manager.js";
 
 export abstract class SchemaLoaderBase {
     constructor(
-        protected readonly federatedLoader: FederatedSchemaLoader,
+        protected readonly manager: SchemaManager,
     ) {
         //
     }

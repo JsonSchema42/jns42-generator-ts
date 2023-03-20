@@ -33,6 +33,8 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         this.instanceItemMap.set(idKey, item);
 
+        this.manager.registerInstanceMetaSchema(idKey, schemaMeta.metaSchemaKey);
+
         await this.loadInstanceReferences(
             instanceUrl,
             instanceNode,
@@ -49,7 +51,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
         const refNodeUrl = selectNodeRefUrl(nodeUrl, node);
 
         if (idNodeUrl != null) {
-            await this.federatedLoader.loadFromNode(
+            await this.manager.loadFromNode(
                 node,
                 idNodeUrl,
                 referencingInstanceUrl,
@@ -59,7 +61,7 @@ export class SchemaLoader extends common.SchemaLoaderBase {
 
         if (refNodeUrl != null) {
             const referenceInstanceUrl = toServerUrl(refNodeUrl);
-            await this.federatedLoader.loadFromURL(
+            await this.manager.loadFromURL(
                 referenceInstanceUrl,
                 referencingInstanceUrl,
                 schemaMeta.metaSchemaUrl,
