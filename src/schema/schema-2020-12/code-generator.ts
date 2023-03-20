@@ -182,7 +182,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
             case "number":
             case "integer":
-                yield* this.generateNumericTypeValidationStatements(factory, nodeItem);
+                yield* this.generateNumberTypeValidationStatements(factory, nodeItem);
                 break;
 
             case "boolean":
@@ -544,7 +544,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         }
     }
 
-    private * generateNumericTypeValidationStatements(
+    private * generateNumberTypeValidationStatements(
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ) {
