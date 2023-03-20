@@ -18,6 +18,8 @@ export class SchemaNamer extends SchemaNamerBase {
         nodeId: string,
         baseName = "",
     ): Iterable<readonly [string, string]> {
+        const re = /[^A-Za-z0-9]/u;
+
         const nodeItem = this.indexer.getNodeItem(nodeId);
         if (nodeItem == null) {
             throw new Error("nodeId not found");
@@ -25,10 +27,12 @@ export class SchemaNamer extends SchemaNamerBase {
 
         const pathParts = nodeItem.nodeBaseUrl.pathname.
             split("/").
-            map(decodeURI);
+            map(decodeURI).
+            map(value => value.replace(re, ""));
         const pointerParts = nodeItem.nodePointer.
             split("/").
-            map(decodeURI);
+            map(decodeURI).
+            map(value => value.replace(re, ""));
 
         const nameParts = nodeItem.nodePointer === "" ?
             [

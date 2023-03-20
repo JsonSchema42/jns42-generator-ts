@@ -12,10 +12,10 @@ export function pointerToHash(pointer: string) {
     return "#" + pointer;
 }
 
-export function hashToPointer(hash: string) {
-    if (hash.startsWith("#")) {
-        return hash.substring(1);
-    }
+// export function hashToPointer(hash: string) {
+//     if (hash.startsWith("#")) {
+//         return hash.substring(1);
+//     }
 
-    return "";
-}
+//     return "";
+// }
