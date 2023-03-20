@@ -13,6 +13,7 @@ test("schema-manager", async t => {
     );
 
     manager.indexNodes();
+    manager.nameNodes();
 
     // eslint-disable-next-line no-debugger
     debugger;

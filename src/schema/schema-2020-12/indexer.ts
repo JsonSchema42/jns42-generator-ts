@@ -24,6 +24,10 @@ export class SchemaIndexer extends common.SchemaIndexerBase {
         super(manager);
     }
 
+    public getNodeItem(nodeId: string) {
+        return this.nodeMap.get(nodeId);
+    }
+
     public indexNodes() {
         for (const item of this.loader.getRootNodeItems()) {
             this.indexNode(

@@ -9,6 +9,7 @@ export class SchemaManager {
 
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaKey>();
+    private readonly nameMap = new Map<string, string>();
 
     public registerRootNodeMetaSchema(
         nodeId: string,
@@ -42,6 +43,13 @@ export class SchemaManager {
         [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaIndexer(
             this,
             this.loaders[schema202012.metaSchema.metaSchemaKey],
+        ),
+    };
+
+    private readonly namers = {
+        [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaNamer(
+            this,
+            this.indexers[schema202012.metaSchema.metaSchemaKey],
         ),
     };
 
@@ -83,6 +91,18 @@ export class SchemaManager {
     ) {
         for (const indexer of Object.values(this.indexers)) {
             indexer.indexNodes();
+        }
+    }
+
+    public nameNodes() {
+        for (const [rootNodeId, metaSchemaKey] of this.rootNodeMetaMap) {
+            const namer = this.namers[metaSchemaKey as keyof typeof this.namers];
+            for (const [nodeId, name] of namer.getTypeNames(rootNodeId)) {
+                if (this.nameMap.has(nodeId)) {
+                    throw new Error("duplicate nodeId");
+                }
+                this.nameMap.set(nodeId, name);
+            }
         }
     }
 
