@@ -1031,10 +1031,29 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     private resolveDynamicReferenceNodeId(
         nodeId: string,
     ) {
-        let resolvedNodeId = this.indexer.getDynamicAnchorNodeId(nodeId);
+        const nodeUrl = new URL(nodeId);
+        let resolvedNodeId: string | null = nodeId;
+        let currentRootNodeUrl: URL | null = new URL("", nodeUrl);
+        while (currentRootNodeUrl != null) {
+            const currentRootNodeId = String(currentRootNodeUrl);
+            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
+            if (currentRootNode == null) {
+                throw new Error("rootNode not found");
+            }
 
-        if (resolvedNodeId == null) {
-            resolvedNodeId = nodeId;
+            const currentNodeUrl = new URL(
+                nodeUrl.hash,
+                currentRootNode.nodeUrl,
+            );
+            const currentNodeId = String(currentNodeUrl);
+            const maybeResolvedNodeId = this.indexer.getDynamicAnchorNodeId(
+                currentNodeId,
+            );
+            if (maybeResolvedNodeId != null) {
+                resolvedNodeId = maybeResolvedNodeId;
+            }
+
+            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
         }
 
         return resolvedNodeId;
