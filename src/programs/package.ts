@@ -1,8 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
+import { PackageJson } from "type-fest";
 import ts from "typescript";
 import * as yargs from "yargs";
 import { SchemaManager } from "../schema/index.js";
+import { packageInfo, projectRoot } from "../utils/index.js";
 
 export function configureLabProgram(argv: yargs.Argv) {
     return argv.
@@ -29,6 +31,10 @@ export function configureLabProgram(argv: yargs.Argv) {
                 option("package-name", {
                     describe: "name of the package",
                     type: "string",
+                }).
+                option("package-version", {
+                    describe: "version of the package",
+                    type: "string",
                 }),
             argv => main(argv as MainOptions),
         );
@@ -39,13 +45,16 @@ interface MainOptions {
     defaultMetaSchemaUrl: "https://json-schema.org/draft/2020-12/schema"
     packageDirectory: string
     packageName: string
+    packageVersion: string
 }
 
 async function main(options: MainOptions) {
     const schemaUrl = new URL(options.schemaUrl);
     const defaultMetaSchemaKey = options.defaultMetaSchemaUrl;
     const packageDirectoryPath = path.resolve(options.packageDirectory);
-    const { packageName } = options;
+    const { packageName, packageVersion } = options;
+
+    const factory = ts.factory;
 
     const manager = new SchemaManager();
 
@@ -58,37 +67,152 @@ async function main(options: MainOptions) {
     manager.indexNodes();
     manager.nameNodes();
 
-    const banner = "/* eslint-disable */\n\n";
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(packageDirectoryPath, { recursive: true });
+
+    const packageFileContent = getPackageFileContent(packageName, packageVersion);
+    const packageFilePath = path.join(packageDirectoryPath, "package.json");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(packageFilePath, packageFileContent);
+
+    const tsconfigFileContent = getTsconfigFileContent();
+    const tsconfigFilePath = path.join(packageDirectoryPath, "tsconfig.json");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(tsconfigFilePath, tsconfigFileContent);
+
+    const mainFileContent = getMainFileContent(factory);
+    const mainFilePath = path.join(packageDirectoryPath, "main.ts");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(mainFilePath, mainFileContent);
+
+    const schemaFileContent = getSchemaFileContent(factory, manager);
+    const schemaFilePath = path.join(packageDirectoryPath, "schema.ts");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(schemaFilePath, schemaFileContent);
+
+    const validationSourceFileContent = path.join(projectRoot, "src", "utils", "validation.ts");
+    const validationFilePath = path.join(packageDirectoryPath, "validation.ts");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.copyFileSync(validationSourceFileContent, validationFilePath);
+}
+
+function getMainFileContent(
+    factory: ts.NodeFactory,
+) {
+    const banner = "/* eslint-disable */\n";
 
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,
     });
 
     const nodes = [
-        ts.factory.createImportDeclaration(
+        factory.createExportDeclaration(
             undefined,
-            ts.factory.createImportClause(
-                false,
-                undefined,
-                ts.factory.createNamespaceImport(ts.factory.createIdentifier("validation")),
-            ),
-            ts.factory.createStringLiteral("./utils/validation.js"),
+            false,
+            undefined,
+            factory.createStringLiteral("./schema.js"),
+            undefined,
         ),
-        ...manager.generateStatements(ts.factory),
     ];
 
-    const sourceFile = ts.factory.createSourceFile(
+    const sourceFile = factory.createSourceFile(
         nodes,
-        ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
+        factory.createToken(ts.SyntaxKind.EndOfFileToken),
         ts.NodeFlags.None,
     );
 
-    const content = banner + printer.printFile(sourceFile);
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(packageDirectoryPath, { recursive: true });
-
-    const schemaFilePath = path.join(packageDirectoryPath, "schema.ts");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(schemaFilePath, content);
+    return banner + printer.printFile(sourceFile);
 }
+function getSchemaFileContent(
+    factory: ts.NodeFactory,
+    manager: SchemaManager,
+) {
+    const banner = "/* eslint-disable */\n";
+
+    const printer = ts.createPrinter({
+        newLine: ts.NewLineKind.LineFeed,
+    });
+
+    const nodes = [
+        factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("validation")),
+            ),
+            factory.createStringLiteral("./validation.js"),
+        ),
+        ...manager.generateStatements(factory),
+    ];
+
+    const sourceFile = factory.createSourceFile(
+        nodes,
+        factory.createToken(ts.SyntaxKind.EndOfFileToken),
+        ts.NodeFlags.None,
+    );
+
+    return banner + printer.printFile(sourceFile);
+}
+
+function getPackageFileContent(
+    name: string,
+    version: string,
+) {
+    const json: PackageJson = {
+        "name": name,
+        "version": version,
+        "sideEffects": false,
+        "type": "module",
+        "main": "main.js",
+        "types": "main.d.ts",
+        "files": [
+            "*",
+        ],
+        "scripts": {
+            "prepare": "tsc",
+        },
+        "author": "",
+        "license": "ISC",
+        "dependencies": withDependencies([
+        ]),
+        "devDependencies": withDependencies([
+            "typescript",
+        ]),
+    };
+
+    return JSON.stringify(json, undefined, 2);
+}
+
+function withDependencies(
+    names: string[],
+) {
+    return names.reduce(
+        (o, name) => Object.assign(o, {
+            [name]:
+                packageInfo.dependencies?.[name] ??
+                packageInfo.devDependencies?.[name],
+        }),
+        {},
+    );
+}
+
+function getTsconfigFileContent() {
+    const json = {
+        "compilerOptions": {
+            "target": "ES2020",
+            "module": "ES2020",
+            "moduleResolution": "node",
+            "declaration": true,
+            "sourceMap": true,
+            "importHelpers": true,
+            "strict": true,
+            "forceConsistentCasingInFileNames": true,
+            "esModuleInterop": true,
+            "skipLibCheck": true,
+        },
+    };
+
+    return JSON.stringify(json, undefined, 2);
+}
+

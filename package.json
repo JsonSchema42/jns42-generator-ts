@@ -52,6 +52,7 @@
     "@types/yargs": "^17.0.22",
     "camelcase": "^7.0.1",
     "tslib": "^2.5.0",
+    "type-fest": "^3.6.1",
     "yargs": "^17.7.1"
   }
 }

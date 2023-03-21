@@ -23,7 +23,9 @@
         "--package-directory",
         ".package",
         "--package-name",
-        "package"
+        "package",
+        "--package-version",
+        "0.0.0"
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
