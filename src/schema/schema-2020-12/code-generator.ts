@@ -755,16 +755,33 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        if (nodeItem.node === true) {
+        const typeNodes = [...this.generateTypeNodes(factory, nodeItem)];
+        if (typeNodes.length === 0) {
             return factory.createKeywordTypeNode(
+                ts.SyntaxKind.UnknownKeyword,
+            );
+        }
+        return factory.createIntersectionTypeNode(
+            typeNodes,
+        );
+    }
+
+    private * generateTypeNodes(
+        factory: ts.NodeFactory,
+        nodeItem: SchemaIndexerNodeItem,
+    ): Iterable<ts.TypeNode> {
+        if (nodeItem.node === true) {
+            yield factory.createKeywordTypeNode(
                 ts.SyntaxKind.AnyKeyword,
             );
+            return;
         }
 
         if (nodeItem.node === false) {
-            return factory.createKeywordTypeNode(
+            yield factory.createKeywordTypeNode(
                 ts.SyntaxKind.NeverKeyword,
             );
+            return;
         }
 
         const nodeRef = selectNodeRef(nodeItem.node);
@@ -772,7 +789,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             const nodeUrl = new URL(nodeRef, nodeItem.nodeBaseUrl);
             const nodeId = String(nodeUrl);
             const resolvedNodeId = this.resolveReferenceNodeId(nodeId);
-            return this.generateTypeReference(
+            yield this.generateTypeReference(
                 factory,
                 resolvedNodeId,
             );
@@ -783,7 +800,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             const nodeUrl = new URL(nodeDynamicRef, nodeItem.nodeBaseUrl);
             const nodeId = String(nodeUrl);
             const resolvedNodeId = this.resolveDynamicReferenceNodeId(nodeId);
-            return this.generateTypeReference(
+            yield this.generateTypeReference(
                 factory,
                 resolvedNodeId,
             );
@@ -791,7 +808,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const constValue = selectNodeConst(nodeItem.node);
         if (constValue != null) {
-            return factory.createLiteralTypeNode(generatePrimitiveLiteral(
+            yield factory.createLiteralTypeNode(generatePrimitiveLiteral(
                 factory,
                 constValue,
             ));
@@ -799,7 +816,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const enumValues = selectNodeEnum(nodeItem.node);
         if (enumValues != null) {
-            return factory.createUnionTypeNode(
+            yield factory.createUnionTypeNode(
                 enumValues.map(value => factory.createLiteralTypeNode(generatePrimitiveLiteral(
                     factory,
                     value,
@@ -809,7 +826,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodePointer, nodeItem.node)];
         if (anyOfEntries.length > 0) {
-            return factory.createUnionTypeNode(
+            yield factory.createUnionTypeNode(
                 anyOfEntries.map(([subNodePointer]) => {
                     const subNodeUrl = new URL(
                         pointerToHash(subNodePointer),
@@ -826,7 +843,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const oneOfEntries = [...selectNodeOneOfEntries(nodeItem.nodePointer, nodeItem.node)];
         if (oneOfEntries.length > 0) {
-            return factory.createUnionTypeNode(
+            yield factory.createUnionTypeNode(
                 oneOfEntries.map(([subNodePointer]) => {
                     const subNodeUrl = new URL(
                         pointerToHash(subNodePointer),
@@ -843,7 +860,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const allOfEntries = [...selectNodeAllOfEntries(nodeItem.nodePointer, nodeItem.node)];
         if (allOfEntries.length > 0) {
-            return factory.createIntersectionTypeNode(
+            yield factory.createIntersectionTypeNode(
                 allOfEntries.map(([subNodePointer]) => {
                     const subNodeUrl = new URL(
                         pointerToHash(subNodePointer),
@@ -860,7 +877,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const types = selectNodeType(nodeItem.node);
         if (types != null) {
-            return factory.createUnionTypeNode(
+            yield factory.createUnionTypeNode(
                 types.map(type => this.generateTypeDefinition(
                     factory,
                     type,
@@ -869,9 +886,6 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        return factory.createKeywordTypeNode(
-            ts.SyntaxKind.UnknownKeyword,
-        );
     }
 
     private generateTypeDefinition(
