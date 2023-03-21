@@ -7,11 +7,27 @@
       "name": "run file",
       "program": "${file}",
       "args": [],
-      "cwd": "${workspaceRoot}",
+      "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceRoot}/out/**/*.js"
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "watch"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "run package",
+      "program": "${workspaceFolder}/src/program.ts",
+      "args": [
+        "package",
+        "https://json-schema.org/draft/2020-12/schema",
+        "--package-directory",
+        ".package",
+        "--package-name",
+        "package"
       ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     }
   ]
