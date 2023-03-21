@@ -2,32 +2,47 @@
  * 
  * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.1.1
  */
-export function isValidType(
+
+export function isValidNullType(
     value: unknown,
-    argument: "null" | "array" | "object" | "string" | "number" | "integer" | "boolean",
-) {
-    switch (argument) {
-        case "null":
-            return value === null;
+): value is null {
+    return value === null;
+}
 
-        case "array":
-            return Array.isArray(value);
+export function isValidArrayType(
+    value: unknown,
+): value is Array<unknown> {
+    return Array.isArray(value);
+}
 
-        case "object":
-            return value !== null && typeof value === "object" && !Array.isArray(value);
+export function isValidObjectType(
+    value: unknown,
+): value is object {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+}
 
-        case "string":
-            return typeof value === "string";
+export function isValidStringType(
+    value: unknown,
+): value is object {
+    return typeof value === "string";
+}
 
-        case "number":
-            return typeof value === "number" && !isNaN(value);
+export function isValidNumberType(
+    value: unknown,
+): value is number {
+    return typeof value === "number" && !isNaN(value);
+}
 
-        case "integer":
-            return typeof value === "number" && value % 1 === 0 && !isNaN(value);
+export function isValidIntegerType(
+    value: unknown,
+): value is number {
+    return typeof value === "number" && value % 1 === 0 && !isNaN(value);
+}
 
-        case "boolean":
-            return typeof value === "boolean";
-    }
+export function isValidBooleanType(
+    value: unknown,
+): value is boolean {
+    return typeof value === "boolean";
 }
 
 /**

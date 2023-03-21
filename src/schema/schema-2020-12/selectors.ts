@@ -380,7 +380,10 @@ export function selectValidationMaxProperties(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("maxProperties" in node) {
+        if (
+            "maxProperties" in node &&
+            typeof node.maxProperties === "number"
+        ) {
             return node.maxProperties;
         }
     }
@@ -390,7 +393,10 @@ export function selectValidationMinProperties(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("minProperties" in node) {
+        if (
+            "minProperties" in node &&
+            typeof node.minProperties === "number"
+        ) {
             return node.minProperties;
         }
     }
@@ -400,8 +406,12 @@ export function selectValidationRequired(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("required" in node) {
-            return node.required;
+        if (
+            "required" in node &&
+            Array.isArray(node.required) &&
+            node.required.every(value => typeof value === "string")
+        ) {
+            return node.required as string[];
         }
     }
 }
@@ -410,7 +420,11 @@ export function selectValidationMinItems(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("minItems" in node) {
+        if (
+            "minItems" in node &&
+            typeof node.minItems === "number"
+
+        ) {
             return node.minItems;
         }
     }
@@ -420,7 +434,10 @@ export function selectValidationMaxItems(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("maxItems" in node) {
+        if (
+            "maxItems" in node &&
+            typeof node.maxItems === "number"
+        ) {
             return node.maxItems;
         }
     }
@@ -430,7 +447,10 @@ export function selectValidationUniqueItems(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("uniqueItems" in node) {
+        if (
+            "uniqueItems" in node &&
+            typeof node.uniqueItems === "boolean"
+        ) {
             return node.uniqueItems;
         }
     }
@@ -440,7 +460,10 @@ export function selectValidationMinLength(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("minLength" in node) {
+        if (
+            "minLength" in node &&
+            typeof node.minLength === "number"
+        ) {
             return node.minLength;
         }
     }
@@ -450,7 +473,10 @@ export function selectValidationMaxLength(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("maxLength" in node) {
+        if (
+            "maxLength" in node &&
+            typeof node.maxLength === "number"
+        ) {
             return node.maxLength;
         }
     }
@@ -460,7 +486,10 @@ export function selectValidationPattern(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("pattern" in node) {
+        if (
+            "pattern" in node &&
+            typeof node.pattern === "string"
+        ) {
             return node.pattern;
         }
     }
@@ -470,7 +499,10 @@ export function selectValidationMinimum(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("minimum" in node) {
+        if (
+            "minimum" in node &&
+            typeof node.minimum === "number"
+        ) {
             return node.minimum;
         }
     }
@@ -480,7 +512,10 @@ export function selectValidationExclusiveMinimum(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("exclusiveMinimum" in node) {
+        if (
+            "exclusiveMinimum" in node &&
+            typeof node.exclusiveMinimum === "number"
+        ) {
             return node.exclusiveMinimum;
         }
     }
@@ -490,7 +525,10 @@ export function selectValidationMaximum(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("maximum" in node) {
+        if (
+            "maximum" in node &&
+            typeof node.maximum === "number"
+        ) {
             return node.maximum;
         }
     }
@@ -500,7 +538,10 @@ export function selectValidationExclusiveMaximum(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("exclusiveMaximum" in node) {
+        if (
+            "exclusiveMaximum" in node &&
+            typeof node.exclusiveMaximum === "number"
+        ) {
             return node.exclusiveMaximum;
         }
     }
@@ -510,7 +551,10 @@ export function selectValidationMultipleOf(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("multipleOf" in node) {
+        if (
+            "multipleOf" in node &&
+            typeof node.multipleOf === "number"
+        ) {
             return node.multipleOf;
         }
     }
@@ -530,7 +574,10 @@ export function selectValidationEnum(
     node: unknown,
 ) {
     if (node != null && typeof node === "object") {
-        if ("enum" in node) {
+        if (
+            "enum" in node &&
+            Array.isArray(node.enum)
+        ) {
             return node.enum;
         }
     }
