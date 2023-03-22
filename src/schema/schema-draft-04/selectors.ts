@@ -466,7 +466,7 @@ export function selectValidationExclusiveMinimum(
     if (node != null && typeof node === "object") {
         if (
             "exclusiveMinimum" in node &&
-            typeof node.exclusiveMinimum === "number"
+            typeof node.exclusiveMinimum === "boolean"
         ) {
             return node.exclusiveMinimum;
         }
@@ -492,7 +492,7 @@ export function selectValidationExclusiveMaximum(
     if (node != null && typeof node === "object") {
         if (
             "exclusiveMaximum" in node &&
-            typeof node.exclusiveMaximum === "number"
+            typeof node.exclusiveMaximum === "boolean"
         ) {
             return node.exclusiveMaximum;
         }
