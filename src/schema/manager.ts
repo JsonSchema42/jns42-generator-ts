@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import ts from "typescript";
 import { discoverRootNodeMetaSchemaKey, MetaSchemaKey } from "./meta.js";
 import * as schema201909 from "./schema-2019-09/index.js";
@@ -62,13 +63,14 @@ export class SchemaManager {
         this.nodeMetaMap.set(nodeId, schemaMetaKey);
     }
 
-    public async loadFromURL(
+    public async loadFromUrl(
         url: URL,
         referencingUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
-        const result = await fetch(url);
-        const schemaRootNode = await result.json() as unknown;
+        const schemaRootNode = this.loadSchemaRootNodeFromUrl(
+            url,
+        );
 
         await this.loadFromRootNode(
             schemaRootNode,
@@ -76,6 +78,30 @@ export class SchemaManager {
             referencingUrl,
             defaultMetaSchemaKey,
         );
+
+    }
+
+    private async loadSchemaRootNodeFromUrl(
+        url: URL,
+    ) {
+        switch (url.protocol) {
+            case "http:":
+            case "http2:": {
+                const result = await fetch(url);
+                const schemaRootNode = await result.json() as unknown;
+
+                return schemaRootNode;
+            }
+
+            case "file:": {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename
+                const content = fs.readFileSync(url.pathname, "utf-8");
+
+                const schemaRootNode = JSON.parse(content) as unknown;
+
+                return schemaRootNode;
+            }
+        }
     }
 
     public async loadFromRootNode(

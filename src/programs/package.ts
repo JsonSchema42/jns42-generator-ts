@@ -58,7 +58,7 @@ async function main(options: MainOptions) {
 
     const manager = new SchemaManager();
 
-    await manager.loadFromURL(
+    await manager.loadFromUrl(
         schemaUrl,
         null,
         defaultMetaSchemaKey,

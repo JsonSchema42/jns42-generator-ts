@@ -59,7 +59,7 @@ export class SchemaLoader extends SchemaLoaderBase {
         if (nodeRef != null) {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
             nodeRefUrl.hash = "";
-            await this.manager.loadFromURL(
+            await this.manager.loadFromUrl(
                 nodeRefUrl,
                 nodeUrl,
                 metaSchema.metaSchemaKey,
