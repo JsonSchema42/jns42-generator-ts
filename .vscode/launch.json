@@ -59,7 +59,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "https://json-schema.org/draft-07/schema",
+        "http://json-schema.org/draft-07/schema",
         "--package-directory",
         ".package/schema-draft-07",
         "--package-name",
@@ -79,7 +79,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "https://json-schema.org/draft-06/schema",
+        "http://json-schema.org/draft-06/schema",
         "--package-directory",
         ".package/schema-draft-06",
         "--package-name",
@@ -99,7 +99,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "https://json-schema.org/draft-04/schema",
+        "http://json-schema.org/draft-04/schema",
         "--package-directory",
         ".package/schema-draft-04",
         "--package-name",
