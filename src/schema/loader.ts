@@ -10,6 +10,7 @@ export abstract class SchemaLoaderBase {
     public abstract loadFromRootNode(
         node: unknown,
         nodeUrl: URL,
+        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
     ): Promise<void>;
 

@@ -23,6 +23,7 @@ export class SchemaLoader extends SchemaLoaderBase {
     public async loadFromRootNode(
         node: SchemaNode,
         nodeUrl: URL,
+        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
     ): Promise<void> {
         const nodeId = String(nodeUrl);
@@ -71,6 +72,7 @@ export class SchemaLoader extends SchemaLoaderBase {
             await this.manager.loadFromRootNode(
                 node,
                 nodeIdUrl,
+                nodeUrl,
                 nodeUrl,
                 metaSchema.metaSchemaKey,
             );

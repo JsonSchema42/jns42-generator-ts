@@ -75,6 +75,7 @@ export class SchemaManager {
         await this.loadFromRootNode(
             schemaRootNode,
             url,
+            url,
             referencingUrl,
             defaultMetaSchemaKey,
         );
@@ -107,6 +108,7 @@ export class SchemaManager {
     public async loadFromRootNode(
         node: unknown,
         nodeUrl: URL,
+        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
@@ -118,6 +120,7 @@ export class SchemaManager {
         await loader.loadFromRootNode(
             node,
             nodeUrl,
+            retrievalUrl,
             referencingNodeUrl,
         );
     }
