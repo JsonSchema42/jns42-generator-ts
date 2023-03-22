@@ -68,7 +68,7 @@ export class SchemaManager {
         referencingUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
-        const schemaRootNode = this.loadSchemaRootNodeFromUrl(
+        const schemaRootNode = await this.loadSchemaRootNodeFromUrl(
             url,
         );
 
