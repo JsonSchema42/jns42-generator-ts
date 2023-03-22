@@ -21,6 +21,10 @@ export function configureLabProgram(argv: yargs.Argv) {
                     type: "string",
                     choices: [
                         "https://json-schema.org/draft/2020-12/schema",
+                        // "https://json-schema.org/draft/2019-09/schema",
+                        // "https://json-schema.org/draft-07/schema",
+                        // "https://json-schema.org/draft-06/schema",
+                        "https://json-schema.org/draft-04/schema",
                     ] as const,
                     default: "https://json-schema.org/draft/2020-12/schema",
                 }).
