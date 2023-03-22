@@ -25,12 +25,44 @@ export class SchemaManager {
             this,
             this.loaders[schema202012.metaSchema.metaSchemaKey],
         ),
+        // [schema201909.metaSchema.metaSchemaKey]: new schema201909.SchemaIndexer(
+        //     this,
+        //     this.loaders[schema201909.metaSchema.metaSchemaKey],
+        // ),
+        // [schemaDraft07.metaSchema.metaSchemaKey]: new schemaDraft07.SchemaIndexer(
+        //     this,
+        //     this.loaders[schemaDraft07.metaSchema.metaSchemaKey],
+        // ),
+        // [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaIndexer(
+        //     this,
+        //     this.loaders[schemaDraft06.metaSchema.metaSchemaKey],
+        // ),
+        [schemaDraft04.metaSchema.metaSchemaKey]: new schemaDraft04.SchemaIndexer(
+            this,
+            this.loaders[schemaDraft04.metaSchema.metaSchemaKey],
+        ),
     };
 
     private readonly namers = {
         [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaNamer(
             this,
             this.indexers[schema202012.metaSchema.metaSchemaKey],
+        ),
+        // [schema201909.metaSchema.metaSchemaKey]: new schema201909.SchemaNamer(
+        //     this,
+        //     this.indexers[schema201909.metaSchema.metaSchemaKey],
+        // ),
+        // [schemaDraft07.metaSchema.metaSchemaKey]: new schemaDraft07.SchemaNamer(
+        //     this,
+        //     this.indexers[schemaDraft07.metaSchema.metaSchemaKey],
+        // ),
+        // [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaNamer(
+        //     this,
+        //     this.indexers[schemaDraft06.metaSchema.metaSchemaKey],
+        // ),
+        [schemaDraft04.metaSchema.metaSchemaKey]: new schemaDraft04.SchemaNamer(
+            this,
+            this.indexers[schemaDraft04.metaSchema.metaSchemaKey],
         ),
     };
 
@@ -39,6 +71,26 @@ export class SchemaManager {
             this,
             this.loaders[schema202012.metaSchema.metaSchemaKey],
             this.indexers[schema202012.metaSchema.metaSchemaKey],
+        ),
+        // [schema201909.metaSchema.metaSchemaKey]: new schema201909.SchemaCodeGenerator(
+        //     this,
+        //     this.loaders[schema201909.metaSchema.metaSchemaKey],
+        //     this.indexers[schema201909.metaSchema.metaSchemaKey],
+        // ),
+        // [schemaDraft07.metaSchema.metaSchemaKey]: new schemaDraft07.SchemaCodeGenerator(
+        //     this,
+        //     this.loaders[schemaDraft07.metaSchema.metaSchemaKey],
+        //     this.indexers[schemaDraft07.metaSchema.metaSchemaKey],
+        // ),
+        // [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaCodeGenerator(
+        //     this,
+        //     this.loaders[schemaDraft06.metaSchema.metaSchemaKey],
+        //     this.indexers[schemaDraft06.metaSchema.metaSchemaKey],
+        // ),
+        [schemaDraft04.metaSchema.metaSchemaKey]: new schemaDraft04.SchemaCodeGenerator(
+            this,
+            this.loaders[schemaDraft04.metaSchema.metaSchemaKey],
+            this.indexers[schemaDraft04.metaSchema.metaSchemaKey],
         ),
     };
 
