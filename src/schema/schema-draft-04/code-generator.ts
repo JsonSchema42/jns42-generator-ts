@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { generateLiteral, generatePrimitiveLiteral, pointerToHash } from "../../utils/index.js";
+import { generateLiteral, generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
@@ -334,7 +334,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             let index = 0;
             for (const [subNodePointer] of itemsEntries) {
                 const subNodeUrl = new URL(
-                    pointerToHash(subNodePointer),
+                    `#${subNodePointer}`,
                     nodeItem.nodeBaseUrl,
                 );
                 const subNodeId = String(subNodeUrl);
@@ -374,7 +374,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         );
         for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -490,7 +490,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         );
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -566,7 +566,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         for (const [propertyName, subNodePointer] of properties) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -809,7 +809,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 anyOfEntries.map(([subNodePointer]) => {
                     const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
+                        `#${subNodePointer}`,
                         nodeItem.nodeBaseUrl,
                     );
                     const subNodeId = String(subNodeUrl);
@@ -826,7 +826,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 oneOfEntries.map(([subNodePointer]) => {
                     const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
+                        `#${subNodePointer}`,
                         nodeItem.nodeBaseUrl,
                     );
                     const subNodeId = String(subNodeUrl);
@@ -843,7 +843,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             yield factory.createParenthesizedType(factory.createIntersectionTypeNode(
                 allOfEntries.map(([subNodePointer]) => {
                     const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
+                        `#${subNodePointer}`,
                         nodeItem.nodeBaseUrl,
                     );
                     const subNodeId = String(subNodeUrl);
@@ -924,7 +924,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -951,7 +951,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             ...propertiesEntries.map(
                 ([propertyName, subNodePointer]) => {
                     const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
+                        `#${subNodePointer}`,
                         nodeItem.nodeBaseUrl,
                     );
                     const subNodeId = String(subNodeUrl);
@@ -991,7 +991,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         );
         for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -1013,7 +1013,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                 itemsEntries.map(
                     ([subNodePointer]) => {
                         const subNodeUrl = new URL(
-                            pointerToHash(subNodePointer),
+                            `#${subNodePointer}`,
                             nodeItem.nodeBaseUrl,
                         );
                         const subNodeId = String(subNodeUrl);

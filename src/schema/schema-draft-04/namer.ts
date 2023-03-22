@@ -1,5 +1,4 @@
 import camelcase from "camelcase";
-import { pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaNamerBase } from "../namer.js";
 import { SchemaIndexer } from "./indexer.js";
@@ -52,7 +51,7 @@ export class SchemaNamer extends SchemaNamerBase {
             const [subNodePointer] of
             selectNodeInstanceEntries(nodeItem.nodePointer, nodeItem.node)
         ) {
-            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeBaseUrl);
+            const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeBaseUrl);
             const subNodeId = String(subNodeUrl);
             yield* this.getTypeNames(
                 subNodeId,

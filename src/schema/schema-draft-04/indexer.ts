@@ -1,4 +1,3 @@
-import { pointerToHash } from "../../utils/index.js";
 import { SchemaIndexerBase } from "../indexer.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
@@ -41,7 +40,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
         nodeBaseUrl: URL,
         nodePointer: string,
     ) {
-        const nodeUrl = new URL(pointerToHash(nodePointer), nodeBaseUrl);
+        const nodeUrl = new URL(`#${nodePointer}`, nodeBaseUrl);
         const nodeId = String(nodeUrl);
 
         const item: SchemaIndexerNodeItem = {
