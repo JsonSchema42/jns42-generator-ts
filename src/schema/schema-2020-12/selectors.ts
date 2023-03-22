@@ -162,7 +162,7 @@ export function* selectNodeAdditionalPropertiesEntries(
     }
 }
 
-export function* selectNodePrefixItemEntries(
+export function* selectNodePrefixItemsEntries(
     nodePointer: string,
     node: SchemaNode,
 ) {
@@ -268,7 +268,7 @@ export function* selectNodeInstanceEntries(
     yield* selectNodeDefEntries(nodePointer, node);
     yield* selectNodePropertyEntries(nodePointer, node);
     yield* selectNodeAdditionalPropertiesEntries(nodePointer, node);
-    yield* selectNodePrefixItemEntries(nodePointer, node);
+    yield* selectNodePrefixItemsEntries(nodePointer, node);
     yield* selectNodeItemsEntries(nodePointer, node);
     yield* selectNodeAllOfEntries(nodePointer, node);
     yield* selectNodeAnyOfEntries(nodePointer, node);
@@ -331,7 +331,7 @@ export function* selectNodeProperties(
             "properties" in node &&
             typeof node.properties === "object" && node.properties != null
         ) {
-            for (const [key, subNode] of Object.entries(node.properties)) {
+            for (const [key] of Object.entries(node.properties)) {
                 const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
                 yield [key, subNodePointer] as const;
             }

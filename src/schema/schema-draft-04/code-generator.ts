@@ -4,7 +4,7 @@ import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeEnum, selectNodeItemsEntries as selectNodeAdditionalItemsEntries, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -326,13 +326,13 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const prefixItemsEntries = selectNodePrefixItemsEntries(
+        const itemsEntries = selectNodeItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
         {
             let index = 0;
-            for (const [subNodePointer] of prefixItemsEntries) {
+            for (const [subNodePointer] of itemsEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
                     nodeItem.nodeBaseUrl,
@@ -368,11 +368,11 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             }
         }
 
-        const itemsEntries = selectNodeItemsEntries(
+        const additionalItemsEntries = selectNodeAdditionalItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
-        for (const [subNodePointer] of itemsEntries) {
+        for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
                 nodeItem.nodeBaseUrl,
@@ -788,30 +788,10 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         if (nodeRef != null) {
             const nodeUrl = new URL(nodeRef, nodeItem.nodeBaseUrl);
             const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveReferenceNodeId(nodeId);
             yield this.generateTypeReference(
                 factory,
-                resolvedNodeId,
+                nodeId,
             );
-        }
-
-        const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
-        if (nodeDynamicRef != null) {
-            const nodeUrl = new URL(nodeDynamicRef, nodeItem.nodeBaseUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveDynamicReferenceNodeId(nodeId);
-            yield this.generateTypeReference(
-                factory,
-                resolvedNodeId,
-            );
-        }
-
-        const constValue = selectNodeConst(nodeItem.node);
-        if (constValue != null) {
-            yield factory.createLiteralTypeNode(generatePrimitiveLiteral(
-                factory,
-                constValue,
-            ));
         }
 
         const enumValues = selectNodeEnum(nodeItem.node);
@@ -1005,11 +985,11 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        const itemsEntries = selectNodeItemsEntries(
+        const additionalItemsEntries = selectNodeAdditionalItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
-        for (const [subNodePointer] of itemsEntries) {
+        for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
                 nodeItem.nodeBaseUrl,
@@ -1023,14 +1003,14 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const prefixItemsEntries = [...selectNodePrefixItemsEntries(
+        const itemsEntries = [...selectNodeItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         )];
 
-        if (prefixItemsEntries.length > 0) {
+        if (itemsEntries.length > 0) {
             return factory.createTupleTypeNode(
-                prefixItemsEntries.map(
+                itemsEntries.map(
                     ([subNodePointer]) => {
                         const subNodeUrl = new URL(
                             pointerToHash(subNodePointer),
@@ -1062,53 +1042,6 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             throw new Error("typeName not found");
         }
         return factory.createTypeReferenceNode(typeName);
-    }
-
-    //#endregion
-
-    //#region helpers
-
-    private resolveReferenceNodeId(
-        nodeId: string,
-    ) {
-        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
-
-        if (resolvedNodeId == null) {
-            resolvedNodeId = nodeId;
-        }
-
-        return resolvedNodeId;
-    }
-
-    private resolveDynamicReferenceNodeId(
-        nodeId: string,
-    ) {
-        const nodeUrl = new URL(nodeId);
-        let resolvedNodeId: string | null = nodeId;
-        let currentRootNodeUrl: URL | null = new URL("", nodeUrl);
-        while (currentRootNodeUrl != null) {
-            const currentRootNodeId = String(currentRootNodeUrl);
-            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
-            if (currentRootNode == null) {
-                throw new Error("rootNode not found");
-            }
-
-            const currentNodeUrl = new URL(
-                nodeUrl.hash,
-                currentRootNode.nodeUrl,
-            );
-            const currentNodeId = String(currentNodeUrl);
-            const maybeResolvedNodeId = this.indexer.getDynamicAnchorNodeId(
-                currentNodeId,
-            );
-            if (maybeResolvedNodeId != null) {
-                resolvedNodeId = maybeResolvedNodeId;
-            }
-
-            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
-        }
-
-        return resolvedNodeId;
     }
 
     //#endregion
