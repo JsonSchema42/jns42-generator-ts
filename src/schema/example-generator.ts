@@ -6,7 +6,7 @@ export abstract class SchemaExampleGeneratorBase {
     ) {
     }
 
-    public abstract generateValidExamples(nodeUrl: URL): Iterable<unknown>
+    public abstract generateExamplesFromUrl(nodeUrl: URL): Iterable<unknown>
 
 }
 

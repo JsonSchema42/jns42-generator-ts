@@ -4,7 +4,7 @@ import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -93,7 +93,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         // TODO!!!
         // yield* this.generateCommonValidationStatements(nodeItem);
 
-        const types = selectNodeType(nodeItem.node);
+        const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             let statement: ts.Statement = factory.createBlock([
                 factory.createExpressionStatement(factory.createYieldExpression(
@@ -558,12 +558,12 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const properties = selectNodeProperties(
+        const properties = selectNodePropertyNamesEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
 
-        for (const [propertyName, subNodePointer] of properties) {
+        for (const [subNodePointer, propertyName] of properties) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
                 nodeItem.nodeBaseUrl,
@@ -874,7 +874,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             ));
         }
 
-        const types = selectNodeType(nodeItem.node);
+        const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 types.map(type => this.generateTypeDefinition(
@@ -962,13 +962,14 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const propertiesEntries = [...selectNodeProperties(nodeItem.nodePointer, nodeItem.node)];
+        const propertiesEntries =
+            [...selectNodePropertyNamesEntries(nodeItem.nodePointer, nodeItem.node)];
         const propertiesSet = new Set(propertiesEntries.map(([name]) => name));
-        const requiredPropertiesSet = new Set(selectNodeRequiredProperties(nodeItem.node));
+        const requiredPropertiesSet = new Set(selectNodeRequiredPropertyNames(nodeItem.node));
 
         return factory.createTypeLiteralNode([
             ...propertiesEntries.map(
-                ([propertyName, subNodePointer]) => {
+                ([subNodePointer, propertyName]) => {
                     const subNodeUrl = new URL(
                         pointerToHash(subNodePointer),
                         nodeItem.nodeBaseUrl,

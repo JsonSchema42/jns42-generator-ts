@@ -12,7 +12,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         super(manager);
     }
 
-    public *generateValidExamples(nodeUrl: URL): Iterable<unknown> {
+    public *generateExamplesFromUrl(nodeUrl: URL): Iterable<unknown> {
         yield* [];
     }
 

@@ -1,8 +1,10 @@
+import { flattenObject, pointerToHash } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeType } from "./selectors.js";
+import { SchemaNode } from "./node.js";
+import { selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
@@ -13,7 +15,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         super(manager);
     }
 
-    public *generateValidExamples(nodeUrl: URL): Iterable<unknown> {
+    public generateExamplesFromUrl(
+        nodeUrl: URL,
+    ): Iterable<unknown> {
         const nodeId = String(nodeUrl);
 
         const item = this.indexer.getNodeItem(nodeId);
@@ -21,69 +25,198 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("item not found");
         }
 
-        const types = selectNodeType(item.node);
-        if (types != null) {
-            for (const type of types) {
-                yield* this.generateExamplesForType(type);
-            }
-        }
-
+        return this.generateExamplesFromNode(
+            item.node,
+            nodeUrl,
+            "",
+        );
     }
 
-    private generateExamplesForType(type: string) {
+    public *generateExamplesFromNode(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ): Iterable<unknown> {
+        const nodeRef = selectNodeRef(node);
+        if (nodeRef != null) {
+            const nodeRefUrl = new URL(nodeRef, nodeUrl);
+            return this.generateExamplesFromUrl(nodeRefUrl);
+        }
+
+        const nodeTypes = selectNodeTypes(node);
+        if (nodeTypes != null) {
+            for (const type of nodeTypes) {
+                yield* this.generateExamplesForType(type, node, nodeUrl, nodePointer);
+            }
+        }
+    }
+
+    private generateExamplesForType(
+        type: string,
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
         switch (type) {
             case "null":
-                return this.generateExamplesForNull();
+                return this.generateExamplesForNull(node, nodeUrl, nodePointer);
 
             case "array":
-                return this.generateExamplesForArray();
+                return this.generateExamplesForArray(node, nodeUrl, nodePointer);
 
             case "object":
-                return this.generateExamplesForObject();
+                return this.generateExamplesForObject(node, nodeUrl, nodePointer);
 
             case "string":
-                return this.generateExamplesForString();
+                return this.generateExamplesForString(node, nodeUrl, nodePointer);
 
             case "number":
-                return this.generateExamplesForNumber();
+                return this.generateExamplesForNumber(node, nodeUrl, nodePointer);
 
             case "integer":
-                return this.generateExamplesForInteger();
+                return this.generateExamplesForInteger(node, nodeUrl, nodePointer);
 
             case "boolean":
-                return this.generateExamplesForBoolean();
+                return this.generateExamplesForBoolean(node, nodeUrl, nodePointer);
 
             default:
                 throw new Error("type not supported");
         }
     }
 
-    private * generateExamplesForNull() {
+    private * generateExamplesForNull(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
         yield null;
     }
 
-    private * generateExamplesForArray() {
-        yield [];
+    private * generateExamplesForArray(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
+        const itemsEntries = selectNodeItemsEntries(nodePointer, node);
+
+        for (const [subNodePointer, subNode] of itemsEntries) {
+            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+            yield this.generateExamplesFromNode(
+                subNode,
+                subNodeUrl,
+                subNodePointer,
+            );
+        }
     }
 
-    private * generateExamplesForObject() {
-        yield {};
+    private * generateExamplesForObject(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
+        const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
+        const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
+        const propertyNameMap = Object.fromEntries(propertyNameEntries);
+        const propertyEntries = [...selectNodePropertyEntries(nodePointer, node)];
+        const propertyNames = new Set(propertyNameEntries.map(([, name]) => name));
+
+        /*
+        yield properties that are required
+        */
+        {
+            const subExamples: Record<string, unknown[]> = {};
+
+            for (const propertyName of requiredPropertyNames) {
+                if (propertyNames.has(propertyName)) {
+                    continue;
+                }
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [{}];
+            }
+
+            for (const [subNodePointer, subNode] of propertyEntries) {
+                // eslint-disable-next-line security/detect-object-injection
+                const propertyName = propertyNameMap[subNodePointer];
+                if (!requiredPropertyNames.has(propertyName)) {
+                    continue;
+                }
+
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [...this.generateExamplesFromNode(
+                    subNode,
+                    subNodeUrl,
+                    subNodePointer,
+                )];
+            }
+
+            yield* flattenObject(subExamples);
+        }
+
+        /*
+        yield all properties
+        */
+        {
+            const subExamples: Record<string, unknown[]> = {};
+
+            for (const propertyName of requiredPropertyNames) {
+                if (propertyNames.has(propertyName)) {
+                    continue;
+                }
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [{}];
+            }
+
+            for (const [subNodePointer, subNode] of propertyEntries) {
+                // eslint-disable-next-line security/detect-object-injection
+                const propertyName = propertyNameMap[subNodePointer];
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [...this.generateExamplesFromNode(
+                    subNode,
+                    subNodeUrl,
+                    subNodePointer,
+                )];
+            }
+
+            yield* flattenObject(subExamples);
+        }
+
     }
 
-    private * generateExamplesForString() {
+    private * generateExamplesForString(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
         yield "";
     }
 
-    private * generateExamplesForNumber() {
+    private * generateExamplesForNumber(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
         yield 1;
         yield 0.5;
     }
 
-    private * generateExamplesForInteger() {
+    private * generateExamplesForInteger(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
         yield 1;
     }
 
-    private * generateExamplesForBoolean() {
+    private * generateExamplesForBoolean(
+        node: SchemaNode,
+        nodeUrl: URL,
+        nodePointer: string,
+    ) {
         yield true;
         yield false;
     }

@@ -269,7 +269,7 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateValidExamples(nodeUrl);
+        yield* exampleGenerator.generateExamplesFromUrl(nodeUrl);
     }
 
 }
