@@ -21,7 +21,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/schema-2020-12/schema",
+        "file:///fixtures/schema-2020-12/schema",
         "--package-directory",
         ".package",
         "--package-name",
