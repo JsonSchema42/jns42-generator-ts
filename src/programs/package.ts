@@ -183,6 +183,7 @@ function getPackageFileContent(
         ]),
         "devDependencies": withDependencies([
             "typescript",
+            "@types/node",
         ]),
     };
 
