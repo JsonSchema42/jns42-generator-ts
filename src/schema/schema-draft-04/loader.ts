@@ -21,8 +21,9 @@ export class SchemaLoader extends SchemaLoaderBase {
     }
 
     public async loadFromRootNode(
-        node: SchemaNode,
+        node: unknown,
         nodeUrl: URL,
+        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
     ): Promise<void> {
         const nodeId = String(nodeUrl);

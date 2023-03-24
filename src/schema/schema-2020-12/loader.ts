@@ -23,19 +23,22 @@ export class SchemaLoader extends SchemaLoaderBase {
     public async loadFromRootNode(
         node: SchemaNode,
         nodeUrl: URL,
+        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
     ): Promise<void> {
-        const nodeId = String(nodeUrl);
+        let nodeId = String(nodeUrl);
+
+        const maybeNodeId = selectNodeId(node);
+        if (maybeNodeId != null) {
+            nodeId = maybeNodeId;
+            nodeUrl = new URL(nodeId);
+        }
 
         const item: SchemaLoaderRootNodeItem = {
             node,
             nodeUrl,
             referencingNodeUrl,
         };
-
-        if (this.rootNodeMap.has(nodeId)) {
-            return;
-        }
 
         this.rootNodeMap.set(nodeId, item);
 
@@ -44,6 +47,7 @@ export class SchemaLoader extends SchemaLoaderBase {
         await this.loadFromSubNodes(
             node,
             nodeUrl,
+            retrievalUrl,
             "",
         );
     }
@@ -51,26 +55,18 @@ export class SchemaLoader extends SchemaLoaderBase {
     private async loadFromSubNodes(
         node: SchemaNode,
         nodeUrl: URL,
+        retrievalUrl: URL,
         nodePointer: string,
     ) {
         const nodeRef = selectNodeRef(node);
-        const nodeId = selectNodeId(node);
 
         if (nodeRef != null) {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
-            nodeRefUrl.hash = "";
-            await this.manager.loadFromURL(
+            const retrievalRefUrl = new URL(nodeRef, retrievalUrl);
+            retrievalRefUrl.hash = "";
+            await this.manager.loadFromUrl(
                 nodeRefUrl,
-                nodeUrl,
-                metaSchema.metaSchemaKey,
-            );
-        }
-
-        if (nodeId != null) {
-            const nodeIdUrl = new URL(nodeId);
-            await this.manager.loadFromRootNode(
-                node,
-                nodeIdUrl,
+                retrievalRefUrl,
                 nodeUrl,
                 metaSchema.metaSchemaKey,
             );
@@ -80,6 +76,7 @@ export class SchemaLoader extends SchemaLoaderBase {
             await this.loadFromSubNodes(
                 subNode,
                 nodeUrl,
+                retrievalUrl,
                 subNodePointer,
             );
         }

@@ -9,7 +9,9 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
       "preLaunchTask": "watch"
     },
     {
@@ -19,7 +21,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "https://json-schema.org/draft/2020-12/schema",
+        "file:///fixtures/schema-2020-12/schema",
         "--package-directory",
         ".package/schema-2020-12",
         "--package-name",
@@ -109,7 +111,9 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
       "preLaunchTask": "watch"
     }
   ]

@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import ts from "typescript";
 import { discoverRootNodeMetaSchemaKey, MetaSchemaKey } from "./meta.js";
 import * as schema201909 from "./schema-2019-09/index.js";
@@ -11,6 +12,7 @@ export class SchemaManager {
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nameMap = new Map<string, string>();
+    private readonly retrievalSet = new Set<string>();
 
     private readonly loaders = {
         [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaLoader(this),
@@ -114,25 +116,59 @@ export class SchemaManager {
         this.nodeMetaMap.set(nodeId, schemaMetaKey);
     }
 
-    public async loadFromURL(
-        url: URL,
+    public async loadFromUrl(
+        nodeUrl: URL,
+        retrievalUrl: URL,
         referencingUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
-        const result = await fetch(url);
-        const schemaRootNode = await result.json() as unknown;
+        const retrievalId = String(retrievalUrl);
+        if (this.retrievalSet.has(retrievalId)) {
+            return;
+        }
+        this.retrievalSet.add(retrievalId);
+
+        const schemaRootNode = await this.loadSchemaRootNodeFromUrl(
+            retrievalUrl,
+        );
 
         await this.loadFromRootNode(
             schemaRootNode,
-            url,
+            nodeUrl,
+            retrievalUrl,
             referencingUrl,
             defaultMetaSchemaKey,
         );
+
+    }
+
+    private async loadSchemaRootNodeFromUrl(
+        url: URL,
+    ) {
+        switch (url.protocol) {
+            case "http:":
+            case "http2:": {
+                const result = await fetch(url);
+                const schemaRootNode = await result.json() as unknown;
+
+                return schemaRootNode;
+            }
+
+            case "file:": {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename
+                const content = fs.readFileSync(url.pathname, "utf-8");
+
+                const schemaRootNode = JSON.parse(content) as unknown;
+
+                return schemaRootNode;
+            }
+        }
     }
 
     public async loadFromRootNode(
         node: unknown,
         nodeUrl: URL,
+        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
@@ -144,6 +180,7 @@ export class SchemaManager {
         await loader.loadFromRootNode(
             node,
             nodeUrl,
+            retrievalUrl,
             referencingNodeUrl,
         );
     }
