@@ -1,3 +1,4 @@
+import deepEqual from "fast-deep-equal";
 import { flattenObject, pointerToHash } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
@@ -121,11 +122,11 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ) {
-        const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
         const propertyEntries = [...selectNodePropertyEntries(nodePointer, node)];
         const propertyNames = new Set(propertyNameEntries.map(([, name]) => name));
+        const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
 
         /*
         yield properties that are required
@@ -165,9 +166,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         }
 
         /*
-        yield all properties
+        yield all properties, but only if they are different from the required properties
         */
-        {
+        if (deepEqual([...requiredPropertyNames], [...propertyNames])) {
             const subExamples: Record<string, unknown[]> = {};
 
             /*
