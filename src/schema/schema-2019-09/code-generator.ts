@@ -4,7 +4,7 @@ import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodeProperties, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -326,13 +326,91 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const prefixItemsEntries = selectNodePrefixItemsEntries(
+        const itemsOneEntries = selectNodeItemsOneEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        {
+            const index = 0;
+            for (const [subNodePointer] of itemsOneEntries) {
+                const subNodeUrl = new URL(
+                    pointerToHash(subNodePointer),
+                    nodeItem.nodeBaseUrl,
+                );
+                const subNodeId = String(subNodeUrl);
+
+                const typeName = this.manager.getName(subNodeId);
+                if (typeName == null) {
+                    throw new Error("name not found");
+                }
+
+                yield factory.createForOfStatement(
+                    undefined,
+                    factory.createVariableDeclarationList([
+                        factory.createVariableDeclaration(
+                            factory.createIdentifier("entry"),
+                        ),
+                    ], ts.NodeFlags.Const),
+                    factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createIdentifier("Object"),
+                            factory.createIdentifier("entries"),
+                        ),
+                        undefined,
+                        [factory.createIdentifier("value")],
+                    ),
+                    factory.createBlock([
+                        factory.createVariableStatement(
+                            undefined,
+                            factory.createVariableDeclarationList([
+                                factory.createVariableDeclaration(
+                                    factory.createArrayBindingPattern([
+                                        factory.createBindingElement(
+                                            undefined,
+                                            undefined,
+                                            factory.createIdentifier("key"),
+                                        ),
+                                        factory.createBindingElement(
+                                            undefined,
+                                            undefined,
+                                            factory.createIdentifier("value"),
+                                        ),
+                                    ]),
+                                    undefined,
+                                    undefined,
+                                    factory.createIdentifier("entry"),
+                                ),
+                            ], ts.NodeFlags.Const),
+                        ),
+                        factory.createExpressionStatement(factory.createYieldExpression(
+                            factory.createToken(ts.SyntaxKind.AsteriskToken),
+                            factory.createCallExpression(
+                                factory.createIdentifier(`validate${typeName}`),
+                                undefined,
+                                [
+                                    factory.createIdentifier("value"),
+                                    factory.createArrayLiteralExpression(
+                                        [
+                                            factory.createSpreadElement(factory.createIdentifier("path")),
+                                            factory.createIdentifier("key"),
+                                        ],
+                                        false,
+                                    ),
+                                ],
+                            )),
+                        ),
+                    ], true),
+                );
+            }
+        }
+
+        const itemsManyEntries = selectNodeItemsManyEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
         {
             let index = 0;
-            for (const [subNodePointer] of prefixItemsEntries) {
+            for (const [subNodePointer] of itemsManyEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
                     nodeItem.nodeBaseUrl,
@@ -368,11 +446,11 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             }
         }
 
-        const itemsEntries = selectNodeItemsEntries(
+        const additionalItemsEntries = selectNodeAdditionalItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
-        for (const [subNodePointer] of itemsEntries) {
+        for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
                 nodeItem.nodeBaseUrl,
@@ -1005,11 +1083,11 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        const itemsEntries = selectNodeItemsEntries(
+        const additionalItemsEntries = selectNodeAdditionalItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
-        for (const [subNodePointer] of itemsEntries) {
+        for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
                 nodeItem.nodeBaseUrl,
@@ -1023,14 +1101,32 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const prefixItemsEntries = [...selectNodePrefixItemsEntries(
+        const itemsOneEntries = selectNodeItemsOneEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        for (const [subNodePointer] of itemsOneEntries) {
+            const subNodeUrl = new URL(
+                pointerToHash(subNodePointer),
+                nodeItem.nodeBaseUrl,
+            );
+            const subNodeId = String(subNodeUrl);
+            return factory.createTypeReferenceNode(
+                "Array",
+                [
+                    this.generateTypeReference(factory, subNodeId),
+                ],
+            );
+        }
+
+        const itemsManyEntries = [...selectNodeItemsManyEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         )];
 
-        if (prefixItemsEntries.length > 0) {
+        if (itemsManyEntries.length > 0) {
             return factory.createTupleTypeNode(
-                prefixItemsEntries.map(
+                itemsManyEntries.map(
                     ([subNodePointer]) => {
                         const subNodeUrl = new URL(
                             pointerToHash(subNodePointer),
