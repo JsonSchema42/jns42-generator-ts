@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://json-schema.org/draft/2020-12/output/schema",
+  "type": [
+    "object",
+    "boolean"
+  ],
+  "required": [
+    "a",
+    "b"
+  ],
+  "properties": {
+    "b": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": "object",
+        "required": [
+          "x",
+          "y"
+        ]
+      }
+    },
+    "c": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

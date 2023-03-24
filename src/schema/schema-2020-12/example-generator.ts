@@ -102,11 +102,17 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         for (const [subNodePointer, subNode] of itemsEntries) {
             const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
-            yield this.generateExamplesFromNode(
+            for (const example of this.generateExamplesFromNode(
                 subNode,
                 subNodeUrl,
                 subNodePointer,
-            );
+            )) {
+                yield [
+                    example,
+                    example,
+                    example,
+                ];
+            }
         }
     }
 
@@ -127,12 +133,15 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         {
             const subExamples: Record<string, unknown[]> = {};
 
+            /*
+            properties without a schema
+            */
             for (const propertyName of requiredPropertyNames) {
                 if (propertyNames.has(propertyName)) {
                     continue;
                 }
                 // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = [{}];
+                subExamples[propertyName] = ["Could be anything"];
             }
 
             for (const [subNodePointer, subNode] of propertyEntries) {
@@ -161,12 +170,15 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         {
             const subExamples: Record<string, unknown[]> = {};
 
+            /*
+            properties without a schema
+            */
             for (const propertyName of requiredPropertyNames) {
                 if (propertyNames.has(propertyName)) {
                     continue;
                 }
                 // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = [{}];
+                subExamples[propertyName] = ["Could be anything"];
             }
 
             for (const [subNodePointer, subNode] of propertyEntries) {
@@ -192,7 +204,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ) {
-        yield "";
+        yield "a string!";
     }
 
     private * generateExamplesForNumber(
