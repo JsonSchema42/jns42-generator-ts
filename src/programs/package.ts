@@ -74,8 +74,6 @@ async function main(options: MainOptions) {
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(packageDirectoryPath, { recursive: true });
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(path.join(packageDirectoryPath, "examples"), { recursive: true });
 
     const packageFileContent = getPackageFileContent(packageName, packageVersion);
     const packageFilePath = path.join(packageDirectoryPath, "package.json");
@@ -102,8 +100,17 @@ async function main(options: MainOptions) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
 
-    for (const example of manager.generateValidExamples(rootNodeUrl)) {
-        //
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(path.join(packageDirectoryPath, "examples"), { recursive: true });
+    {
+        let index = 0;
+        for (const example of manager.generateValidExamples(rootNodeUrl)) {
+            index++;
+            const exampleFileContent = JSON.stringify(example, undefined, 2);
+            const exampleFilePath = path.join(packageDirectoryPath, "example", `valid-${index}.ts`);
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            fs.writeFileSync(exampleFilePath, exampleFileContent);
+        }
     }
 }
 
