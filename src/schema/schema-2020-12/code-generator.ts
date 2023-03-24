@@ -90,7 +90,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeItem: SchemaIndexerNodeItem,
     ): Iterable<ts.Statement> {
-
+        // TODO!!!
         // yield* this.generateCommonValidationStatements(nodeItem);
 
         const types = selectNodeType(nodeItem.node);
@@ -111,7 +111,6 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
             }
             yield statement;
         }
-
     }
 
     private generateTypeValidationIfStatement(
