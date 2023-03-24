@@ -10,6 +10,7 @@ export interface SchemaIndexerNodeItem {
     node: SchemaNode;
     nodeBaseUrl: URL;
     nodePointer: string;
+    nodeParentUrl: URL | null;
 }
 
 export class SchemaIndexer extends SchemaIndexerBase {
@@ -33,8 +34,30 @@ export class SchemaIndexer extends SchemaIndexerBase {
     }
 
     public getDynamicAnchorNodeId(nodeId: string) {
-        const nodeKey = String(nodeId);
-        return this.dynamicAnchorMap.get(nodeKey);
+        return this.dynamicAnchorMap.get(nodeId);
+    }
+
+    public isNodeAncestor(childNodeId: string, nodeAncestorUrl: URL): boolean {
+        const item = this.nodeMap.get(childNodeId);
+        if (!item) {
+            throw new Error("node item not found");
+        }
+
+        if (item.nodeParentUrl == null) {
+            return false;
+        }
+
+        const nodeParentId = String(item.nodeParentUrl);
+        const nodeAncestorId = String(nodeAncestorUrl);
+        if (nodeParentId === nodeAncestorId) {
+            return true;
+        }
+
+        return this.isNodeAncestor(childNodeId, item.nodeParentUrl);
+    }
+
+    public getAllNodeIds() {
+        return this.nodeMap.keys();
     }
 
     public indexNodes() {
@@ -43,6 +66,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
                 item.node,
                 item.nodeUrl,
                 "",
+                null,
             );
         }
     }
@@ -51,6 +75,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
         node: SchemaNode,
         nodeBaseUrl: URL,
         nodePointer: string,
+        nodeParentUrl: URL | null,
     ) {
         const nodeUrl = new URL(pointerToHash(nodePointer), nodeBaseUrl);
         const nodeId = String(nodeUrl);
@@ -59,6 +84,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
             node,
             nodeBaseUrl,
             nodePointer,
+            nodeParentUrl,
         };
         if (this.nodeMap.has(nodeId)) {
             throw new Error("duplicate nodeId");
@@ -91,6 +117,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
                 subNode,
                 nodeBaseUrl,
                 subNodePointer,
+                nodeUrl,
             );
         }
     }
