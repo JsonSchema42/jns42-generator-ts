@@ -4,8 +4,8 @@ import { discoverRootNodeMetaSchemaKey, MetaSchemaKey } from "./meta.js";
 import * as schema201909 from "./schema-2019-09/index.js";
 import * as schema202012 from "./schema-2020-12/index.js";
 import * as schemaDraft04 from "./schema-draft-04/index.js";
-import * as schemaDraft07 from "./schema-draft-06/index.js";
-import * as schemaDraft06 from "./schema-draft-07/index.js";
+import * as schemaDraft06 from "./schema-draft-06/index.js";
+import * as schemaDraft07 from "./schema-draft-07/index.js";
 
 export class SchemaManager {
 
@@ -35,10 +35,10 @@ export class SchemaManager {
         //     this,
         //     this.loaders[schemaDraft07.metaSchema.metaSchemaKey],
         // ),
-        // [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaIndexer(
-        //     this,
-        //     this.loaders[schemaDraft06.metaSchema.metaSchemaKey],
-        // ),
+        [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaIndexer(
+            this,
+            this.loaders[schemaDraft06.metaSchema.metaSchemaKey],
+        ),
         [schemaDraft04.metaSchema.metaSchemaKey]: new schemaDraft04.SchemaIndexer(
             this,
             this.loaders[schemaDraft04.metaSchema.metaSchemaKey],
@@ -58,10 +58,10 @@ export class SchemaManager {
         //     this,
         //     this.indexers[schemaDraft07.metaSchema.metaSchemaKey],
         // ),
-        // [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaNamer(
-        //     this,
-        //     this.indexers[schemaDraft06.metaSchema.metaSchemaKey],
-        // ),
+        [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaNamer(
+            this,
+            this.indexers[schemaDraft06.metaSchema.metaSchemaKey],
+        ),
         [schemaDraft04.metaSchema.metaSchemaKey]: new schemaDraft04.SchemaNamer(
             this,
             this.indexers[schemaDraft04.metaSchema.metaSchemaKey],
@@ -84,11 +84,11 @@ export class SchemaManager {
         //     this.loaders[schemaDraft07.metaSchema.metaSchemaKey],
         //     this.indexers[schemaDraft07.metaSchema.metaSchemaKey],
         // ),
-        // [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaCodeGenerator(
-        //     this,
-        //     this.loaders[schemaDraft06.metaSchema.metaSchemaKey],
-        //     this.indexers[schemaDraft06.metaSchema.metaSchemaKey],
-        // ),
+        [schemaDraft06.metaSchema.metaSchemaKey]: new schemaDraft06.SchemaCodeGenerator(
+            this,
+            this.loaders[schemaDraft06.metaSchema.metaSchemaKey],
+            this.indexers[schemaDraft06.metaSchema.metaSchemaKey],
+        ),
         [schemaDraft04.metaSchema.metaSchemaKey]: new schemaDraft04.SchemaCodeGenerator(
             this,
             this.loaders[schemaDraft04.metaSchema.metaSchemaKey],
