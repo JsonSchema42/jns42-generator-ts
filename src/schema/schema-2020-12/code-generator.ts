@@ -1085,7 +1085,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
     ) {
         const nodeUrl = new URL(nodeId);
         let resolvedNodeId: string | null = nodeId;
-        let currentRootNodeUrl: URL | null = new URL("#", nodeUrl);
+        let currentRootNodeUrl: URL | null = new URL("", nodeUrl);
         while (currentRootNodeUrl != null) {
             const currentRootNodeId = String(currentRootNodeUrl);
             const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
