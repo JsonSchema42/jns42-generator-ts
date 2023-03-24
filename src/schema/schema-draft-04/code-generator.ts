@@ -357,7 +357,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                             factory.createArrayLiteralExpression(
                                 [
                                     factory.createSpreadElement(factory.createIdentifier("path")),
-                                    factory.createNumericLiteral(index),
+                                    factory.createStringLiteral(String(index)),
                                 ],
                                 false,
                             ),
@@ -662,44 +662,49 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
         const multipleOf = selectValidationMultipleOf(nodeItem.node);
 
         if (minimum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
+            if (exclusiveMinimum ?? false) {
+                yield this.wrapValidationExpression(
                     factory,
-                    "isValidMinimum",
-                    minimum,
-                ),
-            );
-        }
-        if (exclusiveMinimum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
+                    this.generateCallValidatorExpression(
+                        factory,
+                        "isValidExclusiveMinimum",
+                        minimum,
+                    ),
+                );
+
+            }
+            else {
+                yield this.wrapValidationExpression(
                     factory,
-                    "isValidExclusiveMinimum",
-                    exclusiveMinimum,
-                ),
-            );
+                    this.generateCallValidatorExpression(
+                        factory,
+                        "isValidMinimum",
+                        minimum,
+                    ),
+                );
+            }
         }
         if (maximum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
+            if (exclusiveMaximum ?? false) {
+                yield this.wrapValidationExpression(
                     factory,
-                    "isValidMaximum",
-                    maximum,
-                ),
-            );
-        }
-        if (exclusiveMaximum != null) {
-            yield this.wrapValidationExpression(
-                factory,
-                this.generateCallValidatorExpression(
+                    this.generateCallValidatorExpression(
+                        factory,
+                        "isValidExclusiveMaximum",
+                        maximum,
+                    ),
+                );
+            }
+            else {
+                yield this.wrapValidationExpression(
                     factory,
-                    "isValidExclusiveMaximum",
-                    exclusiveMaximum,
-                ),
-            );
+                    this.generateCallValidatorExpression(
+                        factory,
+                        "isValidMaximum",
+                        maximum,
+                    ),
+                );
+            }
         }
         if (multipleOf != null) {
             yield this.wrapValidationExpression(

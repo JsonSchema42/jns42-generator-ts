@@ -357,7 +357,7 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                             factory.createArrayLiteralExpression(
                                 [
                                     factory.createSpreadElement(factory.createIdentifier("path")),
-                                    factory.createNumericLiteral(index),
+                                    factory.createStringLiteral(String(index)),
                                 ],
                                 false,
                             ),
