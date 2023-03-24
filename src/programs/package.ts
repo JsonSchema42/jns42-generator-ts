@@ -62,7 +62,7 @@ async function main(options: MainOptions) {
 
     const manager = new SchemaManager();
 
-    await manager.loadFromUrl(
+    const rootNodeUrl = await manager.loadFromUrl(
         schemaUrl,
         schemaUrl,
         null,
@@ -102,6 +102,9 @@ async function main(options: MainOptions) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
 
+    for (const example of manager.generateValidExamples(rootNodeUrl)) {
+        //
+    }
 }
 
 function getMainFileContent(

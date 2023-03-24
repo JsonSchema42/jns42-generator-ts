@@ -12,7 +12,7 @@ export abstract class SchemaLoaderBase {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingNodeUrl: URL | null,
-    ): Promise<void>;
+    ): Promise<URL>;
 
 }
 

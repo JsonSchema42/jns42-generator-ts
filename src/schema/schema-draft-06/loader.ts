@@ -25,7 +25,7 @@ export class SchemaLoader extends SchemaLoaderBase {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingNodeUrl: URL | null,
-    ): Promise<void> {
+    ) {
         let nodeId = String(nodeUrl);
 
         const maybeNodeId = selectNodeId(node);
@@ -50,6 +50,8 @@ export class SchemaLoader extends SchemaLoaderBase {
             retrievalUrl,
             "",
         );
+
+        return nodeUrl;
     }
 
     private async loadFromSubNodes(

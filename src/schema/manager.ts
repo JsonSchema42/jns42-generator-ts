@@ -12,7 +12,7 @@ export class SchemaManager {
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaId>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaId>();
     private readonly nameMap = new Map<string, string>();
-    private readonly retrievalSet = new Set<string>();
+    private readonly retrievalRootNodeMap = new Map<string, URL>();
 
     private readonly loaders = {
         [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaLoader(this),
@@ -141,16 +141,16 @@ export class SchemaManager {
         defaultMetaSchemaId: MetaSchemaId,
     ) {
         const retrievalId = String(retrievalUrl);
-        if (this.retrievalSet.has(retrievalId)) {
-            return;
+        let rootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
+        if (rootNodeUrl != null) {
+            return rootNodeUrl;
         }
-        this.retrievalSet.add(retrievalId);
 
         const schemaRootNode = await this.loadSchemaRootNodeFromUrl(
             retrievalUrl,
         );
 
-        await this.loadFromRootNode(
+        rootNodeUrl = await this.loadFromRootNode(
             schemaRootNode,
             nodeUrl,
             retrievalUrl,
@@ -158,6 +158,13 @@ export class SchemaManager {
             defaultMetaSchemaId,
         );
 
+        if (rootNodeUrl == null) {
+            throw new Error("rootNode not found");
+        }
+
+        this.retrievalRootNodeMap.set(retrievalId, rootNodeUrl);
+
+        return rootNodeUrl;
     }
 
     private async loadSchemaRootNodeFromUrl(
@@ -195,12 +202,13 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const loader = this.loaders[rootNodeSchemaMetaKey];
-        await loader.loadFromRootNode(
+        return await loader.loadFromRootNode(
             node,
             nodeUrl,
             retrievalUrl,
             referencingNodeUrl,
         );
+
     }
 
     public async indexNodes(
@@ -248,9 +256,9 @@ export class SchemaManager {
 
         }
 
-        const exampleGenerator = this.exampleGenerator[metaSchemaId];
+        // eslint-disable-next-line security/detect-object-injection
+        const exampleGenerator = this.exampleGenerators[metaSchemaId];
         yield* exampleGenerator.generateValidExamples(nodeUrl);
-
     }
 
 }
