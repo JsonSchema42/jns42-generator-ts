@@ -21,7 +21,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file:///fixtures/schema-2020-12/schema",
+        "file://${workspaceFolder}/fixtures/schema-2020-12/schema",
         "--package-directory",
         ".package/schema-2020-12",
         "--package-name",
@@ -31,7 +31,9 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
       "preLaunchTask": "watch"
     },
     {
@@ -41,7 +43,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "https://json-schema.org/draft/2019-09/schema",
+        "file://${workspaceFolder}/fixtures/schema-2019-09/schema",
         "--package-directory",
         ".package/schema-2019-09",
         "--package-name",
@@ -51,7 +53,9 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
       "preLaunchTask": "watch"
     },
     {
@@ -61,7 +65,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "http://json-schema.org/draft-07/schema",
+        "file://${workspaceFolder}/fixtures/schema-draft-07/schema",
         "--package-directory",
         ".package/schema-draft-07",
         "--package-name",
@@ -71,7 +75,9 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
       "preLaunchTask": "watch"
     },
     {
@@ -81,7 +87,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "http://json-schema.org/draft-06/schema",
+        "file://${workspaceFolder}/fixtures/schema-draft-06/schema",
         "--package-directory",
         ".package/schema-draft-06",
         "--package-name",
@@ -91,7 +97,9 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
       "preLaunchTask": "watch"
     },
     {
@@ -101,7 +109,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "http://json-schema.org/draft-04/schema",
+        "file://${workspaceFolder}/fixtures/schema-draft-04/schema",
         "--package-directory",
         ".package/schema-draft-04",
         "--package-name",
