@@ -1,4 +1,5 @@
 export * from "./code-generator.js";
+export * from "./example-generator.js";
 export * from "./indexer.js";
 export * from "./loader.js";
 export * from "./manager.js";

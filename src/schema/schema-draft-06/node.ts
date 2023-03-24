@@ -4,9 +4,9 @@ import { selectNodeSchema } from "./selectors.js";
 export type SchemaNode = unknown;
 
 export function isSchemaRootNode(node: unknown): node is SchemaNode {
-    const schemaKey = selectNodeSchema(node);
-    if (schemaKey == null) {
+    const schemaId = selectNodeSchema(node);
+    if (schemaId == null) {
         return false;
     }
-    return schemaKey === metaSchema.metaSchemaKey;
+    return schemaId === metaSchema.metaSchemaId;
 }

@@ -42,7 +42,7 @@ export class SchemaLoader extends SchemaLoaderBase {
 
         this.rootNodeMap.set(nodeId, item);
 
-        this.manager.registerRootNodeMetaSchema(nodeId, metaSchema.metaSchemaKey);
+        this.manager.registerRootNodeMetaSchema(nodeId, metaSchema.metaSchemaId);
 
         await this.loadFromSubNodes(
             node,
@@ -68,7 +68,7 @@ export class SchemaLoader extends SchemaLoaderBase {
                 nodeRefUrl,
                 retrievalRefUrl,
                 nodeUrl,
-                metaSchema.metaSchemaKey,
+                metaSchema.metaSchemaId,
             );
         }
 

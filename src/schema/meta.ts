@@ -5,26 +5,26 @@ import * as schemaDraft07 from "./schema-draft-06/index.js";
 import * as schemaDraft06 from "./schema-draft-07/index.js";
 
 export interface MetaSchemaInfo<K extends string, N> {
-    metaSchemaKey: K;
+    metaSchemaId: K;
     isSchemaRootNode(node: unknown): node is N;
 }
 
 export const metaSchemaMap = {
-    [schema202012.metaSchema.metaSchemaKey]: schema202012.metaSchema,
-    [schema201909.metaSchema.metaSchemaKey]: schema201909.metaSchema,
-    [schemaDraft07.metaSchema.metaSchemaKey]: schemaDraft07.metaSchema,
-    [schemaDraft06.metaSchema.metaSchemaKey]: schemaDraft06.metaSchema,
-    [schemaDraft04.metaSchema.metaSchemaKey]: schemaDraft04.metaSchema,
+    [schema202012.metaSchema.metaSchemaId]: schema202012.metaSchema,
+    [schema201909.metaSchema.metaSchemaId]: schema201909.metaSchema,
+    [schemaDraft07.metaSchema.metaSchemaId]: schemaDraft07.metaSchema,
+    [schemaDraft06.metaSchema.metaSchemaId]: schemaDraft06.metaSchema,
+    [schemaDraft04.metaSchema.metaSchemaId]: schemaDraft04.metaSchema,
 };
 
-export type MetaSchemaKey = keyof typeof metaSchemaMap;
+export type MetaSchemaId = keyof typeof metaSchemaMap;
 
-export function discoverRootNodeMetaSchemaKey(
+export function discoverRootNodeMetaSchemaId(
     schemaRootNode: unknown,
 ) {
-    for (const [schemaKey, schemaMeta] of Object.entries(metaSchemaMap)) {
-        if (schemaMeta.isSchemaRootNode(schemaRootNode)) {
-            return schemaKey as MetaSchemaKey;
+    for (const [metaSchemaId, metaSchema] of Object.entries(metaSchemaMap)) {
+        if (metaSchema.isSchemaRootNode(schemaRootNode)) {
+            return metaSchemaId as MetaSchemaId;
         }
     }
 }

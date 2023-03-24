@@ -64,7 +64,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
             throw new Error("duplicate nodeId");
         }
         this.nodeMap.set(nodeId, item);
-        this.manager.registerNodeMetaSchema(nodeId, metaSchema.metaSchemaKey);
+        this.manager.registerNodeMetaSchema(nodeId, metaSchema.metaSchemaId);
 
         const nodeAnchor = selectNodeAnchor(node);
         if (nodeAnchor != null) {

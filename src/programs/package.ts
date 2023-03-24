@@ -54,7 +54,7 @@ interface MainOptions {
 
 async function main(options: MainOptions) {
     const schemaUrl = new URL(options.schemaUrl);
-    const defaultMetaSchemaKey = options.defaultMetaSchemaUrl;
+    const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
     const packageDirectoryPath = path.resolve(options.packageDirectory);
     const { packageName, packageVersion } = options;
 
@@ -66,7 +66,7 @@ async function main(options: MainOptions) {
         schemaUrl,
         schemaUrl,
         null,
-        defaultMetaSchemaKey,
+        defaultMetaSchemaId,
     );
 
     manager.indexNodes();
@@ -74,6 +74,8 @@ async function main(options: MainOptions) {
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(packageDirectoryPath, { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(path.join(packageDirectoryPath, "examples"), { recursive: true });
 
     const packageFileContent = getPackageFileContent(packageName, packageVersion);
     const packageFilePath = path.join(packageDirectoryPath, "package.json");
@@ -99,6 +101,7 @@ async function main(options: MainOptions) {
     const validationFilePath = path.join(packageDirectoryPath, "validation.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
+
 }
 
 function getMainFileContent(

@@ -52,7 +52,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
             throw new Error("duplicate nodeId");
         }
         this.nodeMap.set(nodeId, item);
-        this.manager.registerNodeMetaSchema(nodeId, metaSchema.metaSchemaKey);
+        this.manager.registerNodeMetaSchema(nodeId, metaSchema.metaSchemaId);
 
         for (const [subNodePointer, subNode] of selectNodeInstanceEntries(nodePointer, node)) {
             this.indexNode(
