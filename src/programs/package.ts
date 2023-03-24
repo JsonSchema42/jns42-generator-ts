@@ -60,6 +60,7 @@ async function main(options: MainOptions) {
 
     await manager.loadFromUrl(
         schemaUrl,
+        schemaUrl,
         null,
         defaultMetaSchemaKey,
     );

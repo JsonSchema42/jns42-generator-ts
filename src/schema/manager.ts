@@ -12,6 +12,7 @@ export class SchemaManager {
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaKey>();
     private readonly nameMap = new Map<string, string>();
+    private readonly retrievalSet = new Set<string>();
 
     private readonly loaders = {
         [schema202012.metaSchema.metaSchemaKey]: new schema202012.SchemaLoader(this),
@@ -64,18 +65,25 @@ export class SchemaManager {
     }
 
     public async loadFromUrl(
-        url: URL,
+        nodeUrl: URL,
+        retrievalUrl: URL,
         referencingUrl: URL | null,
         defaultMetaSchemaKey: MetaSchemaKey,
     ) {
+        const retrievalId = String(retrievalUrl);
+        if (this.retrievalSet.has(retrievalId)) {
+            return;
+        }
+        this.retrievalSet.add(retrievalId);
+
         const schemaRootNode = await this.loadSchemaRootNodeFromUrl(
-            url,
+            retrievalUrl,
         );
 
         await this.loadFromRootNode(
             schemaRootNode,
-            url,
-            url,
+            nodeUrl,
+            retrievalUrl,
             referencingUrl,
             defaultMetaSchemaKey,
         );
