@@ -23,7 +23,7 @@ jobs:
       - run: >
           node out/program
           package
-          file://${{ github.workspace }}/fixtures/${{ matrix.fixture }}/schema
+          file://$PWD/fixtures/${{ matrix.fixture }}/schema
           --package-directory .package/${{ matrix.fixture }}
           --package-name ${{ matrix.fixture }}
           --package-version 0.0.0
