@@ -55,7 +55,7 @@ interface MainOptions {
 async function main(options: MainOptions) {
     const schemaUrl = new URL(options.schemaUrl);
     const defaultMetaSchemaKey = options.defaultMetaSchemaUrl;
-    const packageDirectory = options.packageDirectory;
+    const packageDirectoryPath = path.resolve(options.packageDirectory);
     const { packageName, packageVersion } = options;
 
     const factory = ts.factory;
@@ -73,30 +73,30 @@ async function main(options: MainOptions) {
     manager.nameNodes();
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(packageDirectory, { recursive: true });
+    fs.mkdirSync(packageDirectoryPath, { recursive: true });
 
     const packageFileContent = getPackageFileContent(packageName, packageVersion);
-    const packageFilePath = path.join(packageDirectory, "package.json");
+    const packageFilePath = path.join(packageDirectoryPath, "package.json");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(packageFilePath, packageFileContent);
 
     const tsconfigFileContent = getTsconfigFileContent();
-    const tsconfigFilePath = path.join(packageDirectory, "tsconfig.json");
+    const tsconfigFilePath = path.join(packageDirectoryPath, "tsconfig.json");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(tsconfigFilePath, tsconfigFileContent);
 
     const mainFileContent = getMainFileContent(factory);
-    const mainFilePath = path.join(packageDirectory, "main.ts");
+    const mainFilePath = path.join(packageDirectoryPath, "main.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(mainFilePath, mainFileContent);
 
     const schemaFileContent = getSchemaFileContent(factory, manager);
-    const schemaFilePath = path.join(packageDirectory, "schema.ts");
+    const schemaFilePath = path.join(packageDirectoryPath, "schema.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(schemaFilePath, schemaFileContent);
 
     const validationSourceFileContent = path.join(projectRoot, "src", "utils", "validation.ts");
-    const validationFilePath = path.join(packageDirectory, "validation.ts");
+    const validationFilePath = path.join(packageDirectoryPath, "validation.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
 }
