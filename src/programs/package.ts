@@ -107,7 +107,7 @@ async function main(options: MainOptions) {
         for (const example of manager.generateValidExamples(rootNodeUrl)) {
             index++;
             const exampleFileContent = JSON.stringify(example, undefined, 2);
-            const exampleFilePath = path.join(packageDirectoryPath, "example", `valid-${index}.ts`);
+            const exampleFilePath = path.join(packageDirectoryPath, "examples", `valid-${index}.json`);
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             fs.writeFileSync(exampleFilePath, exampleFileContent);
         }
