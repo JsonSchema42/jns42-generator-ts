@@ -24,46 +24,68 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         const types = selectNodeType(item.node);
         if (types != null) {
             for (const type of types) {
-                yield* this.generateExampleForType(type);
+                yield* this.generateExamplesForType(type);
             }
         }
 
     }
 
-    private * generateExampleForType(type: string) {
+    private generateExamplesForType(type: string) {
         switch (type) {
             case "null":
-                yield null;
-                break;
+                return this.generateExamplesForNull();
 
             case "array":
-                yield [];
-                break;
+                return this.generateExamplesForArray();
 
             case "object":
-                yield {};
-                break;
+                return this.generateExamplesForObject();
 
             case "string":
-                yield "";
-                break;
+                return this.generateExamplesForString();
 
             case "number":
-                yield 0.5;
-                break;
+                return this.generateExamplesForNumber();
 
             case "integer":
-                yield 1;
-                break;
+                return this.generateExamplesForInteger();
 
             case "boolean":
-                yield true;
-                yield false;
-                break;
+                return this.generateExamplesForBoolean();
 
             default:
                 throw new Error("type not supported");
         }
+    }
+
+    private * generateExamplesForNull() {
+        yield null;
+    }
+
+    private * generateExamplesForArray() {
+        yield [];
+    }
+
+    private * generateExamplesForObject() {
+        yield {};
+    }
+
+    private * generateExamplesForString() {
+        yield "";
+    }
+
+    private * generateExamplesForNumber() {
+        yield 1;
+        yield 0.5;
+    }
+
+    private * generateExamplesForInteger() {
+        yield 1;
+    }
+
+    private * generateExamplesForBoolean() {
+        yield true;
+        yield false;
     }
 
 }
