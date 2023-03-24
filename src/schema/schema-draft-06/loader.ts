@@ -34,7 +34,12 @@ export class SchemaLoader extends SchemaLoaderBase {
             nodeUrl = new URL(nodeId);
         }
 
-        const item: SchemaLoaderRootNodeItem = {
+        let item = this.rootNodeMap.get(nodeId);
+        if (item != null) {
+            return nodeUrl;
+        }
+
+        item = {
             node,
             nodeUrl,
             referencingNodeUrl,

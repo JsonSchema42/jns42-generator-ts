@@ -141,6 +141,7 @@ export class SchemaManager {
         defaultMetaSchemaId: MetaSchemaId,
     ) {
         const retrievalId = String(retrievalUrl);
+
         let rootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
         if (rootNodeUrl != null) {
             return rootNodeUrl;
