@@ -786,7 +786,10 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         testExpression: ts.Expression,
     ) {
         return factory.createIfStatement(
-            testExpression,
+            factory.createPrefixUnaryExpression(
+                ts.SyntaxKind.ExclamationToken,
+                testExpression,
+            ),
             factory.createBlock([
                 factory.createExpressionStatement(factory.createYieldExpression(
                     undefined,
