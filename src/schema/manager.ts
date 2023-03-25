@@ -194,7 +194,7 @@ export class SchemaManager {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingUrl: URL | null,
-        defaultMetaSchemaId: MetaSchemaId,
+        defaultmetaSchemaId,
     ) {
         const retrievalId = String(retrievalUrl);
 
@@ -255,7 +255,7 @@ export class SchemaManager {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingNodeUrl: URL | null,
-        defaultMetaSchemaId: MetaSchemaId,
+        defaultmetaSchemaId,
     ) {
         const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
             defaultMetaSchemaId;

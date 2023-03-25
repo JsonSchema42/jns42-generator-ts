@@ -4,6 +4,6 @@ import { isSchemaRootNode, SchemaNode } from "./node.js";
 const metaSchemaId = "http://json-schema.org/draft-04/schema#";
 
 export const metaSchema: MetaSchemaInfo<typeof metaSchemaId, SchemaNode> = {
-    metaSchemaId: metaSchemaId,
+    metaSchemaId,
     isSchemaRootNode,
 };
