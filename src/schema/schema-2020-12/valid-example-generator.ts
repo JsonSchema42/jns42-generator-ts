@@ -38,10 +38,26 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ): Iterable<unknown> {
-        const nodeRef = selectNodeRef(node);
+        const nodeId = String(nodeUrl);
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
+        }
+
+        const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const nodeRefUrl = new URL(nodeRef, nodeUrl);
-            yield* this.generateExamplesFromUrl(nodeRefUrl);
+            const nodeRootId = String(nodeItem.nodeRootUrl);
+            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+            const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+            const nodeId = String(nodeUrl);
+            const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeId);
+
+            yield* this.generateExamplesFromUrl(resolvedNodeUrl);
         }
 
         const nodeTypes = selectNodeTypes(node);
@@ -242,6 +258,18 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
     ) {
         yield true;
         yield false;
+    }
+
+    private resolveReferenceNodeUrl(nodeId: string) {
+        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
+
+        if (resolvedNodeId == null) {
+            resolvedNodeId = nodeId;
+        }
+
+        const resolvedNodeUrl = new URL(resolvedNodeId);
+
+        return resolvedNodeUrl;
     }
 
 }

@@ -310,8 +310,12 @@ export class SchemaManager {
         return this.nameMap.get(nodeId);
     }
 
-    public getRetrievalUrl(nodeRootId: string) {
+    public getNodeRetrievalUrl(nodeRootId: string) {
         return this.rootNodeRetrievalMap.get(nodeRootId);
+    }
+
+    public getNodeRootUrl(nodeRetrievalId: string) {
+        return this.retrievalRootNodeMap.get(nodeRetrievalId);
     }
 
     public *generateTypeStatements(

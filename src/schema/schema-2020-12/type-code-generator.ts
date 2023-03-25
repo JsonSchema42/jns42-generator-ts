@@ -92,9 +92,17 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const nodeUrl = new URL(nodeRef, nodeItem.nodeRootUrl);
+            const nodeRootId = String(nodeItem.nodeRootUrl);
+            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+            const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
             const nodeId = String(nodeUrl);
             const resolvedNodeId = this.resolveReferenceNodeId(nodeId);
+
             yield this.generateTypeReference(
                 factory,
                 resolvedNodeId,
@@ -103,9 +111,17 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
         if (nodeDynamicRef != null) {
-            const nodeUrl = new URL(nodeDynamicRef, nodeItem.nodeRootUrl);
+            const nodeRootId = String(nodeItem.nodeRootUrl);
+            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+            const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
+            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
             const nodeId = String(nodeUrl);
             const resolvedNodeId = this.resolveDynamicReferenceNodeId(nodeId);
+
             yield this.generateTypeReference(
                 factory,
                 resolvedNodeId,

@@ -50,10 +50,26 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ): Iterable<[number, unknown]> {
-        const nodeRef = selectNodeRef(node);
+        const nodeId = String(nodeUrl);
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
+        }
+
+        const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const nodeRefUrl = new URL(nodeRef, nodeUrl);
-            yield* this.generateFromUrl(nodeRefUrl);
+            const nodeRootId = String(nodeItem.nodeRootUrl);
+            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+            const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+            const nodeId = String(nodeUrl);
+            const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeId);
+
+            yield* this.generateFromUrl(resolvedNodeUrl);
         }
 
         const nodeTypes = selectNodeTypes(node);
@@ -211,7 +227,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                 subNodeUrl,
                 subNodePointer,
             )) {
-                yield [errors, example];
+                yield [errors, [example]];
             }
         }
     }
@@ -405,5 +421,16 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         yield [0, false];
     }
 
+    private resolveReferenceNodeUrl(nodeId: string) {
+        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
+
+        if (resolvedNodeId == null) {
+            resolvedNodeId = nodeId;
+        }
+
+        const resolvedNodeUrl = new URL(resolvedNodeId);
+
+        return resolvedNodeUrl;
+    }
 }
 
