@@ -964,7 +964,6 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
 
         const propertiesEntries =
             [...selectNodePropertyNamesEntries(nodeItem.nodePointer, nodeItem.node)];
-        const propertiesSet = new Set(propertiesEntries.map(([name]) => name));
         const requiredPropertiesSet = new Set(selectNodeRequiredPropertyNames(nodeItem.node));
 
         return factory.createTypeLiteralNode([
@@ -988,16 +987,6 @@ export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
                     );
                 },
             ),
-            ...[...requiredPropertiesSet].
-                filter(propertyName => !propertiesSet.has(propertyName)).
-                map(propertyName => factory.createPropertySignature(
-                    undefined,
-                    propertyName,
-                    undefined,
-                    factory.createKeywordTypeNode(
-                        ts.SyntaxKind.AnyKeyword,
-                    ),
-                )),
         ]);
     }
 

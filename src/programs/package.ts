@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { PackageJson } from "type-fest";
 import ts from "typescript";
 import * as yargs from "yargs";
@@ -95,10 +95,15 @@ async function main(options: MainOptions) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(schemaFilePath, schemaFileContent);
 
-    const validationSourceFileContent = path.join(projectRoot, "src", "utils", "validation.ts");
+    const validationSourceFileContent = path.join(projectRoot, "src", "includes", "validation.ts");
     const validationFilePath = path.join(packageDirectoryPath, "validation.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
+
+    const exampleSpecSourceFileContent = path.join(projectRoot, "src", "includes", "example.spec.ts");
+    const exampleSpecFilePath = path.join(packageDirectoryPath, "example.spec.ts");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.copyFileSync(exampleSpecSourceFileContent, exampleSpecFilePath);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(path.join(packageDirectoryPath, "examples-valid"), { recursive: true });
