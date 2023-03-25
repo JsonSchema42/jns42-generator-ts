@@ -1,5 +1,5 @@
-export function* flattenObject(
-    obj: Record<string, unknown[]>,
+export function* flattenObject<T>(
+    obj: Record<string, T[]>,
 ) {
     for (const indexer of generateObjectIndexers(obj)) {
         yield Object.fromEntries(indexer.map(
