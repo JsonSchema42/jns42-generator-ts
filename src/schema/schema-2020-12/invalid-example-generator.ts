@@ -111,16 +111,14 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             }
         }
 
-        if (!this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
-            for (const type of types) {
-                yield* this.generateExamplesForType(
-                    type,
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                    failNodeId,
-                );
-            }
+        for (const type of types) {
+            yield* this.generateExamplesForType(
+                type,
+                node,
+                nodeUrl,
+                nodePointer,
+                failNodeId,
+            );
         }
     }
 
@@ -207,6 +205,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
+        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+            return;
+        }
+
         const nodeId = String(nodeUrl);
 
         if (nodeId === failNodeId) {
@@ -287,7 +289,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         /*
         yield all properties
         */
-        {
+        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
             const subExamples: Record<string, unknown[]> = {};
 
             /*
@@ -326,6 +328,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
+        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+            return;
+        }
+
         const nodeId = String(nodeUrl);
 
         if (nodeId === failNodeId) {
@@ -342,6 +348,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
+        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+            return;
+        }
+
         const nodeId = String(nodeUrl);
 
         if (nodeId === failNodeId) {
@@ -358,6 +368,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
+        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+            return;
+        }
+
         const nodeId = String(nodeUrl);
 
         if (nodeId === failNodeId) {
@@ -374,6 +388,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
+        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+            return;
+        }
+
         const nodeId = String(nodeUrl);
 
         if (nodeId === failNodeId) {
