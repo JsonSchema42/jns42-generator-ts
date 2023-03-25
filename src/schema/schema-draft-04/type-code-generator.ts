@@ -15,34 +15,16 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         super(manager);
     }
 
-    public *generateStatements(
+    protected generateSchemaTypeDeclarationStatement(
         factory: ts.NodeFactory,
         nodeId: string,
+        typeName: string,
     ) {
-        const typeName = this.manager.getName(nodeId);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-
         const nodeItem = this.indexer.getNodeItem(nodeId);
         if (nodeItem == null) {
             throw new Error("nodeItem not found");
         }
 
-        yield this.generateSchemaTypeDeclarationStatement(
-            factory,
-            nodeId,
-            nodeItem,
-            typeName,
-        );
-    }
-
-    private generateSchemaTypeDeclarationStatement(
-        factory: ts.NodeFactory,
-        nodeId: string,
-        nodeItem: SchemaIndexerNodeItem,
-        typeName: string,
-    ) {
         return factory.createTypeAliasDeclaration(
             [
                 factory.createToken(ts.SyntaxKind.ExportKeyword),
