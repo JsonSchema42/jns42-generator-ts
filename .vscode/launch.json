@@ -61,6 +61,28 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "package array-with-ref",
+      "program": "${workspaceFolder}/src/program.ts",
+      "args": [
+        "package",
+        "file://${workspaceFolder}/fixtures/array-with-ref.json",
+        "--package-directory",
+        ".package/array-with-ref",
+        "--package-name",
+        "array-with-ref",
+        "--package-version",
+        "0.0.0"
+      ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
+      "preLaunchTask": "watch"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "package schema-2020-12",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goodschema.org/array-with-ref",
+  "type": [
+    "array"
+  ],
+  "items": {
+    "$ref": "simple-object.json"
+  }
+}
