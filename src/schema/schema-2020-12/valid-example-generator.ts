@@ -7,7 +7,7 @@ import { SchemaLoader } from "./loader.js";
 import { SchemaNode } from "./node.js";
 import { selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
 
-export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
+export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,

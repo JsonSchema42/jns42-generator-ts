@@ -96,28 +96,56 @@ export class SchemaManager {
         ),
     };
 
-    private readonly exampleGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaExampleGenerator(
+    private readonly validExampleGenerators = {
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidExampleGenerator(
             this,
             this.loaders[schema202012.metaSchema.metaSchemaId],
             this.indexers[schema202012.metaSchema.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaExampleGenerator(
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidExampleGenerator(
             this,
             this.loaders[schema201909.metaSchema.metaSchemaId],
             this.indexers[schema201909.metaSchema.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaExampleGenerator(
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidExampleGenerator(
             this,
             this.loaders[schemaDraft07.metaSchema.metaSchemaId],
             this.indexers[schemaDraft07.metaSchema.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaExampleGenerator(
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidExampleGenerator(
             this,
             this.loaders[schemaDraft06.metaSchema.metaSchemaId],
             this.indexers[schemaDraft06.metaSchema.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaExampleGenerator(
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidExampleGenerator(
+            this,
+            this.loaders[schemaDraft04.metaSchema.metaSchemaId],
+            this.indexers[schemaDraft04.metaSchema.metaSchemaId],
+        ),
+    };
+
+    private readonly invalidExampleGenerators = {
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidExampleGenerator(
+            this,
+            this.loaders[schema202012.metaSchema.metaSchemaId],
+            this.indexers[schema202012.metaSchema.metaSchemaId],
+        ),
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidExampleGenerator(
+            this,
+            this.loaders[schema201909.metaSchema.metaSchemaId],
+            this.indexers[schema201909.metaSchema.metaSchemaId],
+        ),
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidExampleGenerator(
+            this,
+            this.loaders[schemaDraft07.metaSchema.metaSchemaId],
+            this.indexers[schemaDraft07.metaSchema.metaSchemaId],
+        ),
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidExampleGenerator(
+            this,
+            this.loaders[schemaDraft06.metaSchema.metaSchemaId],
+            this.indexers[schemaDraft06.metaSchema.metaSchemaId],
+        ),
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidExampleGenerator(
             this,
             this.loaders[schemaDraft04.metaSchema.metaSchemaId],
             this.indexers[schemaDraft04.metaSchema.metaSchemaId],
@@ -268,7 +296,7 @@ export class SchemaManager {
         }
 
         // eslint-disable-next-line security/detect-object-injection
-        const exampleGenerator = this.exampleGenerators[metaSchemaId];
+        const exampleGenerator = this.validExampleGenerators[metaSchemaId];
         yield* exampleGenerator.generateExamplesFromUrl(nodeUrl);
     }
 
