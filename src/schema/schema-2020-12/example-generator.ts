@@ -283,6 +283,39 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         }
 
         /*
+        only yield all properties that are required
+        */
+        {
+            const subExamples: Record<string, Array<[number, unknown]>> = {};
+
+            for (const [subNodePointer, subNode] of propertyEntries) {
+                // eslint-disable-next-line security/detect-object-injection
+                const propertyName = propertyNameMap[subNodePointer];
+                if (!requiredPropertyNames.has(propertyName)) {
+                    continue;
+                }
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [...this.generateFromNode(
+                    subNode,
+                    subNodeUrl,
+                    subNodePointer,
+                )];
+            }
+
+            for (const flattened of flattenObject(subExamples)) {
+                const errors = Object.values(flattened).
+                    reduce((sum, [errors]) => sum + errors, 0);
+                const example = Object.fromEntries(
+                    Object.entries(flattened).
+                        map(([key, [, value]]) => [key, value]),
+                );
+                yield [errors, example];
+            }
+        }
+
+        /*
         yield all properties
         */
         {
