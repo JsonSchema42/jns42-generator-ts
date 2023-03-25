@@ -60,6 +60,74 @@ export class SchemaIndexer extends SchemaIndexerBase {
         return this.nodeMap.keys();
     }
 
+    public resolveReferenceNodeId(nodeId: string, nodeRef: string) {
+        const nodeItem = this.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
+        const nodeRootId = String(nodeItem.nodeRootUrl);
+        const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+        const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+        const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+        const resolvedNodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+        let resolvedNodeId = String(resolvedNodeUrl);
+
+        const anchorNodeId = this.getAnchorNodeId(resolvedNodeId);
+
+        if (anchorNodeId != null) {
+            resolvedNodeId = anchorNodeId;
+        }
+
+        return resolvedNodeId;
+
+    }
+
+    public resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
+        const nodeItem = this.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
+        const nodeRootId = String(nodeItem.nodeRootUrl);
+        const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+        const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
+        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+        const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+        const resolvedNodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+        let resolvedNodeId = String(resolvedNodeUrl);
+
+        let currentRootNodeUrl: URL | null = new URL("", resolvedNodeUrl);
+        while (currentRootNodeUrl != null) {
+            const currentRootNodeId = String(currentRootNodeUrl);
+            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
+            if (currentRootNode == null) {
+                throw new Error("rootNode not found");
+            }
+
+            const currentNodeUrl = new URL(
+                resolvedNodeUrl.hash,
+                currentRootNode.nodeUrl,
+            );
+            const currentNodeId = String(currentNodeUrl);
+            const maybeResolvedNodeId = this.getDynamicAnchorNodeId(
+                currentNodeId,
+            );
+            if (maybeResolvedNodeId != null) {
+                resolvedNodeId = maybeResolvedNodeId;
+            }
+
+            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
+        }
+
+        return resolvedNodeId;
+    }
+
     public indexNodes() {
         for (const item of this.loader.getRootNodeItems()) {
             this.indexNode(
@@ -71,7 +139,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
         }
     }
 
-    public indexNode(
+    private indexNode(
         node: SchemaNode,
         nodeBaseUrl: URL,
         nodePointer: string,

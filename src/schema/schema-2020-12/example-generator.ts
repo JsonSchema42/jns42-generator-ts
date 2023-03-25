@@ -4,7 +4,7 @@ import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
+import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
@@ -59,16 +59,22 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const nodeRootId = String(nodeItem.nodeRootUrl);
-            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+                nodeId,
+                nodeRef,
+            );
+            const resolvedNodeUrl = new URL(resolvedNodeId);
 
-            const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
-            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+            yield* this.generateFromUrl(resolvedNodeUrl);
+        }
 
-            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeId);
+        const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
+        if (nodeDynamicRef != null) {
+            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
+                nodeId,
+                nodeDynamicRef,
+            );
+            const resolvedNodeUrl = new URL(resolvedNodeId);
 
             yield* this.generateFromUrl(resolvedNodeUrl);
         }
@@ -422,16 +428,5 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         yield [0, false];
     }
 
-    private resolveReferenceNodeUrl(nodeId: string) {
-        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
-
-        if (resolvedNodeId == null) {
-            resolvedNodeId = nodeId;
-        }
-
-        const resolvedNodeUrl = new URL(resolvedNodeId);
-
-        return resolvedNodeUrl;
-    }
 }
 

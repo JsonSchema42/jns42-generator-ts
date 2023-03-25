@@ -4,7 +4,7 @@ import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeItemsEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalPropertiesEntries, selectNodeDynamicRef, selectNodeItemsEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -71,7 +71,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             ],
             undefined,
             factory.createBlock(
-                [...this.generateValidatorFunctionBodyStatements(factory, nodeItem)],
+                [...this.generateValidatorFunctionBodyStatements(factory, nodeId, nodeItem)],
                 true,
             ),
         );
@@ -79,10 +79,10 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
 
     private *generateValidatorFunctionBodyStatements(
         factory: ts.NodeFactory,
+        nodeId: string,
         nodeItem: SchemaIndexerNodeItem,
     ): Iterable<ts.Statement> {
-        // TODO!!!
-        // yield* this.generateCommonValidationStatements(nodeItem);
+        yield* this.generateCommonValidationStatements(factory, nodeId, nodeItem);
 
         const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
@@ -101,6 +101,63 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
                 );
             }
             yield statement;
+        }
+    }
+
+    private *generateCommonValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        nodeItem: SchemaIndexerNodeItem,
+    ): Iterable<ts.Statement> {
+        const nodeRef = selectNodeRef(nodeItem.node);
+        if (nodeRef != null) {
+            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+                nodeId,
+                nodeRef,
+            );
+
+            const resolvedTypeName = this.manager.getName(resolvedNodeId);
+            if (resolvedTypeName == null) {
+                throw new Error("could not resolve name");
+            }
+
+            yield factory.createExpressionStatement(factory.createYieldExpression(
+                factory.createToken(ts.SyntaxKind.AsteriskToken),
+                factory.createCallExpression(
+                    factory.createIdentifier(`validate${resolvedTypeName}`),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                        factory.createIdentifier("path"),
+                    ],
+                )),
+            );
+
+        }
+
+        const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
+        if (nodeDynamicRef != null) {
+            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
+                nodeId,
+                nodeDynamicRef,
+            );
+
+            const resolvedTypeName = this.manager.getName(resolvedNodeId);
+            if (resolvedTypeName == null) {
+                throw new Error("could not resolve name");
+            }
+
+            yield factory.createExpressionStatement(factory.createYieldExpression(
+                factory.createToken(ts.SyntaxKind.AsteriskToken),
+                factory.createCallExpression(
+                    factory.createIdentifier(`validate${resolvedTypeName}`),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                        factory.createIdentifier("path"),
+                    ],
+                )),
+            );
         }
     }
 

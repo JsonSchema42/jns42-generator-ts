@@ -52,6 +52,7 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
             undefined,
             this.generateTypeNode(
                 factory,
+                nodeId,
                 nodeItem,
             ),
         );
@@ -59,9 +60,10 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
 
     private generateTypeNode(
         factory: ts.NodeFactory,
+        nodeId: string,
         nodeItem: SchemaIndexerNodeItem,
     ): ts.TypeNode {
-        const typeNodes = [...this.generateTypeNodes(factory, nodeItem)];
+        const typeNodes = [...this.generateTypeNodes(factory, nodeId, nodeItem)];
         if (typeNodes.length === 0) {
             return factory.createKeywordTypeNode(
                 ts.SyntaxKind.UnknownKeyword,
@@ -74,6 +76,7 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
 
     private * generateTypeNodes(
         factory: ts.NodeFactory,
+        nodeId: string,
         nodeItem: SchemaIndexerNodeItem,
     ): Iterable<ts.TypeNode> {
         if (nodeItem.node === true) {
@@ -92,16 +95,10 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const nodeRootId = String(nodeItem.nodeRootUrl);
-            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
-
-            const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
-            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
-
-            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveReferenceNodeId(nodeId);
+            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+                nodeId,
+                nodeRef,
+            );
 
             yield this.generateTypeReference(
                 factory,
@@ -111,16 +108,10 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
         if (nodeDynamicRef != null) {
-            const nodeRootId = String(nodeItem.nodeRootUrl);
-            const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
-
-            const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
-            const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-            const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
-
-            const nodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveDynamicReferenceNodeId(nodeId);
+            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
+                nodeId,
+                nodeDynamicRef,
+            );
 
             yield this.generateTypeReference(
                 factory,
@@ -374,49 +365,6 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
             throw new Error("typeName not found");
         }
         return factory.createTypeReferenceNode(typeName);
-    }
-
-    private resolveReferenceNodeId(
-        nodeId: string,
-    ) {
-        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
-
-        if (resolvedNodeId == null) {
-            resolvedNodeId = nodeId;
-        }
-
-        return resolvedNodeId;
-    }
-
-    private resolveDynamicReferenceNodeId(
-        nodeId: string,
-    ) {
-        const nodeUrl = new URL(nodeId);
-        let resolvedNodeId: string | null = nodeId;
-        let currentRootNodeUrl: URL | null = new URL("", nodeUrl);
-        while (currentRootNodeUrl != null) {
-            const currentRootNodeId = String(currentRootNodeUrl);
-            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
-            if (currentRootNode == null) {
-                throw new Error("rootNode not found");
-            }
-
-            const currentNodeUrl = new URL(
-                nodeUrl.hash,
-                currentRootNode.nodeUrl,
-            );
-            const currentNodeId = String(currentNodeUrl);
-            const maybeResolvedNodeId = this.indexer.getDynamicAnchorNodeId(
-                currentNodeId,
-            );
-            if (maybeResolvedNodeId != null) {
-                resolvedNodeId = maybeResolvedNodeId;
-            }
-
-            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
-        }
-
-        return resolvedNodeId;
     }
 
 }
