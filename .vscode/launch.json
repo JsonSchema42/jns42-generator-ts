@@ -27,7 +27,8 @@
         "--package-name",
         "string-or-boolean",
         "--package-version",
-        "0.0.0"
+        "0.0.0",
+        "--generate-test"
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
@@ -49,7 +50,8 @@
         "--package-name",
         "simple-object",
         "--package-version",
-        "0.0.0"
+        "0.0.0",
+        "--generate-test"
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
@@ -70,6 +72,29 @@
         ".package/array-with-ref",
         "--package-name",
         "array-with-ref",
+        "--package-version",
+        "0.0.0",
+        "--generate-test"
+      ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
+      "preLaunchTask": "watch"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "package openapi-v3_1",
+      "program": "${workspaceFolder}/src/program.ts",
+      "args": [
+        "package",
+        "file://${workspaceFolder}/fixtures/openapi-v3_1.json",
+        "--package-directory",
+        ".package/openapi-v3_1",
+        "--package-name",
+        "openapi-v3_1",
         "--package-version",
         "0.0.0"
       ],
