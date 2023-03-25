@@ -1,7 +1,7 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
+import { selectNodeDynamicRef, selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
 
 export interface SchemaLoaderRootNodeItem {
     node: SchemaNode;
@@ -66,13 +66,25 @@ export class SchemaLoader extends SchemaLoaderBase {
         nodePointer: string,
     ) {
         const nodeRef = selectNodeRef(node);
-
         if (nodeRef != null) {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
             const retrievalRefUrl = new URL(nodeRef, retrievalUrl);
             retrievalRefUrl.hash = "";
             await this.manager.loadFromUrl(
                 nodeRefUrl,
+                retrievalRefUrl,
+                nodeUrl,
+                metaSchema.metaSchemaId,
+            );
+        }
+
+        const nodeDynamicRef = selectNodeDynamicRef(node);
+        if (nodeDynamicRef != null) {
+            const nodeDynamicRefUrl = new URL(nodeDynamicRef, nodeUrl);
+            const retrievalRefUrl = new URL(nodeDynamicRef, retrievalUrl);
+            retrievalRefUrl.hash = "";
+            await this.manager.loadFromUrl(
+                nodeDynamicRefUrl,
                 retrievalRefUrl,
                 nodeUrl,
                 metaSchema.metaSchemaId,
