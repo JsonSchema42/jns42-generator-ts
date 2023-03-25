@@ -68,28 +68,56 @@ export class SchemaManager {
         ),
     };
 
-    private readonly codeGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaCodeGenerator(
+    private readonly typeCodeGenerators = {
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaTypeCodeGenerator(
             this,
             this.loaders[schema202012.metaSchema.metaSchemaId],
             this.indexers[schema202012.metaSchema.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaCodeGenerator(
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaTypeCodeGenerator(
             this,
             this.loaders[schema201909.metaSchema.metaSchemaId],
             this.indexers[schema201909.metaSchema.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaCodeGenerator(
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaTypeCodeGenerator(
             this,
             this.loaders[schemaDraft07.metaSchema.metaSchemaId],
             this.indexers[schemaDraft07.metaSchema.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaCodeGenerator(
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaTypeCodeGenerator(
             this,
             this.loaders[schemaDraft06.metaSchema.metaSchemaId],
             this.indexers[schemaDraft06.metaSchema.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaCodeGenerator(
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaTypeCodeGenerator(
+            this,
+            this.loaders[schemaDraft04.metaSchema.metaSchemaId],
+            this.indexers[schemaDraft04.metaSchema.metaSchemaId],
+        ),
+    };
+
+    private readonly validationCodeGenerators = {
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidationCodeGenerator(
+            this,
+            this.loaders[schema202012.metaSchema.metaSchemaId],
+            this.indexers[schema202012.metaSchema.metaSchemaId],
+        ),
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidationCodeGenerator(
+            this,
+            this.loaders[schema201909.metaSchema.metaSchemaId],
+            this.indexers[schema201909.metaSchema.metaSchemaId],
+        ),
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidationCodeGenerator(
+            this,
+            this.loaders[schemaDraft07.metaSchema.metaSchemaId],
+            this.indexers[schemaDraft07.metaSchema.metaSchemaId],
+        ),
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidationCodeGenerator(
+            this,
+            this.loaders[schemaDraft06.metaSchema.metaSchemaId],
+            this.indexers[schemaDraft06.metaSchema.metaSchemaId],
+        ),
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidationCodeGenerator(
             this,
             this.loaders[schemaDraft04.metaSchema.metaSchemaId],
             this.indexers[schemaDraft04.metaSchema.metaSchemaId],
@@ -273,12 +301,26 @@ export class SchemaManager {
         return this.nameMap.get(nodeId);
     }
 
-    public *generateStatements(
+    public *generateTypeStatements(
         factory: ts.NodeFactory,
     ) {
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
             // eslint-disable-next-line security/detect-object-injection
-            const codeGenerator = this.codeGenerators[metaSchemaId];
+            const codeGenerator = this.typeCodeGenerators[metaSchemaId];
+            yield* codeGenerator.generateStatements(
+                factory,
+                nodeId,
+            );
+        }
+
+    }
+
+    public *generateValidationStatements(
+        factory: ts.NodeFactory,
+    ) {
+        for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
+            // eslint-disable-next-line security/detect-object-injection
+            const codeGenerator = this.validationCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
                 nodeId,

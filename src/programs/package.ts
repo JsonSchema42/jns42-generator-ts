@@ -180,7 +180,8 @@ function getSchemaFileContent(
             ),
             factory.createStringLiteral("./validation.js"),
         ),
-        ...manager.generateStatements(factory),
+        ...manager.generateTypeStatements(factory),
+        ...manager.generateValidationStatements(factory),
     ];
 
     const sourceFile = factory.createSourceFile(

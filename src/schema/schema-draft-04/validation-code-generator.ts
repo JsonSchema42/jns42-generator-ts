@@ -6,7 +6,7 @@ import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeEnum, selectNodeItemsEntries as selectNodeAdditionalItemsEntries, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
-export class SchemaCodeGenerator extends SchemaCodeGeneratorBase {
+export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
