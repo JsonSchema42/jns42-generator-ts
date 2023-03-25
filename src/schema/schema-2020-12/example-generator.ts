@@ -6,7 +6,7 @@ import { SchemaLoader } from "./loader.js";
 import { SchemaNode } from "./node.js";
 import { selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
-export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
+export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -17,11 +17,12 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
 
     public *generateExamplesFromUrl(
         nodeUrl: URL,
+        wantErrors: number,
     ): Iterable<unknown> {
         for (const [errors, example] of this.generateFromUrl(
             nodeUrl,
         )) {
-            if (errors !== 1) {
+            if (errors !== wantErrors) {
                 continue;
             }
             yield example;

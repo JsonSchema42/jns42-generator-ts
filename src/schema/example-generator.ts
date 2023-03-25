@@ -8,6 +8,7 @@ export abstract class SchemaExampleGeneratorBase {
 
     public abstract generateExamplesFromUrl(
         nodeUrl: URL,
+        wantErrors: number,
     ): Iterable<unknown>
 
 }
