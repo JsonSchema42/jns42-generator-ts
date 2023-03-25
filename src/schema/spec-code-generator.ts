@@ -78,15 +78,24 @@ export class SchemaSpecCodeGenerator extends SchemaCodeGeneratorBase {
 
         yield factory.createVariableStatement(
             undefined,
-            factory.createVariableDeclarationList(
-                [factory.createVariableDeclaration(
+            factory.createVariableDeclarationList([
+                factory.createVariableDeclaration(
                     factory.createIdentifier("directoryPath"),
                     undefined,
                     undefined,
-                    factory.createStringLiteral("examples-valid"),
-                )],
-                ts.NodeFlags.Const,
-            ),
+                    factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createIdentifier("path"),
+                            factory.createIdentifier("join"),
+                        ),
+                        undefined,
+                        [
+                            factory.createStringLiteral("examples"),
+                            factory.createStringLiteral("valid"),
+                        ],
+                    ),
+                ),
+            ], ts.NodeFlags.Const),
         );
 
         yield factory.createForOfStatement(
@@ -240,7 +249,17 @@ export class SchemaSpecCodeGenerator extends SchemaCodeGeneratorBase {
                     factory.createIdentifier("directoryPath"),
                     undefined,
                     undefined,
-                    factory.createStringLiteral("examples-invalid"),
+                    factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createIdentifier("path"),
+                            factory.createIdentifier("join"),
+                        ),
+                        undefined,
+                        [
+                            factory.createStringLiteral("examples"),
+                            factory.createStringLiteral("invalid"),
+                        ],
+                    ),
                 ),
             ], ts.NodeFlags.Const),
         );

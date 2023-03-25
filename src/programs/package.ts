@@ -111,26 +111,26 @@ async function main(options: MainOptions) {
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(path.join(packageDirectoryPath, "examples-valid"), { recursive: true });
+    fs.mkdirSync(path.join(packageDirectoryPath, "examples", "valid"), { recursive: true });
     {
         let index = 0;
         for (const example of manager.generateValidExamples(rootNodeUrl)) {
             index++;
             const exampleFileContent = JSON.stringify(example, undefined, 2);
-            const exampleFilePath = path.join(packageDirectoryPath, "examples-valid", `valid-${packageName}-${index}.json`);
+            const exampleFilePath = path.join(packageDirectoryPath, "examples", "valid", `valid-${packageName}-${index}.json`);
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             fs.writeFileSync(exampleFilePath, exampleFileContent);
         }
     }
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(path.join(packageDirectoryPath, "examples-invalid"), { recursive: true });
+    fs.mkdirSync(path.join(packageDirectoryPath, "examples", "invalid"), { recursive: true });
     {
         let index = 0;
         for (const example of manager.generateInvalidExamples(rootNodeUrl)) {
             index++;
             const exampleFileContent = JSON.stringify(example, undefined, 2);
-            const exampleFilePath = path.join(packageDirectoryPath, "examples-invalid", `invalid-${packageName}-${index}.json`);
+            const exampleFilePath = path.join(packageDirectoryPath, "examples", "invalid", `invalid-${packageName}-${index}.json`);
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             fs.writeFileSync(exampleFilePath, exampleFileContent);
         }
