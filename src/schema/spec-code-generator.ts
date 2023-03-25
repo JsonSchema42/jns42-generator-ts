@@ -13,46 +13,6 @@ export class SchemaSpecCodeGenerator extends SchemaCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): Iterable<ts.Statement> {
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                factory.createIdentifier("assert"),
-                undefined,
-            ),
-            factory.createStringLiteral("node:assert"),
-            undefined,
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                factory.createIdentifier("fs"),
-                undefined,
-            ),
-            factory.createStringLiteral("node:fs"),
-            undefined,
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("path")),
-            ),
-            factory.createStringLiteral("node:path"),
-            undefined,
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                factory.createIdentifier("test"),
-                undefined,
-            ),
-            factory.createStringLiteral("node:test"),
-            undefined,
-        );
         yield factory.createExpressionStatement(factory.createCallExpression(
             factory.createIdentifier("test"),
             undefined,

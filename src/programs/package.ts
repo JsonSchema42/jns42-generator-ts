@@ -207,24 +207,6 @@ function getValidatorsFileContent(
     });
 
     const nodes = [
-        factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("validation")),
-            ),
-            factory.createStringLiteral("./validation.js"),
-        ),
-        factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("types")),
-            ),
-            factory.createStringLiteral("./types.js"),
-        ),
         ...manager.generateValidatorStatements(factory),
     ];
 
@@ -249,24 +231,6 @@ function getSpecFileContent(
     });
 
     const nodes = [
-        factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("types")),
-            ),
-            factory.createStringLiteral("./types.js"),
-        ),
-        factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("validators")),
-            ),
-            factory.createStringLiteral("./validators.js"),
-        ),
         ...manager.generateSpecStatements(factory, nodeUrl),
     ];
 

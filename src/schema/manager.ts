@@ -323,6 +323,26 @@ export class SchemaManager {
     public *generateValidatorStatements(
         factory: ts.NodeFactory,
     ) {
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("validation")),
+            ),
+            factory.createStringLiteral("./validation.js"),
+        );
+
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("types")),
+            ),
+            factory.createStringLiteral("./types.js"),
+        );
+
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
             // eslint-disable-next-line security/detect-object-injection
             const codeGenerator = this.validationCodeGenerators[metaSchemaId];
@@ -338,6 +358,66 @@ export class SchemaManager {
         nodeUrl: URL,
     ) {
         const nodeId = String(nodeUrl);
+
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("types")),
+            ),
+            factory.createStringLiteral("./types.js"),
+        );
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("validators")),
+            ),
+            factory.createStringLiteral("./validators.js"),
+        );
+
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                factory.createIdentifier("assert"),
+                undefined,
+            ),
+            factory.createStringLiteral("node:assert"),
+            undefined,
+        );
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                factory.createIdentifier("fs"),
+                undefined,
+            ),
+            factory.createStringLiteral("node:fs"),
+            undefined,
+        );
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("path")),
+            ),
+            factory.createStringLiteral("node:path"),
+            undefined,
+        );
+        yield factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                factory.createIdentifier("test"),
+                undefined,
+            ),
+            factory.createStringLiteral("node:test"),
+            undefined,
+        );
 
         const codeGenerator = this.specCodeGenerator;
         yield* codeGenerator.generateStatements(
