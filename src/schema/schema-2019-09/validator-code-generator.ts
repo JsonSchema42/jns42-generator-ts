@@ -99,7 +99,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             for (const [subNodePointer] of itemsOneEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
-                    nodeItem.nodeBaseUrl,
+                    nodeItem.nodeRootUrl,
                 );
                 const subNodeId = String(subNodeUrl);
 
@@ -177,7 +177,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             for (const [subNodePointer] of itemsManyEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
-                    nodeItem.nodeBaseUrl,
+                    nodeItem.nodeRootUrl,
                 );
                 const subNodeId = String(subNodeUrl);
 
@@ -217,7 +217,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -338,7 +338,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -414,7 +414,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         for (const [propertyName, subNodePointer] of properties) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 

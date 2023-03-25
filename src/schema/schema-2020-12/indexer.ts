@@ -6,17 +6,22 @@ import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
 import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeInstanceEntries } from "./selectors.js";
 
-export interface SchemaIndexerNodeItem {
-    node: SchemaNode;
-    nodeRootUrl: URL;
-    nodePointer: string;
-    nodeParentUrl: URL | null;
-}
+export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
+    protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-export class SchemaIndexer extends SchemaIndexerBase {
-    private readonly nodeMap = new Map<string, SchemaIndexerNodeItem>();
-    private readonly anchorMap = new Map<string, string>();
-    private readonly dynamicAnchorMap = new Map<string, string>();
+    protected getRootNodeEntries(): Iterable<[URL, SchemaNode]> {
+        return [...this.loader.getRootNodeItems()].
+            map(({ nodeUrl, node }) => [nodeUrl, node]);
+    }
+    protected toNodeUrl(nodePointer: string, nodeRootUrl: URL): URL {
+        return new URL(pointerToHash(nodePointer), nodeRootUrl);
+    }
+    protected selectNodeInstanceEntries(
+        nodePointer: string,
+        node: SchemaNode,
+    ): Iterable<readonly [string, SchemaNode]> {
+        return selectNodeInstanceEntries(nodePointer, node);
+    }
 
     constructor(
         manager: SchemaManager,
@@ -25,9 +30,8 @@ export class SchemaIndexer extends SchemaIndexerBase {
         super(manager);
     }
 
-    public getNodeItem(nodeId: string) {
-        return this.nodeMap.get(nodeId);
-    }
+    private readonly anchorMap = new Map<string, string>();
+    private readonly dynamicAnchorMap = new Map<string, string>();
 
     public getAnchorNodeId(nodeId: string) {
         return this.anchorMap.get(nodeId);
@@ -35,29 +39,6 @@ export class SchemaIndexer extends SchemaIndexerBase {
 
     public getDynamicAnchorNodeId(nodeId: string) {
         return this.dynamicAnchorMap.get(nodeId);
-    }
-
-    public isNodeAncestor(childNodeId: string, nodeAncestorUrl: URL): boolean {
-        const item = this.nodeMap.get(childNodeId);
-        if (!item) {
-            throw new Error("node item not found");
-        }
-
-        if (item.nodeParentUrl == null) {
-            return false;
-        }
-
-        const nodeParentId = String(item.nodeParentUrl);
-        const nodeAncestorId = String(nodeAncestorUrl);
-        if (nodeParentId === nodeAncestorId) {
-            return true;
-        }
-
-        return this.isNodeAncestor(childNodeId, item.nodeParentUrl);
-    }
-
-    public getAllNodeIds() {
-        return this.nodeMap.keys();
     }
 
     public resolveReferenceNodeId(nodeId: string, nodeRef: string) {
@@ -130,41 +111,17 @@ export class SchemaIndexer extends SchemaIndexerBase {
         return resolvedNodeId;
     }
 
-    public indexNodes() {
-        for (const item of this.loader.getRootNodeItems()) {
-            this.indexNode(
-                item.node,
-                item.nodeUrl,
-                "",
-                null,
-            );
-        }
-    }
-
-    private indexNode(
+    protected indexNode(
         node: SchemaNode,
-        nodeBaseUrl: URL,
+        nodeRootUrl: URL,
         nodePointer: string,
-        nodeParentUrl: URL | null,
     ) {
-        const nodeUrl = new URL(pointerToHash(nodePointer), nodeBaseUrl);
+        const nodeUrl = new URL(pointerToHash(nodePointer), nodeRootUrl);
         const nodeId = String(nodeUrl);
-
-        const item: SchemaIndexerNodeItem = {
-            node,
-            nodeRootUrl: nodeBaseUrl,
-            nodePointer,
-            nodeParentUrl,
-        };
-        if (this.nodeMap.has(nodeId)) {
-            throw new Error("duplicate nodeId");
-        }
-        this.nodeMap.set(nodeId, item);
-        this.manager.registerNodeMetaSchema(nodeId, metaSchema.metaSchemaId);
 
         const nodeAnchor = selectNodeAnchor(node);
         if (nodeAnchor != null) {
-            const anchorUrl = new URL(`#${nodeAnchor}`, nodeBaseUrl);
+            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
             const anchorId = String(anchorUrl);
             if (this.anchorMap.has(anchorId)) {
                 throw new Error("duplicate anchorId");
@@ -174,7 +131,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
 
         const nodeDynamicAnchor = selectNodeDynamicAnchor(node);
         if (nodeDynamicAnchor != null) {
-            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeBaseUrl);
+            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeRootUrl);
             const dynamicAnchorId = String(dynamicAnchorUrl);
             if (this.dynamicAnchorMap.has(dynamicAnchorId)) {
                 throw new Error("duplicate dynamicAnchorId");
@@ -182,14 +139,12 @@ export class SchemaIndexer extends SchemaIndexerBase {
             this.dynamicAnchorMap.set(dynamicAnchorId, nodeId);
         }
 
-        for (const [subNodePointer, subNode] of selectNodeInstanceEntries(nodePointer, node)) {
-            this.indexNode(
-                subNode,
-                nodeBaseUrl,
-                subNodePointer,
-                nodeUrl,
-            );
-        }
+        super.indexNode(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
     }
 
 }
+

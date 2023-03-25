@@ -99,7 +99,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             for (const [subNodePointer] of itemsEntries) {
                 const subNodeUrl = new URL(
                     `#${subNodePointer}`,
-                    nodeItem.nodeBaseUrl,
+                    nodeItem.nodeRootUrl,
                 );
                 const subNodeId = String(subNodeUrl);
 
@@ -139,7 +139,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 `#${subNodePointer}`,
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -260,7 +260,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
                 `#${subNodePointer}`,
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -336,7 +336,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         for (const [propertyName, subNodePointer] of properties) {
             const subNodeUrl = new URL(
                 `#${subNodePointer}`,
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 

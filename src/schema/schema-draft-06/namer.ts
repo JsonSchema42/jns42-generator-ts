@@ -24,7 +24,7 @@ export class SchemaNamer extends SchemaNamerBase {
             throw new Error("nodeId not found");
         }
 
-        const pathParts = nodeItem.nodeBaseUrl.pathname.
+        const pathParts = nodeItem.nodeRootUrl.pathname.
             split("/").
             map(decodeURI).
             map(value => value.replace(re, ""));
@@ -51,7 +51,7 @@ export class SchemaNamer extends SchemaNamerBase {
             const [subNodePointer] of
             selectNodeInstanceEntries(nodeItem.nodePointer, nodeItem.node)
         ) {
-            const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeBaseUrl);
+            const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeRootUrl);
             const subNodeId = String(subNodeUrl);
             yield* this.getTypeNames(
                 subNodeId,

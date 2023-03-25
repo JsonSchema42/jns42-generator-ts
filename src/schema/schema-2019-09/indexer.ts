@@ -6,16 +6,22 @@ import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
 import { selectNodeAnchor, selectNodeInstanceEntries, selectNodeRecursiveAnchor } from "./selectors.js";
 
-export interface SchemaIndexerNodeItem {
-    node: SchemaNode;
-    nodeBaseUrl: URL;
-    nodePointer: string;
-}
+export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
+    protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-export class SchemaIndexer extends SchemaIndexerBase {
-    private readonly nodeMap = new Map<string, SchemaIndexerNodeItem>();
-    private readonly anchorMap = new Map<string, string>();
-    private readonly recursiveAnchorMap = new Map<string, string>();
+    protected getRootNodeEntries(): Iterable<[URL, SchemaNode]> {
+        return [...this.loader.getRootNodeItems()].
+            map(({ nodeUrl, node }) => [nodeUrl, node]);
+    }
+    protected toNodeUrl(nodePointer: string, nodeRootUrl: URL): URL {
+        return new URL(pointerToHash(nodePointer), nodeRootUrl);
+    }
+    protected selectNodeInstanceEntries(
+        nodePointer: string,
+        node: SchemaNode,
+    ): Iterable<readonly [string, SchemaNode]> {
+        return selectNodeInstanceEntries(nodePointer, node);
+    }
 
     constructor(
         manager: SchemaManager,
@@ -24,9 +30,8 @@ export class SchemaIndexer extends SchemaIndexerBase {
         super(manager);
     }
 
-    public getNodeItem(nodeId: string) {
-        return this.nodeMap.get(nodeId);
-    }
+    private readonly anchorMap = new Map<string, string>();
+    private readonly recursiveAnchorMap = new Map<string, string>();
 
     public getAnchorNodeId(nodeId: string) {
         return this.anchorMap.get(nodeId);
@@ -37,38 +42,17 @@ export class SchemaIndexer extends SchemaIndexerBase {
         return this.recursiveAnchorMap.get(nodeKey);
     }
 
-    public indexNodes() {
-        for (const item of this.loader.getRootNodeItems()) {
-            this.indexNode(
-                item.node,
-                item.nodeUrl,
-                "",
-            );
-        }
-    }
-
-    public indexNode(
+    protected indexNode(
         node: SchemaNode,
-        nodeBaseUrl: URL,
+        nodeRootUrl: URL,
         nodePointer: string,
     ) {
-        const nodeUrl = new URL(pointerToHash(nodePointer), nodeBaseUrl);
+        const nodeUrl = new URL(pointerToHash(nodePointer), nodeRootUrl);
         const nodeId = String(nodeUrl);
-
-        const item: SchemaIndexerNodeItem = {
-            node,
-            nodeBaseUrl,
-            nodePointer,
-        };
-        if (this.nodeMap.has(nodeId)) {
-            throw new Error("duplicate nodeId");
-        }
-        this.nodeMap.set(nodeId, item);
-        this.manager.registerNodeMetaSchema(nodeId, metaSchema.metaSchemaId);
 
         const nodeAnchor = selectNodeAnchor(node);
         if (nodeAnchor != null) {
-            const anchorUrl = new URL(`#${nodeAnchor}`, nodeBaseUrl);
+            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
             const anchorId = String(anchorUrl);
             if (this.anchorMap.has(anchorId)) {
                 throw new Error("duplicate anchorId");
@@ -86,13 +70,11 @@ export class SchemaIndexer extends SchemaIndexerBase {
             this.recursiveAnchorMap.set(recursiveAnchorId, nodeId);
         }
 
-        for (const [subNodePointer, subNode] of selectNodeInstanceEntries(nodePointer, node)) {
-            this.indexNode(
-                subNode,
-                nodeBaseUrl,
-                subNodePointer,
-            );
-        }
+        super.indexNode(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
     }
 
 }
