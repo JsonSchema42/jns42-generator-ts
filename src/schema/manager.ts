@@ -194,7 +194,7 @@ export class SchemaManager {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingUrl: URL | null,
-        defaultmetaSchemaId,
+        defaultMetaSchemaId: MetaSchemaId,
     ) {
         const retrievalId = String(retrievalUrl);
 
@@ -214,7 +214,6 @@ export class SchemaManager {
             referencingUrl,
             defaultMetaSchemaId,
         );
-
         if (rootNodeUrl == null) {
             throw new Error("rootNode not found");
         }
@@ -255,7 +254,7 @@ export class SchemaManager {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingNodeUrl: URL | null,
-        defaultmetaSchemaId,
+        defaultMetaSchemaId: MetaSchemaId,
     ) {
         const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
             defaultMetaSchemaId;
