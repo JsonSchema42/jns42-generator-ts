@@ -15,73 +15,15 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         super(manager);
     }
 
-    public *generateStatements(
+    protected *generateValidatorFunctionBodyStatements(
         factory: ts.NodeFactory,
         nodeId: string,
-    ) {
-        const typeName = this.manager.getName(nodeId);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-
+    ): Iterable<ts.Statement> {
         const nodeItem = this.indexer.getNodeItem(nodeId);
         if (nodeItem == null) {
             throw new Error("nodeItem not found");
         }
 
-        yield this.generateValidatorFunctionDeclarationStatement(
-            factory,
-            nodeId,
-            nodeItem,
-            typeName,
-        );
-    }
-
-    private generateValidatorFunctionDeclarationStatement(
-        factory: ts.NodeFactory,
-        nodeId: string,
-        nodeItem: SchemaIndexerNodeItem,
-        typeName: string,
-    ): ts.FunctionDeclaration {
-        return factory.createFunctionDeclaration(
-            [
-                factory.createToken(ts.SyntaxKind.ExportKeyword),
-            ],
-            factory.createToken(ts.SyntaxKind.AsteriskToken),
-            `validate${typeName}`,
-            undefined,
-            [
-                factory.createParameterDeclaration(
-                    undefined,
-                    undefined,
-                    "value",
-                    undefined,
-                    this.generateTypeReference(factory, nodeId),
-                ),
-                factory.createParameterDeclaration(
-                    undefined,
-                    undefined,
-                    "path",
-                    undefined,
-                    factory.createArrayTypeNode(
-                        factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                    ),
-                    factory.createArrayLiteralExpression([]),
-                ),
-            ],
-            undefined,
-            factory.createBlock(
-                [...this.generateValidatorFunctionBodyStatements(factory, nodeId, nodeItem)],
-                true,
-            ),
-        );
-    }
-
-    private *generateValidatorFunctionBodyStatements(
-        factory: ts.NodeFactory,
-        nodeId: string,
-        nodeItem: SchemaIndexerNodeItem,
-    ): Iterable<ts.Statement> {
         yield* this.generateCommonValidationStatements(factory, nodeId, nodeItem);
 
         const types = selectNodeTypes(nodeItem.node);
@@ -758,24 +700,6 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
                 ),
             );
         }
-    }
-
-    private wrapValidationExpression(
-        factory: ts.NodeFactory,
-        testExpression: ts.Expression,
-    ) {
-        return factory.createIfStatement(
-            factory.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                testExpression,
-            ),
-            factory.createBlock([
-                factory.createExpressionStatement(factory.createYieldExpression(
-                    undefined,
-                    factory.createIdentifier("path"),
-                )),
-            ]),
-        );
     }
 
 }
