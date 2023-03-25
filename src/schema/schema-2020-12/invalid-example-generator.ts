@@ -18,26 +18,13 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
     public *generateExamplesFromUrl(
         nodeUrl: URL,
     ): Iterable<unknown> {
-        const nodeId = String(nodeUrl);
-
-        const item = this.indexer.getNodeItem(nodeId);
-        if (item == null) {
-            throw new Error("item not found");
-        }
-
-        const nodeIds = [...this.indexer.getAllNodeIds()];
-        for (const nodeId of nodeIds) {
-            for (const [fails, example] of this.generateFromNode(
-                item.node,
-                nodeUrl,
-                "",
-                nodeId,
-            )) {
-                if (!fails) {
-                    continue;
-                }
-                yield example;
+        for (const [isValid, example] of this.generateFromUrl(
+            nodeUrl,
+        )) {
+            if (isValid) {
+                continue;
             }
+            yield example;
         }
     }
 
@@ -51,22 +38,17 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("item not found");
         }
 
-        const nodeIds = [...this.indexer.getAllNodeIds()];
-        for (const nodeId of nodeIds) {
-            yield* this.generateFromNode(
-                item.node,
-                nodeUrl,
-                "",
-                nodeId,
-            );
-        }
+        yield* this.generateFromNode(
+            item.node,
+            nodeUrl,
+            "",
+        );
     }
 
     private *generateFromNode(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
         const nodeRef = selectNodeRef(node);
         if (nodeRef != null) {
@@ -81,7 +63,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                 node,
                 nodeUrl,
                 nodePointer,
-                failNodeId,
             );
         }
     }
@@ -91,60 +72,50 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
         const typeSet = new Set(types);
 
-        const nodeId = String(nodeUrl);
-
-        if (nodeId === failNodeId) {
-            for (const type of simpleTypes) {
-                if (typeSet.has(type)) {
-                    continue;
-                }
-
+        for (const type of simpleTypes) {
+            if (typeSet.has(type)) {
+                yield* this.generateForType(
+                    type,
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                );
+            }
+            else {
                 switch (type) {
                     case "null":
-                        yield [true, null];
+                        yield [false, null];
                         break;
 
                     case "array":
-                        yield [true, []];
+                        yield [false, []];
                         break;
 
                     case "object":
-                        yield [true, {}];
+                        yield [false, {}];
                         break;
 
                     case "string":
-                        yield [true, "fail!!"];
+                        yield [false, "fail!!"];
                         break;
 
                     case "number":
-                        yield [true, 10.1];
+                        yield [false, 10.1];
                         break;
 
                     case "integer":
-                        yield [true, 10];
+                        yield [false, 10];
                         break;
 
                     case "boolean":
-                        yield [true, true];
-                        yield [true, false];
+                        yield [false, true];
+                        yield [false, false];
                         break;
                 }
-
             }
-        }
-
-        for (const type of types) {
-            yield* this.generateForType(
-                type,
-                node,
-                nodeUrl,
-                nodePointer,
-                failNodeId,
-            );
         }
     }
 
@@ -153,7 +124,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
         switch (type) {
             case "null":
@@ -161,7 +131,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -170,7 +139,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -179,7 +147,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -188,7 +155,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -197,7 +163,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -206,7 +171,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -215,7 +179,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
-                    failNodeId,
                 );
                 break;
 
@@ -229,40 +192,26 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
-        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
-            return;
-        }
-
-        const nodeId = String(nodeUrl);
-
-        if (nodeId === failNodeId) {
-            //
-        }
-        else {
-            yield [false, null];
-        }
+        yield [true, null];
     }
 
     private * generateForArray(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
         const itemsEntries = selectNodeItemsEntries(nodePointer, node);
 
         for (const [subNodePointer, subNode] of itemsEntries) {
             const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
-            for (const [fails, example] of this.generateFromNode(
+            for (const [isValid, example] of this.generateFromNode(
                 subNode,
                 subNodeUrl,
                 subNodePointer,
-                failNodeId,
             )) {
-                yield [fails, example];
+                yield [isValid, example];
             }
         }
     }
@@ -271,16 +220,13 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
-        const nodeId = String(nodeUrl);
-
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
         const propertyEntries = [...selectNodePropertyEntries(nodePointer, node)];
         const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
 
-        if (nodeId === failNodeId) {
+        {
             /*
             only yield properties that are not required
             */
@@ -300,7 +246,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     subNode,
                     subNodeUrl,
                     subNodePointer,
-                    failNodeId,
                 )];
             }
 
@@ -308,7 +253,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                 const example = Object.fromEntries(
                     Object.entries(flattened).map(([key, [, value]]) => [key, value]),
                 );
-                yield [true, example];
+                yield [false, example];
             }
         }
 
@@ -328,16 +273,15 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     subNode,
                     subNodeUrl,
                     subNodePointer,
-                    failNodeId,
                 )];
             }
 
             for (const flattened of flattenObject(subExamples)) {
-                const fails = Object.values(flattened).some(([fails]) => fails);
+                const isValid = Object.values(flattened).every(([isValid]) => isValid);
                 const example = Object.fromEntries(
                     Object.entries(flattened).map(([key, [, value]]) => [key, value]),
                 );
-                yield [fails, example];
+                yield [isValid, example];
             }
         }
 
@@ -347,79 +291,33 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
-        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
-            return;
-        }
-        const nodeId = String(nodeUrl);
-
-        if (nodeId === failNodeId) {
-            //
-        }
-        else {
-            yield [false, "a string!"];
-        }
+        yield [true, "a string!"];
     }
 
     private * generateForNumber(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
-        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
-            return;
-        }
-        const nodeId = String(nodeUrl);
-
-        if (nodeId === failNodeId) {
-            //
-        }
-        else {
-            yield [false, 1.5];
-        }
+        yield [true, 1.5];
     }
 
     private * generateForInteger(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
-        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
-            return;
-        }
-
-        const nodeId = String(nodeUrl);
-
-        if (nodeId === failNodeId) {
-            //
-        }
-        else {
-            yield [false, 1];
-        }
+        yield [true, 1];
     }
 
     private * generateForBoolean(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        failNodeId: string,
     ): Iterable<[boolean, unknown]> {
-        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
-            return;
-        }
-
-        const nodeId = String(nodeUrl);
-
-        if (nodeId === failNodeId) {
-            //
-        }
-        else {
-            yield [false, true];
-            yield [false, false];
-        }
+        yield [true, true];
+        yield [true, false];
     }
 
 }

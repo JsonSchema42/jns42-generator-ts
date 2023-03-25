@@ -17,15 +17,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package example",
+      "name": "package string-or-boolean",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/example.json",
+        "file://${workspaceFolder}/fixtures/string-or-boolean.json",
         "--package-directory",
-        ".package/example",
+        ".package/string-or-boolean",
         "--package-name",
-        "example",
+        "string-or-boolean",
         "--package-version",
         "0.0.0"
       ],
