@@ -238,8 +238,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             )) {
                 yield [
                     example,
-                    example,
-                    example,
                 ];
             }
         }
@@ -259,10 +257,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         const propertyNames = new Set(propertyNameEntries.map(([, name]) => name));
         const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
 
-        /*
-        only yield properties that are not required
-        */
         if (nodeId === failNodeId) {
+            /*
+            only yield properties that are not required
+            */
             const subExamples: Record<string, unknown[]> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
@@ -285,23 +283,17 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
 
             yield* flattenObject(subExamples);
         }
+        else {
+            if (propertyNameEntries.length === 0) {
+                yield {};
+            }
+        }
 
         /*
         yield all properties
         */
-        if (this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+        {
             const subExamples: Record<string, unknown[]> = {};
-
-            /*
-            properties without a schema
-            */
-            for (const propertyName of requiredPropertyNames) {
-                if (propertyNames.has(propertyName)) {
-                    continue;
-                }
-                // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = ["Could be anything"];
-            }
 
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection

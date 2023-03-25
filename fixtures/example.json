@@ -1,12 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://json-schema.org/draft/2020-12/output/schema",
+  "$id": "https://luvdasun.com/example",
   "type": [
     "object",
     "boolean"
   ],
   "required": [
-    "a",
     "b"
   ],
   "properties": {
@@ -20,7 +19,15 @@
         "required": [
           "x",
           "y"
-        ]
+        ],
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        }
       }
     },
     "c": {

@@ -137,8 +137,6 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
             )) {
                 yield [
                     example,
-                    example,
-                    example,
                 ];
             }
         }
@@ -164,17 +162,6 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
         */
         {
             const subExamples: Record<string, unknown[]> = {};
-
-            /*
-            properties without a schema
-            */
-            for (const propertyName of requiredPropertyNames) {
-                if (propertyNames.has(propertyName)) {
-                    continue;
-                }
-                // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = ["Could be anything"];
-            }
 
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection
@@ -204,17 +191,6 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
             propertyNames.size > 0
         ) {
             const subExamples: Record<string, unknown[]> = {};
-
-            /*
-            properties without a schema
-            */
-            for (const propertyName of requiredPropertyNames) {
-                if (propertyNames.has(propertyName)) {
-                    continue;
-                }
-                // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = ["Could be anything"];
-            }
 
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection
