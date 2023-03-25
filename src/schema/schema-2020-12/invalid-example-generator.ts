@@ -26,17 +26,22 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("item not found");
         }
 
-        yield* this.generateExamplesFromNode(
-            item.node,
-            nodeUrl,
-            "",
-        );
+        const nodeIds = [...this.indexer.getAllNodeIds()];
+        for (const nodeId of nodeIds) {
+            yield* this.generateExamplesFromNode(
+                item.node,
+                nodeUrl,
+                "",
+                nodeId,
+            );
+        }
     }
 
     private *generateExamplesFromNode(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ): Iterable<unknown> {
         const nodeRef = selectNodeRef(node);
         if (nodeRef != null) {
@@ -51,6 +56,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                 node,
                 nodeUrl,
                 nodePointer,
+                failNodeId,
             );
         }
     }
@@ -60,6 +66,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         for (const type of types) {
             yield* this.generateExamplesForType(
@@ -67,6 +74,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                 node,
                 nodeUrl,
                 nodePointer,
+                failNodeId,
             );
         }
     }
@@ -76,34 +84,70 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         switch (type) {
             case "null":
-                yield* this.generateExamplesForNull(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForNull(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             case "array":
-                yield* this.generateExamplesForArray(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForArray(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             case "object":
-                yield* this.generateExamplesForObject(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForObject(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             case "string":
-                yield* this.generateExamplesForString(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForString(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             case "number":
-                yield* this.generateExamplesForNumber(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForNumber(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             case "integer":
-                yield* this.generateExamplesForInteger(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForInteger(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             case "boolean":
-                yield* this.generateExamplesForBoolean(node, nodeUrl, nodePointer);
+                yield* this.generateExamplesForBoolean(
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
                 break;
 
             default:
@@ -116,6 +160,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         yield null;
     }
@@ -124,6 +169,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         const itemsEntries = selectNodeItemsEntries(nodePointer, node);
 
@@ -134,6 +180,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                 subNode,
                 subNodeUrl,
                 subNodePointer,
+                failNodeId,
             )) {
                 yield [
                     example,
@@ -148,6 +195,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
@@ -186,6 +234,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                     subNode,
                     subNodeUrl,
                     subNodePointer,
+                    failNodeId,
                 )];
             }
 
@@ -218,6 +267,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
                         subNode,
                         subNodeUrl,
                         subNodePointer,
+                        failNodeId,
                     )];
                 }
 
@@ -231,6 +281,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         yield "a string!";
     }
@@ -239,6 +290,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         yield 1;
         yield 0.5;
@@ -248,6 +300,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         yield 1;
     }
@@ -256,6 +309,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        failNodeId: string,
     ) {
         yield true;
         yield false;
