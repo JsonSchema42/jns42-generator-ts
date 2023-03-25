@@ -18,10 +18,10 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
     public *generateExamplesFromUrl(
         nodeUrl: URL,
     ): Iterable<unknown> {
-        for (const [isValid, example] of this.generateFromUrl(
+        for (const [errors, example] of this.generateFromUrl(
             nodeUrl,
         )) {
-            if (isValid) {
+            if (errors !== 1) {
                 continue;
             }
             yield example;
@@ -30,7 +30,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
 
     public *generateFromUrl(
         nodeUrl: URL,
-    ): Iterable<[boolean, unknown]> {
+    ): Iterable<[number, unknown]> {
         const nodeId = String(nodeUrl);
 
         const item = this.indexer.getNodeItem(nodeId);
@@ -49,7 +49,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
+    ): Iterable<[number, unknown]> {
         const nodeRef = selectNodeRef(node);
         if (nodeRef != null) {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
@@ -72,7 +72,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
+    ): Iterable<[number, unknown]> {
         const typeSet = new Set(types);
 
         for (const type of simpleTypes) {
@@ -87,32 +87,32 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             else {
                 switch (type) {
                     case "null":
-                        yield [false, null];
+                        yield [1, null];
                         break;
 
                     case "array":
-                        yield [false, []];
+                        yield [1, []];
                         break;
 
                     case "object":
-                        yield [false, {}];
+                        yield [1, {}];
                         break;
 
                     case "string":
-                        yield [false, "fail!!"];
+                        yield [1, "fail!!"];
                         break;
 
                     case "number":
-                        yield [false, 10.1];
+                        yield [1, 10.1];
                         break;
 
                     case "integer":
-                        yield [false, 10];
+                        yield [1, 10];
                         break;
 
                     case "boolean":
-                        yield [false, true];
-                        yield [false, false];
+                        yield [1, true];
+                        yield [1, false];
                         break;
                 }
             }
@@ -124,7 +124,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
+    ): Iterable<[number, unknown]> {
         switch (type) {
             case "null":
                 yield* this.generateForNull(
@@ -192,26 +192,26 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
-        yield [true, null];
+    ): Iterable<[number, unknown]> {
+        yield [0, null];
     }
 
     private * generateForArray(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
+    ): Iterable<[number, unknown]> {
         const itemsEntries = selectNodeItemsEntries(nodePointer, node);
 
         for (const [subNodePointer, subNode] of itemsEntries) {
             const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
-            for (const [isValid, example] of this.generateFromNode(
+            for (const [errors, example] of this.generateFromNode(
                 subNode,
                 subNodeUrl,
                 subNodePointer,
             )) {
-                yield [isValid, example];
+                yield [errors, example];
             }
         }
     }
@@ -220,7 +220,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
+    ): Iterable<[number, unknown]> {
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
         const propertyEntries = [...selectNodePropertyEntries(nodePointer, node)];
@@ -230,7 +230,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             /*
             only yield properties that are not required
             */
-            const subExamples: Record<string, Array<[boolean, unknown]>> = {};
+            const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection
@@ -250,10 +250,12 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             }
 
             for (const flattened of flattenObject(subExamples)) {
+                const errors = Object.values(flattened).
+                    reduce((sum, [errors]) => sum + errors, 0);
                 const example = Object.fromEntries(
                     Object.entries(flattened).map(([key, [, value]]) => [key, value]),
                 );
-                yield [false, example];
+                yield [errors + 1, example];
             }
         }
 
@@ -261,7 +263,7 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         yield all properties
         */
         {
-            const subExamples: Record<string, Array<[boolean, unknown]>> = {};
+            const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection
@@ -277,11 +279,13 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             }
 
             for (const flattened of flattenObject(subExamples)) {
-                const isValid = Object.values(flattened).every(([isValid]) => isValid);
+                const errors = Object.values(flattened).
+                    reduce((sum, [errors]) => sum + errors, 0);
                 const example = Object.fromEntries(
-                    Object.entries(flattened).map(([key, [, value]]) => [key, value]),
+                    Object.entries(flattened).
+                        map(([key, [, value]]) => [key, value]),
                 );
-                yield [isValid, example];
+                yield [errors, example];
             }
         }
 
@@ -291,33 +295,33 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
-        yield [true, "a string!"];
+    ): Iterable<[number, unknown]> {
+        yield [0, "a string!"];
     }
 
     private * generateForNumber(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
-        yield [true, 1.5];
+    ): Iterable<[number, unknown]> {
+        yield [0, 1.5];
     }
 
     private * generateForInteger(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
-        yield [true, 1];
+    ): Iterable<[number, unknown]> {
+        yield [0, 1];
     }
 
     private * generateForBoolean(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-    ): Iterable<[boolean, unknown]> {
-        yield [true, true];
-        yield [true, false];
+    ): Iterable<[number, unknown]> {
+        yield [0, true];
+        yield [0, false];
     }
 
 }
