@@ -90,20 +90,25 @@ async function main(options: MainOptions) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(mainFilePath, mainFileContent);
 
-    const schemaFileContent = getSchemaFileContent(factory, manager);
-    const schemaFilePath = path.join(packageDirectoryPath, "schema.ts");
+    const typesFileContent = getTypesFileContent(factory, manager);
+    const typesFilePath = path.join(packageDirectoryPath, "types.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(schemaFilePath, schemaFileContent);
+    fs.writeFileSync(typesFilePath, typesFileContent);
+
+    const validatorsFileContent = getValidatorsFileContent(factory, manager);
+    const validatorsFilePath = path.join(packageDirectoryPath, "validators.ts");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(validatorsFilePath, validatorsFileContent);
+
+    const specFileContent = getSpecFileContent(factory, manager, rootNodeUrl);
+    const specFilePath = path.join(packageDirectoryPath, "schema.spec.ts");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(specFilePath, specFileContent);
 
     const validationSourceFileContent = path.join(projectRoot, "src", "includes", "validation.ts");
     const validationFilePath = path.join(packageDirectoryPath, "validation.ts");
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
-
-    const exampleSpecSourceFileContent = path.join(projectRoot, "src", "includes", "example.spec.ts");
-    const exampleSpecFilePath = path.join(packageDirectoryPath, "example.spec.ts");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.copyFileSync(exampleSpecSourceFileContent, exampleSpecFilePath);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(path.join(packageDirectoryPath, "examples-valid"), { recursive: true });
@@ -147,7 +152,14 @@ function getMainFileContent(
             undefined,
             false,
             undefined,
-            factory.createStringLiteral("./schema.js"),
+            factory.createStringLiteral("./types.js"),
+            undefined,
+        ),
+        factory.createExportDeclaration(
+            undefined,
+            false,
+            undefined,
+            factory.createStringLiteral("./validators.js"),
             undefined,
         ),
     ];
@@ -160,7 +172,31 @@ function getMainFileContent(
 
     return banner + printer.printFile(sourceFile);
 }
-function getSchemaFileContent(
+
+function getTypesFileContent(
+    factory: ts.NodeFactory,
+    manager: SchemaManager,
+) {
+    const banner = "/* eslint-disable */\n";
+
+    const printer = ts.createPrinter({
+        newLine: ts.NewLineKind.LineFeed,
+    });
+
+    const nodes = [
+        ...manager.generateTypeStatements(factory),
+    ];
+
+    const sourceFile = factory.createSourceFile(
+        nodes,
+        factory.createToken(ts.SyntaxKind.EndOfFileToken),
+        ts.NodeFlags.None,
+    );
+
+    return banner + printer.printFile(sourceFile);
+}
+
+function getValidatorsFileContent(
     factory: ts.NodeFactory,
     manager: SchemaManager,
 ) {
@@ -180,8 +216,58 @@ function getSchemaFileContent(
             ),
             factory.createStringLiteral("./validation.js"),
         ),
-        ...manager.generateTypeStatements(factory),
-        ...manager.generateValidationStatements(factory),
+        factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("types")),
+            ),
+            factory.createStringLiteral("./types.js"),
+        ),
+        ...manager.generateValidatorStatements(factory),
+    ];
+
+    const sourceFile = factory.createSourceFile(
+        nodes,
+        factory.createToken(ts.SyntaxKind.EndOfFileToken),
+        ts.NodeFlags.None,
+    );
+
+    return banner + printer.printFile(sourceFile);
+}
+
+function getSpecFileContent(
+    factory: ts.NodeFactory,
+    manager: SchemaManager,
+    nodeUrl: URL,
+) {
+    const banner = "/* eslint-disable */\n";
+
+    const printer = ts.createPrinter({
+        newLine: ts.NewLineKind.LineFeed,
+    });
+
+    const nodes = [
+        factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("types")),
+            ),
+            factory.createStringLiteral("./types.js"),
+        ),
+        factory.createImportDeclaration(
+            undefined,
+            factory.createImportClause(
+                false,
+                undefined,
+                factory.createNamespaceImport(factory.createIdentifier("validators")),
+            ),
+            factory.createStringLiteral("./validators.js"),
+        ),
+        ...manager.generateSpecStatements(factory, nodeUrl),
     ];
 
     const sourceFile = factory.createSourceFile(

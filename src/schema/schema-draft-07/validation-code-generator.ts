@@ -727,7 +727,10 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         if (typeName == null) {
             throw new Error("typeName not found");
         }
-        return factory.createTypeReferenceNode(typeName);
+        return factory.createTypeReferenceNode(factory.createQualifiedName(
+            factory.createIdentifier("types"),
+            factory.createIdentifier(typeName),
+        ));
     }
 
 }

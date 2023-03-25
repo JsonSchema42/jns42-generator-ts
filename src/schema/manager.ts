@@ -6,6 +6,7 @@ import * as schema202012 from "./schema-2020-12/index.js";
 import * as schemaDraft04 from "./schema-draft-04/index.js";
 import * as schemaDraft06 from "./schema-draft-06/index.js";
 import * as schemaDraft07 from "./schema-draft-07/index.js";
+import { SchemaSpecCodeGenerator } from "./spec-code-generator.js";
 
 export class SchemaManager {
 
@@ -180,6 +181,10 @@ export class SchemaManager {
         ),
     };
 
+    private readonly specCodeGenerator = new SchemaSpecCodeGenerator(
+        this,
+    );
+
     public registerRootNodeMetaSchema(
         nodeId: string,
         schemaMetaKey: MetaSchemaId,
@@ -315,7 +320,7 @@ export class SchemaManager {
 
     }
 
-    public *generateValidationStatements(
+    public *generateValidatorStatements(
         factory: ts.NodeFactory,
     ) {
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
@@ -326,6 +331,19 @@ export class SchemaManager {
                 nodeId,
             );
         }
+    }
+
+    public *generateSpecStatements(
+        factory: ts.NodeFactory,
+        nodeUrl: URL,
+    ) {
+        const nodeId = String(nodeUrl);
+
+        const codeGenerator = this.specCodeGenerator;
+        yield* codeGenerator.generateStatements(
+            factory,
+            nodeId,
+        );
 
     }
 
