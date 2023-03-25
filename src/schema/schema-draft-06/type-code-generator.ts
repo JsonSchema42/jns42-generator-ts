@@ -15,48 +15,15 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         super(manager);
     }
 
-    protected generateSchemaTypeDeclarationStatement(
+    protected * generateTypeNodes(
         factory: ts.NodeFactory,
         nodeId: string,
-        typeName: string,
-    ) {
+    ): Iterable<ts.TypeNode> {
         const nodeItem = this.indexer.getNodeItem(nodeId);
         if (nodeItem == null) {
             throw new Error("nodeItem not found");
         }
 
-        return factory.createTypeAliasDeclaration(
-            [
-                factory.createToken(ts.SyntaxKind.ExportKeyword),
-            ],
-            typeName,
-            undefined,
-            this.generateTypeNode(
-                factory,
-                nodeItem,
-            ),
-        );
-    }
-
-    private generateTypeNode(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): ts.TypeNode {
-        const typeNodes = [...this.generateTypeNodes(factory, nodeItem)];
-        if (typeNodes.length === 0) {
-            return factory.createKeywordTypeNode(
-                ts.SyntaxKind.UnknownKeyword,
-            );
-        }
-        return factory.createParenthesizedType(factory.createIntersectionTypeNode(
-            typeNodes,
-        ));
-    }
-
-    private * generateTypeNodes(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): Iterable<ts.TypeNode> {
         if (nodeItem.node === true) {
             yield factory.createKeywordTypeNode(
                 ts.SyntaxKind.AnyKeyword,

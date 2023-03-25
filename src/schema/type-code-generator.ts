@@ -3,11 +3,10 @@ import { SchemaCodeGeneratorBase } from "./code-generator.js";
 
 export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBase {
 
-    protected abstract generateSchemaTypeDeclarationStatement(
+    protected abstract generateTypeNodes(
         factory: ts.NodeFactory,
         nodeId: string,
-        typeName: string,
-    ): ts.Statement;
+    ): Iterable<ts.TypeNode>;
 
     public *generateStatements(
         factory: ts.NodeFactory,
@@ -24,6 +23,39 @@ export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBas
             typeName,
         );
 
+    }
+
+    protected generateSchemaTypeDeclarationStatement(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        typeName: string,
+    ) {
+        return factory.createTypeAliasDeclaration(
+            [
+                factory.createToken(ts.SyntaxKind.ExportKeyword),
+            ],
+            typeName,
+            undefined,
+            this.generateTypeNode(
+                factory,
+                nodeId,
+            ),
+        );
+    }
+
+    protected generateTypeNode(
+        factory: ts.NodeFactory,
+        nodeId: string,
+    ): ts.TypeNode {
+        const typeNodes = [...this.generateTypeNodes(factory, nodeId)];
+        if (typeNodes.length === 0) {
+            return factory.createKeywordTypeNode(
+                ts.SyntaxKind.UnknownKeyword,
+            );
+        }
+        return factory.createParenthesizedType(factory.createIntersectionTypeNode(
+            typeNodes,
+        ));
     }
 
     protected generateTypeReference(
