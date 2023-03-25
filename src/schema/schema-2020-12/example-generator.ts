@@ -7,6 +7,8 @@ import { SchemaNode } from "./node.js";
 import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
+    public refDepthLimit = 3;
+
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -21,6 +23,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     ): Iterable<unknown> {
         for (const [errors, example] of this.generateFromUrl(
             nodeUrl,
+            0,
         )) {
             if (errors !== wantErrors) {
                 continue;
@@ -31,6 +34,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
     public *generateFromUrl(
         nodeUrl: URL,
+        refDepth: number,
     ): Iterable<[number, unknown]> {
         const nodeId = String(nodeUrl);
 
@@ -43,6 +47,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             item.node,
             nodeUrl,
             "",
+            refDepth,
         );
     }
 
@@ -50,6 +55,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        refDepth: number,
     ): Iterable<[number, unknown]> {
         const nodeId = String(nodeUrl);
         const nodeItem = this.indexer.getNodeItem(nodeId);
@@ -65,7 +71,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             );
             const resolvedNodeUrl = new URL(resolvedNodeId);
 
-            yield* this.generateFromUrl(resolvedNodeUrl);
+            if (refDepth < this.refDepthLimit) {
+                yield* this.generateFromUrl(resolvedNodeUrl, refDepth + 1);
+            }
         }
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
@@ -76,7 +84,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             );
             const resolvedNodeUrl = new URL(resolvedNodeId);
 
-            yield* this.generateFromUrl(resolvedNodeUrl);
+            if (refDepth < this.refDepthLimit) {
+                yield* this.generateFromUrl(resolvedNodeUrl, refDepth + 1);
+            }
         }
 
         const nodeTypes = selectNodeTypes(node);
@@ -86,6 +96,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 node,
                 nodeUrl,
                 nodePointer,
+                refDepth,
             );
         }
     }
@@ -95,6 +106,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        refDepth: number,
     ): Iterable<[number, unknown]> {
         const typeSet = new Set(types);
 
@@ -105,6 +117,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
+                    refDepth,
                 );
             }
             else {
@@ -147,6 +160,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        refDepth: number,
     ): Iterable<[number, unknown]> {
         switch (type) {
             case "null":
@@ -162,6 +176,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
+                    refDepth,
                 );
                 break;
 
@@ -170,6 +185,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     node,
                     nodeUrl,
                     nodePointer,
+                    refDepth,
                 );
                 break;
 
@@ -223,6 +239,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        refDepth: number,
     ): Iterable<[number, unknown]> {
         const itemsEntries = selectNodeItemsEntries(nodePointer, node);
 
@@ -233,6 +250,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 subNode,
                 subNodeUrl,
                 subNodePointer,
+                refDepth,
             )) {
                 yield [errors, [example]];
             }
@@ -243,6 +261,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
+        refDepth: number,
     ): Iterable<[number, unknown]> {
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
@@ -269,6 +288,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     subNode,
                     subNodeUrl,
                     subNodePointer,
+                    refDepth,
                 )];
             }
 
@@ -301,6 +321,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     subNode,
                     subNodeUrl,
                     subNodePointer,
+                    refDepth,
                 )];
             }
 
@@ -331,6 +352,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     subNode,
                     subNodeUrl,
                     subNodePointer,
+                    refDepth,
                 )];
             }
 

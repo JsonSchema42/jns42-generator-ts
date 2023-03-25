@@ -70,6 +70,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
         const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
 
         const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+        nodeRefRetrievalUrl.hash = "";
         const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
         const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
 
@@ -96,6 +97,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
         const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
 
         const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
+        nodeRefRetrievalUrl.hash = "";
         const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
         const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
 
