@@ -164,12 +164,14 @@ export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBas
     protected generateTypeReference(
         factory: ts.NodeFactory,
         nodeId: string,
-    ): ts.TypeNode {
+    ) {
         const typeName = this.manager.getName(nodeId);
         if (typeName == null) {
             throw new Error("typeName not found");
         }
-        return factory.createTypeReferenceNode(typeName);
+        return factory.createTypeReferenceNode(
+            factory.createIdentifier(typeName),
+        );
     }
 
 }

@@ -164,17 +164,6 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
         }
     }
 
-    protected generateTypeReference(
-        factory: ts.NodeFactory,
-        nodeId: string,
-    ): ts.TypeNode {
-        const typeName = this.manager.getName(nodeId);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-        return factory.createTypeReferenceNode(typeName);
-    }
-
     protected wrapValidationExpression(
         factory: ts.NodeFactory,
         testExpression: ts.Expression,
@@ -305,6 +294,22 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
             default:
                 throw new Error("type not supported");
         }
+    }
+
+    protected generateTypeReference(
+        factory: ts.NodeFactory,
+        nodeId: string,
+    ) {
+        const typeName = this.manager.getName(nodeId);
+        if (typeName == null) {
+            throw new Error("typeName not found");
+        }
+        return factory.createTypeReferenceNode(
+            factory.createQualifiedName(
+                factory.createIdentifier("types"),
+                factory.createIdentifier(typeName),
+            ),
+        );
     }
 
 }
