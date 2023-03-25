@@ -125,27 +125,27 @@ export class SchemaManager {
     };
 
     private readonly invalidExampleGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidExampleGenerator(
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaInvalidExampleGenerator(
             this,
             this.loaders[schema202012.metaSchema.metaSchemaId],
             this.indexers[schema202012.metaSchema.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidExampleGenerator(
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaInvalidExampleGenerator(
             this,
             this.loaders[schema201909.metaSchema.metaSchemaId],
             this.indexers[schema201909.metaSchema.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidExampleGenerator(
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaInvalidExampleGenerator(
             this,
             this.loaders[schemaDraft07.metaSchema.metaSchemaId],
             this.indexers[schemaDraft07.metaSchema.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidExampleGenerator(
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaInvalidExampleGenerator(
             this,
             this.loaders[schemaDraft06.metaSchema.metaSchemaId],
             this.indexers[schemaDraft06.metaSchema.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidExampleGenerator(
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaInvalidExampleGenerator(
             this,
             this.loaders[schemaDraft04.metaSchema.metaSchemaId],
             this.indexers[schemaDraft04.metaSchema.metaSchemaId],
@@ -297,6 +297,19 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const exampleGenerator = this.validExampleGenerators[metaSchemaId];
+        yield* exampleGenerator.generateExamplesFromUrl(nodeUrl);
+    }
+
+    public *generateInvalidExamples(nodeUrl: URL) {
+        const nodeId = String(nodeUrl);
+        const metaSchemaId = this.nodeMetaMap.get(nodeId);
+        if (metaSchemaId == null) {
+            throw new Error("node nopt found");
+
+        }
+
+        // eslint-disable-next-line security/detect-object-injection
+        const exampleGenerator = this.invalidExampleGenerators[metaSchemaId];
         yield* exampleGenerator.generateExamplesFromUrl(nodeUrl);
     }
 

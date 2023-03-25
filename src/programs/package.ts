@@ -113,6 +113,19 @@ async function main(options: MainOptions) {
         }
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(path.join(packageDirectoryPath, "examples-invalid"), { recursive: true });
+    {
+        let index = 0;
+        for (const example of manager.generateInvalidExamples(rootNodeUrl)) {
+            index++;
+            const exampleFileContent = JSON.stringify(example, undefined, 2);
+            const exampleFilePath = path.join(packageDirectoryPath, "examples-invalid", `invalid-${packageName}-${index}.json`);
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            fs.writeFileSync(exampleFilePath, exampleFileContent);
+        }
+    }
+
 }
 
 function getMainFileContent(
@@ -210,7 +223,9 @@ function withDependencies(
     return names.reduce(
         (o, name) => Object.assign(o, {
             [name]:
+                // eslint-disable-next-line security/detect-object-injection
                 packageInfo.dependencies?.[name] ??
+                // eslint-disable-next-line security/detect-object-injection
                 packageInfo.devDependencies?.[name],
         }),
         {},

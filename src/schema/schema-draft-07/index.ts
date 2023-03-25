@@ -1,5 +1,6 @@
 export * from "./code-generator.js";
 export * from "./indexer.js";
+export * from "./invalid-example-generator.js";
 export * from "./loader.js";
 export * from "./meta.js";
 export * from "./namer.js";
