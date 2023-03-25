@@ -1,12 +1,12 @@
 import ts from "typescript";
 import { generateLiteral, pointerToHash } from "../../utils/index.js";
-import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
+import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeDynamicRef, selectNodeItemsEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
-export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
+export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -71,7 +71,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             ],
             undefined,
             factory.createBlock(
-                [...this.generateValidatorFunctionBodyStatements(factory, nodeId, nodeItem)],
+                [...this.generateValidatorFunctionBodyStatements(factory, nodeItem)],
                 true,
             ),
         );
@@ -79,12 +79,12 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
 
     private *generateValidatorFunctionBodyStatements(
         factory: ts.NodeFactory,
-        nodeId: string,
         nodeItem: SchemaIndexerNodeItem,
     ): Iterable<ts.Statement> {
-        yield* this.generateCommonValidationStatements(factory, nodeId, nodeItem);
 
-        const types = selectNodeTypes(nodeItem.node);
+        // yield* this.generateCommonValidationStatements(nodeItem);
+
+        const types = selectNodeType(nodeItem.node);
         if (types != null) {
             let statement: ts.Statement = factory.createBlock([
                 factory.createExpressionStatement(factory.createYieldExpression(
@@ -102,63 +102,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             }
             yield statement;
         }
-    }
 
-    private *generateCommonValidationStatements(
-        factory: ts.NodeFactory,
-        nodeId: string,
-        nodeItem: SchemaIndexerNodeItem,
-    ): Iterable<ts.Statement> {
-        const nodeRef = selectNodeRef(nodeItem.node);
-        if (nodeRef != null) {
-            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
-                nodeId,
-                nodeRef,
-            );
-
-            const resolvedTypeName = this.manager.getName(resolvedNodeId);
-            if (resolvedTypeName == null) {
-                throw new Error("could not resolve name");
-            }
-
-            yield factory.createExpressionStatement(factory.createYieldExpression(
-                factory.createToken(ts.SyntaxKind.AsteriskToken),
-                factory.createCallExpression(
-                    factory.createIdentifier(`validate${resolvedTypeName}`),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                        factory.createIdentifier("path"),
-                    ],
-                )),
-            );
-
-        }
-
-        const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
-        if (nodeDynamicRef != null) {
-            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
-                nodeId,
-                nodeDynamicRef,
-            );
-
-            const resolvedTypeName = this.manager.getName(resolvedNodeId);
-            if (resolvedTypeName == null) {
-                throw new Error("could not resolve name");
-            }
-
-            yield factory.createExpressionStatement(factory.createYieldExpression(
-                factory.createToken(ts.SyntaxKind.AsteriskToken),
-                factory.createCallExpression(
-                    factory.createIdentifier(`validate${resolvedTypeName}`),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                        factory.createIdentifier("path"),
-                    ],
-                )),
-            );
-        }
     }
 
     private generateTypeValidationIfStatement(
@@ -373,16 +317,93 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const prefixItemsEntries = selectNodePrefixItemsEntries(
+        const itemsOneEntries = selectNodeItemsOneEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        {
+            for (const [subNodePointer] of itemsOneEntries) {
+                const subNodeUrl = new URL(
+                    pointerToHash(subNodePointer),
+                    nodeItem.nodeBaseUrl,
+                );
+                const subNodeId = String(subNodeUrl);
+
+                const typeName = this.manager.getName(subNodeId);
+                if (typeName == null) {
+                    throw new Error("name not found");
+                }
+
+                yield factory.createForOfStatement(
+                    undefined,
+                    factory.createVariableDeclarationList([
+                        factory.createVariableDeclaration(
+                            factory.createIdentifier("entry"),
+                        ),
+                    ], ts.NodeFlags.Const),
+                    factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createIdentifier("Object"),
+                            factory.createIdentifier("entries"),
+                        ),
+                        undefined,
+                        [factory.createIdentifier("value")],
+                    ),
+                    factory.createBlock([
+                        factory.createVariableStatement(
+                            undefined,
+                            factory.createVariableDeclarationList([
+                                factory.createVariableDeclaration(
+                                    factory.createArrayBindingPattern([
+                                        factory.createBindingElement(
+                                            undefined,
+                                            undefined,
+                                            factory.createIdentifier("key"),
+                                        ),
+                                        factory.createBindingElement(
+                                            undefined,
+                                            undefined,
+                                            factory.createIdentifier("value"),
+                                        ),
+                                    ]),
+                                    undefined,
+                                    undefined,
+                                    factory.createIdentifier("entry"),
+                                ),
+                            ], ts.NodeFlags.Const),
+                        ),
+                        factory.createExpressionStatement(factory.createYieldExpression(
+                            factory.createToken(ts.SyntaxKind.AsteriskToken),
+                            factory.createCallExpression(
+                                factory.createIdentifier(`validate${typeName}`),
+                                undefined,
+                                [
+                                    factory.createIdentifier("value"),
+                                    factory.createArrayLiteralExpression(
+                                        [
+                                            factory.createSpreadElement(factory.createIdentifier("path")),
+                                            factory.createIdentifier("key"),
+                                        ],
+                                        false,
+                                    ),
+                                ],
+                            )),
+                        ),
+                    ], true),
+                );
+            }
+        }
+
+        const itemsManyEntries = selectNodeItemsManyEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
         {
             let index = 0;
-            for (const [subNodePointer] of prefixItemsEntries) {
+            for (const [subNodePointer] of itemsManyEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
-                    nodeItem.nodeRootUrl,
+                    nodeItem.nodeBaseUrl,
                 );
                 const subNodeId = String(subNodeUrl);
 
@@ -415,14 +436,14 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             }
         }
 
-        const itemsEntries = selectNodeItemsEntries(
+        const additionalItemsEntries = selectNodeAdditionalItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
-        for (const [subNodePointer] of itemsEntries) {
+        for (const [subNodePointer] of additionalItemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeRootUrl,
+                nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -538,7 +559,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeRootUrl,
+                nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -606,15 +627,15 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             );
         }
 
-        const properties = selectNodePropertyNamesEntries(
+        const properties = selectNodeProperties(
             nodeItem.nodePointer,
             nodeItem.node,
         );
 
-        for (const [subNodePointer, propertyName] of properties) {
+        for (const [propertyName, subNodePointer] of properties) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeRootUrl,
+                nodeItem.nodeBaseUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -776,20 +797,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
                 )),
             ]),
         );
-    }
-
-    private generateTypeReference(
-        factory: ts.NodeFactory,
-        nodeId: string,
-    ): ts.TypeNode {
-        const typeName = this.manager.getName(nodeId);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-        return factory.createTypeReferenceNode(factory.createQualifiedName(
-            factory.createIdentifier("types"),
-            factory.createIdentifier(typeName),
-        ));
     }
 
 }

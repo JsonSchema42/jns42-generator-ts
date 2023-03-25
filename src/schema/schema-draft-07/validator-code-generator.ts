@@ -1,12 +1,12 @@
 import ts from "typescript";
 import { generateLiteral } from "../../utils/index.js";
-import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
+import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalPropertiesEntries, selectNodeItemsEntries as selectNodeAdditionalItemsEntries, selectNodeItemsEntries, selectNodeProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
-export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
+export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -720,20 +720,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
                 )),
             ]),
         );
-    }
-
-    private generateTypeReference(
-        factory: ts.NodeFactory,
-        nodeId: string,
-    ): ts.TypeNode {
-        const typeName = this.manager.getName(nodeId);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-        return factory.createTypeReferenceNode(factory.createQualifiedName(
-            factory.createIdentifier("types"),
-            factory.createIdentifier(typeName),
-        ));
     }
 
 }

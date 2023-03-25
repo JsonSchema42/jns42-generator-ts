@@ -1,14 +1,7 @@
 import ts from "typescript";
 import { SchemaCodeGeneratorBase } from "./code-generator.js";
-import { SchemaManager } from "./manager.js";
 
-export class SchemaSpecCodeGenerator extends SchemaCodeGeneratorBase {
-    constructor(
-        manager: SchemaManager,
-    ) {
-        super(manager);
-    }
-
+export abstract class SchemaSpecCodeGeneratorBase extends SchemaCodeGeneratorBase {
     public * generateStatements(
         factory: ts.NodeFactory,
         nodeId: string,

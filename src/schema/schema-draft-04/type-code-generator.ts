@@ -1,12 +1,12 @@
 import ts from "typescript";
 import { generatePrimitiveLiteral } from "../../utils/index.js";
-import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
+import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeEnum, selectNodeItemsEntries as selectNodeAdditionalItemsEntries, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType } from "./selectors.js";
 
-export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
+export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -336,17 +336,6 @@ export class SchemaTypeCodeGenerator extends SchemaCodeGeneratorBase {
                 ),
             ],
         );
-    }
-
-    private generateTypeReference(
-        factory: ts.NodeFactory,
-        nodeId: string,
-    ): ts.TypeNode {
-        const typeName = this.manager.getName(nodeId);
-        if (typeName == null) {
-            throw new Error("typeName not found");
-        }
-        return factory.createTypeReferenceNode(typeName);
     }
 
 }

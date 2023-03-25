@@ -6,7 +6,6 @@ import * as schema202012 from "./schema-2020-12/index.js";
 import * as schemaDraft04 from "./schema-draft-04/index.js";
 import * as schemaDraft06 from "./schema-draft-06/index.js";
 import * as schemaDraft07 from "./schema-draft-07/index.js";
-import { SchemaSpecCodeGenerator } from "./spec-code-generator.js";
 
 export class SchemaManager {
 
@@ -98,31 +97,49 @@ export class SchemaManager {
         ),
     };
 
-    private readonly validationCodeGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidationCodeGenerator(
+    private readonly validatorCodeGenerators = {
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidatorCodeGenerator(
             this,
             this.loaders[schema202012.metaSchema.metaSchemaId],
             this.indexers[schema202012.metaSchema.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidationCodeGenerator(
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidatorCodeGenerator(
             this,
             this.loaders[schema201909.metaSchema.metaSchemaId],
             this.indexers[schema201909.metaSchema.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidationCodeGenerator(
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidatorCodeGenerator(
             this,
             this.loaders[schemaDraft07.metaSchema.metaSchemaId],
             this.indexers[schemaDraft07.metaSchema.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidationCodeGenerator(
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidatorCodeGenerator(
             this,
             this.loaders[schemaDraft06.metaSchema.metaSchemaId],
             this.indexers[schemaDraft06.metaSchema.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidationCodeGenerator(
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidatorCodeGenerator(
             this,
             this.loaders[schemaDraft04.metaSchema.metaSchemaId],
             this.indexers[schemaDraft04.metaSchema.metaSchemaId],
+        ),
+    };
+
+    private readonly specCodeGenerators = {
+        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaSpecCodeGenerator(
+            this,
+        ),
+        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaSpecCodeGenerator(
+            this,
+        ),
+        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaSpecCodeGenerator(
+            this,
+        ),
+        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaSpecCodeGenerator(
+            this,
+        ),
+        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaSpecCodeGenerator(
+            this,
         ),
     };
 
@@ -153,11 +170,6 @@ export class SchemaManager {
             this.indexers[schemaDraft04.metaSchema.metaSchemaId],
         ),
     };
-
-    private readonly specCodeGenerator = new SchemaSpecCodeGenerator(
-        this,
-    );
-
     public registerRootNodeMetaSchema(
         nodeId: string,
         schemaMetaKey: MetaSchemaId,
@@ -329,7 +341,7 @@ export class SchemaManager {
 
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
             // eslint-disable-next-line security/detect-object-injection
-            const codeGenerator = this.validationCodeGenerators[metaSchemaId];
+            const codeGenerator = this.validatorCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
                 nodeId,
@@ -403,11 +415,19 @@ export class SchemaManager {
             undefined,
         );
 
-        const codeGenerator = this.specCodeGenerator;
-        yield* codeGenerator.generateStatements(
-            factory,
-            nodeId,
-        );
+        {
+            const metaSchemaId = this.nodeMetaMap.get(nodeId);
+            if (metaSchemaId == null) {
+                throw new Error("node not found");
+            }
+
+            // eslint-disable-next-line security/detect-object-injection
+            const codeGenerator = this.specCodeGenerators[metaSchemaId];
+            yield* codeGenerator.generateStatements(
+                factory,
+                nodeId,
+            );
+        }
 
     }
 
@@ -415,8 +435,7 @@ export class SchemaManager {
         const nodeId = String(nodeUrl);
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
-            throw new Error("node nopt found");
-
+            throw new Error("node not found");
         }
 
         // eslint-disable-next-line security/detect-object-injection
