@@ -9,6 +9,7 @@ jobs:
       matrix:
         fixture:
           - string-or-boolean
+          - simple-object
     runs-on: ubuntu-latest
     container: node:18
     steps:

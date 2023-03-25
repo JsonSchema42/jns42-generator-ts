@@ -1,10 +1,10 @@
-import { flattenObject, pointerToHash, simpleTypes } from "../../utils/index.js";
+import { createString, flattenObject, pointerToHash, simpleTypes } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
+import { selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
@@ -296,7 +296,30 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ): Iterable<[number, unknown]> {
-        yield [0, "a string!"];
+        const minLength = selectValidationMinLength(node);
+        const maxLength = selectValidationMaxLength(node);
+        const pattern = selectValidationPattern(node);
+
+        if (minLength != null) {
+            yield [1, createString(minLength - 1)];
+        }
+        if (maxLength != null) {
+            yield [1, createString(maxLength + 1)];
+        }
+        if (pattern != null) {
+            throw new Error("not implemented");
+        }
+
+        // TODO robust implementation
+        const minLengthOrDefault = minLength ?? 5;
+        const maxLengthOrDefault = maxLength ?? 10;
+
+        yield [
+            0,
+            createString(
+                Math.round(minLengthOrDefault + (maxLengthOrDefault - minLengthOrDefault) / 2),
+            ),
+        ];
     }
 
     private * generateForNumber(
@@ -304,7 +327,36 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ): Iterable<[number, unknown]> {
-        yield [0, 1.5];
+        const minimum = selectValidationMinimum(node);
+        const exclusiveMinimum = selectValidationExclusiveMinimum(node);
+        const maximum = selectValidationMaximum(node);
+        const exclusiveMaximum = selectValidationExclusiveMaximum(node);
+        const multipleOf = selectValidationMultipleOf(node);
+
+        if (minimum != null) {
+            yield [1, minimum - 1];
+        }
+        if (exclusiveMinimum != null) {
+            yield [1, exclusiveMinimum];
+        }
+        if (maximum != null) {
+            yield [1, maximum + 1];
+        }
+        if (exclusiveMaximum != null) {
+            yield [1, exclusiveMaximum];
+        }
+        if (multipleOf != null) {
+            throw new Error("not implemented");
+        }
+
+        // TODO robust implementation
+        const minValueOrDefault = minimum ?? exclusiveMinimum ?? -1000;
+        const maxValueOrDefault = maximum ?? exclusiveMaximum ?? +1000;
+
+        yield [
+            0,
+            minValueOrDefault + (maxValueOrDefault - minValueOrDefault),
+        ];
     }
 
     private * generateForInteger(
@@ -312,7 +364,36 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ): Iterable<[number, unknown]> {
-        yield [0, 1];
+        const minimum = selectValidationMinimum(node);
+        const exclusiveMinimum = selectValidationExclusiveMinimum(node);
+        const maximum = selectValidationMaximum(node);
+        const exclusiveMaximum = selectValidationExclusiveMaximum(node);
+        const multipleOf = selectValidationMultipleOf(node);
+
+        if (minimum != null) {
+            yield [1, minimum - 1];
+        }
+        if (exclusiveMinimum != null) {
+            yield [1, exclusiveMinimum];
+        }
+        if (maximum != null) {
+            yield [1, maximum + 1];
+        }
+        if (exclusiveMaximum != null) {
+            yield [1, exclusiveMaximum];
+        }
+        if (multipleOf != null) {
+            throw new Error("not implemented");
+        }
+
+        // TODO robust implementation
+        const minValueOrDefault = minimum ?? exclusiveMinimum ?? -1000;
+        const maxValueOrDefault = maximum ?? exclusiveMaximum ?? +1000;
+
+        yield [
+            0,
+            Math.round(minValueOrDefault + (maxValueOrDefault - minValueOrDefault)),
+        ];
     }
 
     private * generateForBoolean(
