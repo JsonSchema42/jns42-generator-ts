@@ -2,7 +2,7 @@ import ts from "typescript";
 import { generatePrimitiveLiteral, pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
-import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
+import { SchemaIndexer } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
 
@@ -138,62 +138,23 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 types.map(type => this.generateTypeDefinition(
                     factory,
+                    nodeId,
                     type,
-                    nodeItem,
                 )),
             ));
         }
 
     }
 
-    private generateTypeDefinition(
+    protected generateObjectTypeDefinition(
         factory: ts.NodeFactory,
-        type: string,
-        nodeItem: SchemaIndexerNodeItem,
+        nodeId: string,
     ): ts.TypeNode {
-        switch (type) {
-            case "null":
-                return factory.createLiteralTypeNode(
-                    factory.createNull(),
-                );
-
-            case "boolean":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.BooleanKeyword,
-                );
-
-            case "number":
-            case "integer":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.NumberKeyword,
-                );
-
-            case "string":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.StringKeyword,
-                );
-
-            case "object":
-                return this.generateObjectTypeDefinition(
-                    factory,
-                    nodeItem,
-                );
-
-            case "array":
-                return this.generateArrayTypeDefinition(
-                    factory,
-                    nodeItem,
-                );
-
-            default:
-                throw new Error("type not supported");
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
         }
-    }
 
-    private generateObjectTypeDefinition(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): ts.TypeNode {
         const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
             nodeItem.nodePointer,
             nodeItem.node,
@@ -248,10 +209,15 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         ]);
     }
 
-    private generateArrayTypeDefinition(
+    protected generateArrayTypeDefinition(
         factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
+        nodeId: string,
     ): ts.TypeNode {
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
         const itemsEntries = selectNodeItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,

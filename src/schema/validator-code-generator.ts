@@ -109,7 +109,7 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
         elseStatement: ts.Statement,
     ) {
         const thenBlock = factory.createBlock(
-            [...this.generateTypeValidationStatements(factory, type, nodeId)],
+            [...this.generateTypeValidationStatements(factory, nodeId, type)],
             true,
         );
 
