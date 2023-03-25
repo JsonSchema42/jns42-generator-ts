@@ -1,10 +1,10 @@
 import ts from "typescript";
-import { generateLiteral, generatePrimitiveLiteral, pointerToHash } from "../../utils/index.js";
+import { generateLiteral, pointerToHash } from "../../utils/index.js";
 import { SchemaCodeGeneratorBase } from "../code-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
     constructor(
@@ -29,13 +29,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             throw new Error("nodeItem not found");
         }
 
-        yield this.generateSchemaTypeDeclarationStatement(
-            factory,
-            nodeId,
-            nodeItem,
-            typeName,
-        );
-
         yield this.generateValidatorFunctionDeclarationStatement(
             factory,
             nodeId,
@@ -43,8 +36,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             typeName,
         );
     }
-
-    //#region validation
 
     private generateValidatorFunctionDeclarationStatement(
         factory: ts.NodeFactory,
@@ -331,7 +322,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             nodeItem.node,
         );
         {
-            const index = 0;
             for (const [subNodePointer] of itemsOneEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
@@ -806,349 +796,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         );
     }
 
-    //#endregion
-
-    //#region types
-
-    private generateSchemaTypeDeclarationStatement(
-        factory: ts.NodeFactory,
-        nodeId: string,
-        nodeItem: SchemaIndexerNodeItem,
-        typeName: string,
-    ) {
-        return factory.createTypeAliasDeclaration(
-            [
-                factory.createToken(ts.SyntaxKind.ExportKeyword),
-            ],
-            typeName,
-            undefined,
-            this.generateTypeNode(
-                factory,
-                nodeItem,
-            ),
-        );
-    }
-
-    private generateTypeNode(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): ts.TypeNode {
-        const typeNodes = [...this.generateTypeNodes(factory, nodeItem)];
-        if (typeNodes.length === 0) {
-            return factory.createKeywordTypeNode(
-                ts.SyntaxKind.UnknownKeyword,
-            );
-        }
-        return factory.createParenthesizedType(factory.createIntersectionTypeNode(
-            typeNodes,
-        ));
-    }
-
-    private * generateTypeNodes(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): Iterable<ts.TypeNode> {
-        if (nodeItem.node === true) {
-            yield factory.createKeywordTypeNode(
-                ts.SyntaxKind.AnyKeyword,
-            );
-            return;
-        }
-
-        if (nodeItem.node === false) {
-            yield factory.createKeywordTypeNode(
-                ts.SyntaxKind.NeverKeyword,
-            );
-            return;
-        }
-
-        const nodeRef = selectNodeRef(nodeItem.node);
-        if (nodeRef != null) {
-            const nodeUrl = new URL(nodeRef, nodeItem.nodeBaseUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveReferenceNodeId(nodeId);
-            yield this.generateTypeReference(
-                factory,
-                resolvedNodeId,
-            );
-        }
-
-        const nodeRecursiveRef = selectNodeRecursiveRef(nodeItem.node);
-        if (nodeRecursiveRef != null) {
-            const nodeUrl = new URL(nodeRecursiveRef, nodeItem.nodeBaseUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveRecursiveReferenceNodeId(nodeId);
-            yield this.generateTypeReference(
-                factory,
-                resolvedNodeId,
-            );
-        }
-
-        const constValue = selectNodeConst(nodeItem.node);
-        if (constValue != null) {
-            yield factory.createLiteralTypeNode(generatePrimitiveLiteral(
-                factory,
-                constValue,
-            ));
-        }
-
-        const enumValues = selectNodeEnum(nodeItem.node);
-        if (enumValues != null) {
-            yield factory.createParenthesizedType(factory.createUnionTypeNode(
-                enumValues.map(value => factory.createLiteralTypeNode(generatePrimitiveLiteral(
-                    factory,
-                    value,
-                ))),
-            ));
-        }
-
-        const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodePointer, nodeItem.node)];
-        if (anyOfEntries.length > 0) {
-            yield factory.createParenthesizedType(factory.createUnionTypeNode(
-                anyOfEntries.map(([subNodePointer]) => {
-                    const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
-                        nodeItem.nodeBaseUrl,
-                    );
-                    const subNodeId = String(subNodeUrl);
-                    return this.generateTypeReference(
-                        factory,
-                        subNodeId,
-                    );
-                }),
-            ));
-        }
-
-        const oneOfEntries = [...selectNodeOneOfEntries(nodeItem.nodePointer, nodeItem.node)];
-        if (oneOfEntries.length > 0) {
-            yield factory.createParenthesizedType(factory.createUnionTypeNode(
-                oneOfEntries.map(([subNodePointer]) => {
-                    const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
-                        nodeItem.nodeBaseUrl,
-                    );
-                    const subNodeId = String(subNodeUrl);
-                    return this.generateTypeReference(
-                        factory,
-                        subNodeId,
-                    );
-                }),
-            ));
-        }
-
-        const allOfEntries = [...selectNodeAllOfEntries(nodeItem.nodePointer, nodeItem.node)];
-        if (allOfEntries.length > 0) {
-            yield factory.createParenthesizedType(factory.createIntersectionTypeNode(
-                allOfEntries.map(([subNodePointer]) => {
-                    const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
-                        nodeItem.nodeBaseUrl,
-                    );
-                    const subNodeId = String(subNodeUrl);
-                    return this.generateTypeReference(
-                        factory,
-                        subNodeId,
-                    );
-                }),
-            ));
-        }
-
-        const types = selectNodeType(nodeItem.node);
-        if (types != null) {
-            yield factory.createParenthesizedType(factory.createUnionTypeNode(
-                types.map(type => this.generateTypeDefinition(
-                    factory,
-                    type,
-                    nodeItem,
-                )),
-            ));
-        }
-
-    }
-
-    private generateTypeDefinition(
-        factory: ts.NodeFactory,
-        type: string,
-        nodeItem: SchemaIndexerNodeItem,
-    ): ts.TypeNode {
-        switch (type) {
-            case "null":
-                return factory.createLiteralTypeNode(
-                    factory.createNull(),
-                );
-
-            case "boolean":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.BooleanKeyword,
-                );
-
-            case "number":
-            case "integer":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.NumberKeyword,
-                );
-
-            case "string":
-                return factory.createKeywordTypeNode(
-                    ts.SyntaxKind.StringKeyword,
-                );
-
-            case "object":
-                return this.generateObjectTypeDefinition(
-                    factory,
-                    nodeItem,
-                );
-
-            case "array":
-                return this.generateArrayTypeDefinition(
-                    factory,
-                    nodeItem,
-                );
-
-            default:
-                throw new Error("type not supported");
-
-        }
-    }
-
-    private generateObjectTypeDefinition(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): ts.TypeNode {
-        const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
-            nodeItem.nodePointer,
-            nodeItem.node,
-        );
-
-        for (const [subNodePointer] of additionalPropertiesEntries) {
-            const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
-            );
-            const subNodeId = String(subNodeUrl);
-
-            return factory.createTypeReferenceNode(
-                "Record",
-                [
-                    factory.createKeywordTypeNode(
-                        ts.SyntaxKind.StringKeyword,
-                    ),
-                    this.generateTypeReference(
-                        factory,
-                        subNodeId,
-                    ),
-                ],
-            );
-        }
-
-        const propertiesEntries = [...selectNodeProperties(nodeItem.nodePointer, nodeItem.node)];
-        const propertiesSet = new Set(propertiesEntries.map(([name]) => name));
-        const requiredPropertiesSet = new Set(selectNodeRequiredProperties(nodeItem.node));
-
-        return factory.createTypeLiteralNode([
-            ...propertiesEntries.map(
-                ([propertyName, subNodePointer]) => {
-                    const subNodeUrl = new URL(
-                        pointerToHash(subNodePointer),
-                        nodeItem.nodeBaseUrl,
-                    );
-                    const subNodeId = String(subNodeUrl);
-                    return factory.createPropertySignature(
-                        undefined,
-                        propertyName,
-                        requiredPropertiesSet.has(propertyName) ?
-                            undefined :
-                            factory.createToken(ts.SyntaxKind.QuestionToken),
-                        this.generateTypeReference(
-                            factory,
-                            subNodeId,
-                        ),
-                    );
-                },
-            ),
-            ...[...requiredPropertiesSet].
-                filter(propertyName => !propertiesSet.has(propertyName)).
-                map(propertyName => factory.createPropertySignature(
-                    undefined,
-                    propertyName,
-                    undefined,
-                    factory.createKeywordTypeNode(
-                        ts.SyntaxKind.AnyKeyword,
-                    ),
-                )),
-        ]);
-    }
-
-    private generateArrayTypeDefinition(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ): ts.TypeNode {
-        const additionalItemsEntries = selectNodeAdditionalItemsEntries(
-            nodeItem.nodePointer,
-            nodeItem.node,
-        );
-        for (const [subNodePointer] of additionalItemsEntries) {
-            const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
-            );
-            const subNodeId = String(subNodeUrl);
-            return factory.createTypeReferenceNode(
-                "Array",
-                [
-                    this.generateTypeReference(factory, subNodeId),
-                ],
-            );
-        }
-
-        const itemsOneEntries = selectNodeItemsOneEntries(
-            nodeItem.nodePointer,
-            nodeItem.node,
-        );
-        for (const [subNodePointer] of itemsOneEntries) {
-            const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
-            );
-            const subNodeId = String(subNodeUrl);
-            return factory.createTypeReferenceNode(
-                "Array",
-                [
-                    this.generateTypeReference(factory, subNodeId),
-                ],
-            );
-        }
-
-        const itemsManyEntries = [...selectNodeItemsManyEntries(
-            nodeItem.nodePointer,
-            nodeItem.node,
-        )];
-
-        if (itemsManyEntries.length > 0) {
-            return factory.createTupleTypeNode(
-                itemsManyEntries.map(
-                    ([subNodePointer]) => {
-                        const subNodeUrl = new URL(
-                            pointerToHash(subNodePointer),
-                            nodeItem.nodeBaseUrl,
-                        );
-                        const subNodeId = String(subNodeUrl);
-                        return this.generateTypeReference(factory, subNodeId);
-                    },
-                ),
-            );
-        }
-
-        return factory.createTypeReferenceNode(
-            "Array",
-            [
-                factory.createKeywordTypeNode(
-                    ts.SyntaxKind.UnknownKeyword,
-                ),
-            ],
-        );
-    }
-
     private generateTypeReference(
         factory: ts.NodeFactory,
         nodeId: string,
@@ -1159,55 +806,6 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         }
         return factory.createTypeReferenceNode(typeName);
     }
-
-    //#endregion
-
-    //#region helpers
-
-    private resolveReferenceNodeId(
-        nodeId: string,
-    ) {
-        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
-
-        if (resolvedNodeId == null) {
-            resolvedNodeId = nodeId;
-        }
-
-        return resolvedNodeId;
-    }
-
-    private resolveRecursiveReferenceNodeId(
-        nodeId: string,
-    ) {
-        const nodeUrl = new URL(nodeId);
-        let resolvedNodeId: string | null = nodeId;
-        let currentRootNodeUrl: URL | null = new URL("", nodeUrl);
-        while (currentRootNodeUrl != null) {
-            const currentRootNodeId = String(currentRootNodeUrl);
-            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
-            if (currentRootNode == null) {
-                throw new Error("rootNode not found");
-            }
-
-            const currentNodeUrl = new URL(
-                nodeUrl.hash,
-                currentRootNode.nodeUrl,
-            );
-            const currentNodeId = String(currentNodeUrl);
-            const maybeResolvedNodeId = this.indexer.getRecursiveAnchorNodeId(
-                currentNodeId,
-            );
-            if (maybeResolvedNodeId != null) {
-                resolvedNodeId = maybeResolvedNodeId;
-            }
-
-            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
-        }
-
-        return resolvedNodeId;
-    }
-
-    //#endregion
 
 }
 
