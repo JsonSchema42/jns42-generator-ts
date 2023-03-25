@@ -269,19 +269,7 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateExamplesFromRootUrl(nodeUrl, true);
-    }
-
-    public *generateInvalidExamples(nodeUrl: URL) {
-        const nodeId = String(nodeUrl);
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("node nopt found");
-        }
-
-        // eslint-disable-next-line security/detect-object-injection
-        const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateExamplesFromRootUrl(nodeUrl, false);
+        yield* exampleGenerator.generateExamplesFromUrl(nodeUrl);
     }
 
 }
