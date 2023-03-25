@@ -1,5 +1,5 @@
-import deepEqual from "fast-deep-equal";
 import { flattenObject, pointerToHash } from "../../utils/index.js";
+import { iterableElementsEqual } from "../../utils/iterable.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
@@ -155,6 +155,10 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
         const propertyNames = new Set(propertyNameEntries.map(([, name]) => name));
         const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
 
+        if (requiredPropertyNames.size === 0) {
+            yield {};
+        }
+
         /*
         yield properties that are required
         */
@@ -190,39 +194,42 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
             }
 
             yield* flattenObject(subExamples);
+        }
+
+        /*
+        yield all properties, but only if they are different from the required properties
+        */
+        if (
+            !iterableElementsEqual(requiredPropertyNames, propertyNames) &&
+            propertyNames.size > 0
+        ) {
+            const subExamples: Record<string, unknown[]> = {};
 
             /*
-            yield all properties, but only if they are different from the required properties
+            properties without a schema
             */
-            if (deepEqual([...requiredPropertyNames], [...propertyNames])) {
-                const subExamples: Record<string, unknown[]> = {};
-
-                /*
-                properties without a schema
-                */
-                for (const propertyName of requiredPropertyNames) {
-                    if (propertyNames.has(propertyName)) {
-                        continue;
-                    }
-                    // eslint-disable-next-line security/detect-object-injection
-                    subExamples[propertyName] = ["Could be anything"];
+            for (const propertyName of requiredPropertyNames) {
+                if (propertyNames.has(propertyName)) {
+                    continue;
                 }
-
-                for (const [subNodePointer, subNode] of propertyEntries) {
-                    // eslint-disable-next-line security/detect-object-injection
-                    const propertyName = propertyNameMap[subNodePointer];
-                    const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
-
-                    // eslint-disable-next-line security/detect-object-injection
-                    subExamples[propertyName] = [...this.generateExamplesFromNode(
-                        subNode,
-                        subNodeUrl,
-                        subNodePointer,
-                    )];
-                }
-
-                yield* flattenObject(subExamples);
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = ["Could be anything"];
             }
+
+            for (const [subNodePointer, subNode] of propertyEntries) {
+                // eslint-disable-next-line security/detect-object-injection
+                const propertyName = propertyNameMap[subNodePointer];
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [...this.generateExamplesFromNode(
+                    subNode,
+                    subNodeUrl,
+                    subNodePointer,
+                )];
+            }
+
+            yield* flattenObject(subExamples);
         }
 
     }
@@ -232,7 +239,7 @@ export class SchemaValidExampleGenerator extends SchemaExampleGeneratorBase {
         nodeUrl: URL,
         nodePointer: string,
     ) {
-        yield "a string!";
+        yield "A string!";
     }
 
     private * generateExamplesForNumber(

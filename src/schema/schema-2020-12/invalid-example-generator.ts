@@ -1,5 +1,4 @@
-import deepEqual from "fast-deep-equal";
-import { flattenObject, pointerToHash } from "../../utils/index.js";
+import { flattenObject, pointerToHash, simpleTypes } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
@@ -68,14 +67,60 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
-        for (const type of types) {
-            yield* this.generateExamplesForType(
-                type,
-                node,
-                nodeUrl,
-                nodePointer,
-                failNodeId,
-            );
+        const typeSet = new Set(types);
+
+        const nodeId = String(nodeUrl);
+
+        if (nodeId === failNodeId) {
+            for (const type of simpleTypes) {
+                if (typeSet.has(type)) {
+                    continue;
+                }
+
+                switch (type) {
+                    case "null":
+                        yield null;
+                        break;
+
+                    case "array":
+                        yield [];
+                        break;
+
+                    case "object":
+                        yield {};
+                        break;
+
+                    case "string":
+                        yield "fail!!";
+                        break;
+
+                    case "number":
+                        yield 10.1;
+                        break;
+
+                    case "integer":
+                        yield 10;
+                        break;
+
+                    case "boolean":
+                        yield true;
+                        yield false;
+                        break;
+                }
+
+            }
+        }
+
+        if (!this.indexer.isNodeAncestor(failNodeId, nodeUrl)) {
+            for (const type of types) {
+                yield* this.generateExamplesForType(
+                    type,
+                    node,
+                    nodeUrl,
+                    nodePointer,
+                    failNodeId,
+                );
+            }
         }
     }
 
@@ -162,7 +207,14 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
-        yield null;
+        const nodeId = String(nodeUrl);
+
+        if (nodeId === failNodeId) {
+            //
+        }
+        else {
+            yield null;
+        }
     }
 
     private * generateExamplesForArray(
@@ -197,6 +249,8 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
+        const nodeId = String(nodeUrl);
+
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
         const propertyEntries = [...selectNodePropertyEntries(nodePointer, node)];
@@ -204,7 +258,34 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
 
         /*
-        yield properties that are required
+        only yield properties that are not required
+        */
+        if (nodeId === failNodeId) {
+            const subExamples: Record<string, unknown[]> = {};
+
+            for (const [subNodePointer, subNode] of propertyEntries) {
+                // eslint-disable-next-line security/detect-object-injection
+                const propertyName = propertyNameMap[subNodePointer];
+                if (requiredPropertyNames.has(propertyName)) {
+                    continue;
+                }
+
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+                // eslint-disable-next-line security/detect-object-injection
+                subExamples[propertyName] = [...this.generateExamplesFromNode(
+                    subNode,
+                    subNodeUrl,
+                    subNodePointer,
+                    failNodeId,
+                )];
+            }
+
+            yield* flattenObject(subExamples);
+        }
+
+        /*
+        yield all properties
         */
         {
             const subExamples: Record<string, unknown[]> = {};
@@ -223,10 +304,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection
                 const propertyName = propertyNameMap[subNodePointer];
-                if (!requiredPropertyNames.has(propertyName)) {
-                    continue;
-                }
-
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
@@ -239,40 +316,6 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
             }
 
             yield* flattenObject(subExamples);
-
-            /*
-            yield all properties, but only if they are different from the required properties
-            */
-            if (deepEqual([...requiredPropertyNames], [...propertyNames])) {
-                const subExamples: Record<string, unknown[]> = {};
-
-                /*
-                properties without a schema
-                */
-                for (const propertyName of requiredPropertyNames) {
-                    if (propertyNames.has(propertyName)) {
-                        continue;
-                    }
-                    // eslint-disable-next-line security/detect-object-injection
-                    subExamples[propertyName] = ["Could be anything"];
-                }
-
-                for (const [subNodePointer, subNode] of propertyEntries) {
-                    // eslint-disable-next-line security/detect-object-injection
-                    const propertyName = propertyNameMap[subNodePointer];
-                    const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
-
-                    // eslint-disable-next-line security/detect-object-injection
-                    subExamples[propertyName] = [...this.generateExamplesFromNode(
-                        subNode,
-                        subNodeUrl,
-                        subNodePointer,
-                        failNodeId,
-                    )];
-                }
-
-                yield* flattenObject(subExamples);
-            }
         }
 
     }
@@ -283,7 +326,14 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
-        yield "a string!";
+        const nodeId = String(nodeUrl);
+
+        if (nodeId === failNodeId) {
+            //
+        }
+        else {
+            yield "a string!";
+        }
     }
 
     private * generateExamplesForNumber(
@@ -292,8 +342,14 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
-        yield 1;
-        yield 0.5;
+        const nodeId = String(nodeUrl);
+
+        if (nodeId === failNodeId) {
+            //
+        }
+        else {
+            yield 1.5;
+        }
     }
 
     private * generateExamplesForInteger(
@@ -302,7 +358,14 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
-        yield 1;
+        const nodeId = String(nodeUrl);
+
+        if (nodeId === failNodeId) {
+            //
+        }
+        else {
+            yield 1;
+        }
     }
 
     private * generateExamplesForBoolean(
@@ -311,8 +374,15 @@ export class SchemaInvalidExampleGenerator extends SchemaExampleGeneratorBase {
         nodePointer: string,
         failNodeId: string,
     ) {
-        yield true;
-        yield false;
+        const nodeId = String(nodeUrl);
+
+        if (nodeId === failNodeId) {
+            //
+        }
+        else {
+            yield true;
+            yield false;
+        }
     }
 
 }
