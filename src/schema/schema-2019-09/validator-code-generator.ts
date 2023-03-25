@@ -1,8 +1,8 @@
 import ts from "typescript";
-import { generateLiteral, pointerToHash } from "../../utils/index.js";
+import { pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
-import { SchemaIndexer, SchemaIndexerNodeItem } from "./indexer.js";
+import { SchemaIndexer } from "./indexer.js";
 import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
@@ -37,7 +37,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             for (const type of types) {
                 statement = this.generateTypeValidationIfStatement(
                     factory,
-                    nodeItem,
+                    nodeId,
                     type,
                     statement,
                 );
@@ -47,183 +47,15 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     }
 
-    private generateTypeValidationIfStatement(
+    protected *generateArrayTypeValidationStatements(
         factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-        type: string,
-        elseStatement: ts.Statement,
+        nodeId: string,
     ) {
-        const thenBlock = factory.createBlock(
-            [
-                ...this.generateTypeValidationStatements(factory, type, nodeItem),
-            ],
-            true,
-        );
-
-        const testExpression = this.generateCallValidateTypeExpression(
-            factory,
-            type,
-        );
-
-        return factory.createIfStatement(
-            testExpression,
-            thenBlock,
-            elseStatement,
-        );
-    }
-
-    private generateCallValidatorExpression(
-        factory: ts.NodeFactory,
-        validatorName: string,
-        validateArgument: unknown,
-    ) {
-
-        return factory.createCallExpression(
-            factory.createPropertyAccessExpression(
-                factory.createIdentifier("validation"),
-                validatorName,
-            ),
-            undefined,
-            [
-                factory.createIdentifier("value"),
-                generateLiteral(factory, validateArgument),
-            ],
-        );
-    }
-
-    private generateCallValidateTypeExpression(
-        factory: ts.NodeFactory,
-        type: unknown,
-    ) {
-
-        switch (type) {
-            case "null":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidNullType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "array":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidArrayType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "object":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidObjectType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "string":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidStringType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "number":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidNumberType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "integer":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidIntegerType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "boolean":
-                return factory.createCallExpression(
-                    factory.createPropertyAccessExpression(
-                        factory.createIdentifier("validation"),
-                        factory.createIdentifier("isValidBooleanType"),
-                    ),
-                    undefined,
-                    [
-                        factory.createIdentifier("value"),
-                    ],
-                );
-
-            default:
-                throw new Error("type not supported");
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
         }
-    }
 
-    private *generateTypeValidationStatements(
-        factory: ts.NodeFactory,
-        type: string,
-        nodeItem: SchemaIndexerNodeItem,
-    ) {
-        switch (type) {
-            case "null":
-                break;
-
-            case "array":
-                yield* this.generateArrayTypeValidationStatements(factory, nodeItem);
-                break;
-
-            case "object":
-                yield* this.generateObjectTypeValidationStatements(factory, nodeItem);
-                break;
-
-            case "string":
-                yield* this.generateStringTypeValidationStatements(factory, nodeItem);
-                break;
-
-            case "number":
-            case "integer":
-                yield* this.generateNumberTypeValidationStatements(factory, nodeItem);
-                break;
-
-            case "boolean":
-                break;
-
-            default:
-                throw new Error("type not supported");
-        }
-    }
-
-    private *generateArrayTypeValidationStatements(
-        factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
-    ) {
         const minItems = selectValidationMinItems(nodeItem.node);
         const maxItems = selectValidationMaxItems(nodeItem.node);
         const uniqueItems = selectValidationUniqueItems(nodeItem.node);
@@ -455,10 +287,15 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     }
 
-    private *generateObjectTypeValidationStatements(
+    protected *generateObjectTypeValidationStatements(
         factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
+        nodeId: string,
     ) {
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
         const minProperties = selectValidationMinProperties(nodeItem.node);
         const maxProperties = selectValidationMaxProperties(nodeItem.node);
         const required = selectValidationRequired(nodeItem.node);
@@ -621,10 +458,15 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         }
     }
 
-    private * generateStringTypeValidationStatements(
+    protected * generateStringTypeValidationStatements(
         factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
+        nodeId: string,
     ) {
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
         const minLength = selectValidationMinLength(nodeItem.node);
         const maxLength = selectValidationMaxLength(nodeItem.node);
         const pattern = selectValidationPattern(nodeItem.node);
@@ -661,10 +503,15 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         }
     }
 
-    private * generateNumberTypeValidationStatements(
+    protected * generateNumberTypeValidationStatements(
         factory: ts.NodeFactory,
-        nodeItem: SchemaIndexerNodeItem,
+        nodeId: string,
     ) {
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
         const minimum = selectValidationMinimum(nodeItem.node);
         const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
         const maximum = selectValidationMaximum(nodeItem.node);

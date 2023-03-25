@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { generateLiteral } from "../utils/index.js";
 import { SchemaCodeGeneratorBase } from "./code-generator.js";
 
 export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGeneratorBase {
@@ -6,7 +7,45 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
     protected abstract generateValidatorFunctionBodyStatements(
         factory: ts.NodeFactory,
         nodeId: string,
-    ): Iterable<ts.Statement>;
+    ): Iterable<ts.Statement>
+
+    protected generateNullTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string,
+    ): Iterable<ts.Statement> {
+        return [];
+    }
+    protected abstract generateArrayTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string
+    ): Iterable<ts.Statement>
+    protected abstract generateObjectTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string
+    ): Iterable<ts.Statement>
+    protected abstract generateStringTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string
+    ): Iterable<ts.Statement>
+    protected abstract generateNumberTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string
+    ): Iterable<ts.Statement>
+    protected generateIntegerTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string,
+    ): Iterable<ts.Statement> {
+        return this.generateNumberTypeValidationStatements(
+            factory,
+            nodeId,
+        );
+    }
+    protected generateBooleanTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string,
+    ): Iterable<ts.Statement> {
+        return [];
+    }
 
     public *generateStatements(
         factory: ts.NodeFactory,
@@ -63,6 +102,68 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
         );
     }
 
+    protected generateTypeValidationIfStatement(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        type: string,
+        elseStatement: ts.Statement,
+    ) {
+        const thenBlock = factory.createBlock(
+            [...this.generateTypeValidationStatements(factory, type, nodeId)],
+            true,
+        );
+
+        const testExpression = this.generateCallValidateTypeExpression(
+            factory,
+            type,
+        );
+
+        return factory.createIfStatement(
+            testExpression,
+            thenBlock,
+            elseStatement,
+        );
+    }
+
+    protected *generateTypeValidationStatements(
+        factory: ts.NodeFactory,
+        nodeId: string,
+        type: string,
+    ) {
+        switch (type) {
+            case "null":
+                yield* this.generateNullTypeValidationStatements(factory, nodeId);
+                break;
+
+            case "array":
+                yield* this.generateArrayTypeValidationStatements(factory, nodeId);
+                break;
+
+            case "object":
+                yield* this.generateObjectTypeValidationStatements(factory, nodeId);
+                break;
+
+            case "string":
+                yield* this.generateStringTypeValidationStatements(factory, nodeId);
+                break;
+
+            case "number":
+                yield* this.generateNumberTypeValidationStatements(factory, nodeId);
+                break;
+
+            case "integer":
+                yield* this.generateIntegerTypeValidationStatements(factory, nodeId);
+                break;
+
+            case "boolean":
+                yield* this.generateBooleanTypeValidationStatements(factory, nodeId);
+                break;
+
+            default:
+                throw new Error("type not supported");
+        }
+    }
+
     protected generateTypeReference(
         factory: ts.NodeFactory,
         nodeId: string,
@@ -90,6 +191,120 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
                 )),
             ]),
         );
+    }
+
+    protected generateCallValidatorExpression(
+        factory: ts.NodeFactory,
+        validatorName: string,
+        validateArgument: unknown,
+    ) {
+
+        return factory.createCallExpression(
+            factory.createPropertyAccessExpression(
+                factory.createIdentifier("validation"),
+                validatorName,
+            ),
+            undefined,
+            [
+                factory.createIdentifier("value"),
+                generateLiteral(factory, validateArgument),
+            ],
+        );
+    }
+
+    protected generateCallValidateTypeExpression(
+        factory: ts.NodeFactory,
+        type: unknown,
+    ) {
+
+        switch (type) {
+            case "null":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidNullType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            case "array":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidArrayType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            case "object":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidObjectType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            case "string":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidStringType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            case "number":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidNumberType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            case "integer":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidIntegerType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            case "boolean":
+                return factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createIdentifier("validation"),
+                        factory.createIdentifier("isValidBooleanType"),
+                    ),
+                    undefined,
+                    [
+                        factory.createIdentifier("value"),
+                    ],
+                );
+
+            default:
+                throw new Error("type not supported");
+        }
     }
 
 }
