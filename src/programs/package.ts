@@ -40,7 +40,7 @@ export function configureLabProgram(argv: yargs.Argv) {
                     describe: "version of the package",
                     type: "string",
                 }).
-                option("generate-tests", {
+                option("generate-test", {
                     describe: "generate test for this package (use with caution!)",
                     type: "boolean",
                 }),
@@ -54,7 +54,7 @@ interface MainOptions {
     packageDirectory: string
     packageName: string
     packageVersion: string
-    generateTests: boolean
+    generateTest: boolean
 }
 
 async function main(options: MainOptions) {
@@ -110,7 +110,7 @@ async function main(options: MainOptions) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.copyFileSync(validationSourceFileContent, validationFilePath);
 
-    if (options.generateTests) {
+    if (options.generateTest) {
         const specFileContent = getSpecFileContent(factory, manager, rootNodeUrl);
         const specFilePath = path.join(packageDirectoryPath, "schema.spec.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
