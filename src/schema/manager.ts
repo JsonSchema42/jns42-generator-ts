@@ -14,6 +14,7 @@ export class SchemaManager {
     private readonly nodeMetaMap = new Map<string, MetaSchemaId>();
     private readonly nameMap = new Map<string, string>();
     private readonly retrievalRootNodeMap = new Map<string, URL>();
+    private readonly rootNodeRetrievalMap = new Map<string, URL>();
 
     private readonly loaders = {
         [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaLoader(this),
@@ -234,7 +235,10 @@ export class SchemaManager {
             throw new Error("rootNode not found");
         }
 
+        const rootNodeId = String(rootNodeUrl);
+
         this.retrievalRootNodeMap.set(retrievalId, rootNodeUrl);
+        this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
 
         return rootNodeUrl;
     }
@@ -304,6 +308,10 @@ export class SchemaManager {
 
     public getName(nodeId: string) {
         return this.nameMap.get(nodeId);
+    }
+
+    public getRetrievalUrl(nodeRootId: string) {
+        return this.rootNodeRetrievalMap.get(nodeRootId);
     }
 
     public *generateTypeStatements(

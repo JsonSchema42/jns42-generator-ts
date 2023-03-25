@@ -325,7 +325,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
             for (const [subNodePointer] of prefixItemsEntries) {
                 const subNodeUrl = new URL(
                     pointerToHash(subNodePointer),
-                    nodeItem.nodeBaseUrl,
+                    nodeItem.nodeRootUrl,
                 );
                 const subNodeId = String(subNodeUrl);
 
@@ -365,7 +365,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         for (const [subNodePointer] of itemsEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -481,7 +481,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 
@@ -557,7 +557,7 @@ export class SchemaValidationCodeGenerator extends SchemaCodeGeneratorBase {
         for (const [subNodePointer, propertyName] of properties) {
             const subNodeUrl = new URL(
                 pointerToHash(subNodePointer),
-                nodeItem.nodeBaseUrl,
+                nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
 

@@ -8,7 +8,7 @@ import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeInstanceEntries } 
 
 export interface SchemaIndexerNodeItem {
     node: SchemaNode;
-    nodeBaseUrl: URL;
+    nodeRootUrl: URL;
     nodePointer: string;
     nodeParentUrl: URL | null;
 }
@@ -82,7 +82,7 @@ export class SchemaIndexer extends SchemaIndexerBase {
 
         const item: SchemaIndexerNodeItem = {
             node,
-            nodeBaseUrl,
+            nodeRootUrl: nodeBaseUrl,
             nodePointer,
             nodeParentUrl,
         };
