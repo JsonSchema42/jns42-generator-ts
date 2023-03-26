@@ -43,7 +43,6 @@ export function* selectNodeDefinitionsEntries(
     }
 }
 
-
 export function* selectNodePropertyEntries(
     nodePointer: string,
     node: Schema,
@@ -54,7 +53,6 @@ export function* selectNodePropertyEntries(
             yield [subNodePointer, subNode] as const;
         }
     }
-}
 }
 
 export function* selectNodeAdditionalPropertiesEntries(
@@ -67,7 +65,6 @@ export function* selectNodeAdditionalPropertiesEntries(
         yield [subNodePointer, subNode] as const;
     }
 }
-}
 
 export function* selectNodeItemsOneEntries(
     nodePointer: string,
@@ -78,7 +75,6 @@ export function* selectNodeItemsOneEntries(
         const subNodePointer = appendJsonPointer(nodePointer, "items");
         yield [subNodePointer, subNode] as const;
     }
-}
 }
 
 export function* selectNodeItemsManyEntries(
@@ -92,7 +88,6 @@ export function* selectNodeItemsManyEntries(
         }
     }
 }
-}
 
 export function* selectNodeAdditionalItemsEntries(
     nodePointer: string,
@@ -103,7 +98,6 @@ export function* selectNodeAdditionalItemsEntries(
         const subNodePointer = appendJsonPointer(nodePointer, "additionalItems");
         yield [subNodePointer, subNode] as const;
     }
-}
 }
 
 export function* selectNodeAnyOfEntries(
@@ -117,7 +111,6 @@ export function* selectNodeAnyOfEntries(
         }
     }
 }
-}
 
 export function* selectNodeOneOfEntries(
     nodePointer: string,
@@ -130,7 +123,6 @@ export function* selectNodeOneOfEntries(
         }
     }
 }
-}
 
 export function* selectNodeAllOfEntries(
     nodePointer: string,
@@ -142,7 +134,6 @@ export function* selectNodeAllOfEntries(
             yield [subNodePointer, subNode] as const;
         }
     }
-}
 }
 
 export function* selectNodeInstanceEntries(
@@ -200,7 +191,6 @@ export function* selectNodeProperties(
     }
 }
 
-
 export function selectNodeEnum(
     node: Schema,
 ) {
@@ -233,7 +223,7 @@ export function selectValidationRequired(
     node: Schema,
 ) {
     if (typeof node === "object") {
-        return node.required
+        return node.required;
     }
 }
 
@@ -261,7 +251,6 @@ export function selectValidationUniqueItems(
     }
 }
 
-
 export function selectValidationMinLength(
     node: Schema,
 ) {
@@ -286,7 +275,6 @@ export function selectValidationPattern(
     }
 }
 
-
 export function selectValidationMinimum(
     node: Schema,
 ) {
@@ -310,7 +298,6 @@ export function selectValidationMaximum(
         return node.maximum;
     }
 }
-
 
 export function selectValidationExclusiveMaximum(
     node: Schema,
