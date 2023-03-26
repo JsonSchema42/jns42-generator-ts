@@ -199,28 +199,34 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("node item nod found");
         }
 
-        const minLength = selectValidationMinLength(nodeItem.node);
-        const maxLength = selectValidationMaxLength(nodeItem.node);
-        const pattern = selectValidationPattern(nodeItem.node);
+        const validationMinLength = selectValidationMinLength(nodeItem.node);
+        const validationMaxLength = selectValidationMaxLength(nodeItem.node);
+        const validationPattern = selectValidationPattern(nodeItem.node);
 
-        if (minLength != null) {
-            yield [1, createString(minLength - 1)];
+        if (validationMinLength != null) {
+            yield [1, createString(validationMinLength - 1)];
         }
-        if (maxLength != null) {
-            yield [1, createString(maxLength + 1)];
+        if (validationMaxLength != null) {
+            yield [1, createString(validationMaxLength + 1)];
         }
-        if (pattern != null) {
-            // throw new Error("not implemented");
+        if (validationPattern != null) {
+            throw new Error("not implemented");
         }
 
-        // TODO robust implementation
-        const minLengthOrDefault = minLength ?? 5;
-        const maxLengthOrDefault = maxLength ?? 10;
+        let minimumLength = 5;
+        if (validationMinLength != null) {
+            minimumLength = validationMinLength;
+        }
+
+        let maximumLength = 20;
+        if (validationMaxLength != null) {
+            maximumLength = validationMaxLength;
+        }
 
         yield [
             0,
             createString(
-                Math.round(minLengthOrDefault + (maxLengthOrDefault - minLengthOrDefault) / 2),
+                Math.round(minimumLength + Math.random() * (maximumLength - minimumLength)),
             ),
         ];
     }
@@ -233,35 +239,47 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("node item nod found");
         }
 
-        const minimum = selectValidationMinimum(nodeItem.node);
-        const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
-        const maximum = selectValidationMaximum(nodeItem.node);
-        const exclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
-        const multipleOf = selectValidationMultipleOf(nodeItem.node);
+        const validationMinimum = selectValidationMinimum(nodeItem.node);
+        const validationExclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
+        const validationMaximum = selectValidationMaximum(nodeItem.node);
+        const validationExclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
+        const validationMultipleOf = selectValidationMultipleOf(nodeItem.node);
 
-        if (minimum != null) {
-            yield [1, minimum - 1];
+        if (validationMinimum != null) {
+            yield [1, validationMinimum - 1];
         }
-        if (exclusiveMinimum != null) {
-            yield [1, exclusiveMinimum];
+        if (validationExclusiveMinimum != null) {
+            yield [1, validationExclusiveMinimum];
         }
-        if (maximum != null) {
-            yield [1, maximum + 1];
+        if (validationMaximum != null) {
+            yield [1, validationMaximum + 1];
         }
-        if (exclusiveMaximum != null) {
-            yield [1, exclusiveMaximum];
+        if (validationExclusiveMaximum != null) {
+            yield [1, validationExclusiveMaximum];
         }
-        if (multipleOf != null) {
+        if (validationMultipleOf != null) {
             throw new Error("not implemented");
         }
 
-        // TODO robust implementation
-        const minValueOrDefault = minimum ?? exclusiveMinimum ?? -1000;
-        const maxValueOrDefault = maximum ?? exclusiveMaximum ?? +1000;
+        let minimumValue = Number.MIN_VALUE;
+        if (validationMinimum != null) {
+            minimumValue = validationMinimum;
+        }
+        if (validationExclusiveMinimum != null) {
+            minimumValue = validationExclusiveMinimum + 1;
+        }
+
+        let maximumValue = Number.MAX_VALUE;
+        if (validationMaximum != null) {
+            maximumValue = validationMaximum;
+        }
+        if (validationExclusiveMaximum != null) {
+            maximumValue = validationExclusiveMaximum - 1;
+        }
 
         yield [
             0,
-            minValueOrDefault + (maxValueOrDefault - minValueOrDefault),
+            minimumValue + Math.random() * (maximumValue - minimumValue),
         ];
     }
 
@@ -295,13 +313,25 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("not implemented");
         }
 
-        // TODO robust implementation
-        const minValueOrDefault = minimum ?? exclusiveMinimum ?? -1000;
-        const maxValueOrDefault = maximum ?? exclusiveMaximum ?? +1000;
+        let minimumValue = Number.MIN_SAFE_INTEGER;
+        if (minimum != null) {
+            minimumValue = minimum;
+        }
+        if (exclusiveMinimum != null) {
+            minimumValue = exclusiveMinimum + 0.5;
+        }
+
+        let maximumValue = Number.MAX_SAFE_INTEGER;
+        if (maximum != null) {
+            maximumValue = maximum;
+        }
+        if (exclusiveMaximum != null) {
+            maximumValue = exclusiveMaximum - 0.5;
+        }
 
         yield [
             0,
-            Math.round(minValueOrDefault + (maxValueOrDefault - minValueOrDefault)),
+            Math.round(minimumValue + Math.random() * (maximumValue - minimumValue)),
         ];
     }
 
