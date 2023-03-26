@@ -3,6 +3,29 @@ import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
+
+    protected generateFromNode(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+    protected generateForArray(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+    protected generateForObject(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+    protected generateForString(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+    protected generateForNumber(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+    protected generateForInteger(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+    protected generateForBoolean(nodeId: string): Iterable<[number, unknown]> {
+        throw new Error("Method not implemented.");
+    }
+
     constructor(
         manager: SchemaManager,
         private readonly indexer: SchemaIndexer,
@@ -10,12 +33,4 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         super(manager);
     }
 
-    public *generateExamplesFromUrl(
-        nodeUrl: URL,
-        wantErrors: number,
-    ): Iterable<unknown> {
-        yield* [];
-    }
-
 }
-
