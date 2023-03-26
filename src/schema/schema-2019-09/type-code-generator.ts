@@ -3,13 +3,11 @@ import { generatePrimitiveLiteral, pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaIndexer } from "./indexer.js";
-import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredProperties, selectNodeType } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly loader: SchemaLoader,
         private readonly indexer: SchemaIndexer,
     ) {
         super(manager);
@@ -40,9 +38,11 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const nodeUrl = new URL(nodeRef, nodeItem.nodeRootUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveReferenceNodeId(nodeId);
+            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+                nodeId,
+                nodeRef,
+            );
+
             yield this.generateTypeReference(
                 factory,
                 resolvedNodeId,
@@ -51,9 +51,11 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
         const nodeRecursiveRef = selectNodeRecursiveRef(nodeItem.node);
         if (nodeRecursiveRef != null) {
-            const nodeUrl = new URL(nodeRecursiveRef, nodeItem.nodeRootUrl);
-            const nodeId = String(nodeUrl);
-            const resolvedNodeId = this.resolveRecursiveReferenceNodeId(nodeId);
+            const resolvedNodeId = this.indexer.resolveRecursiveReferenceNodeId(
+                nodeId,
+                nodeRecursiveRef,
+            );
+
             yield this.generateTypeReference(
                 factory,
                 resolvedNodeId,
@@ -288,49 +290,6 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                 ),
             ],
         );
-    }
-
-    private resolveReferenceNodeId(
-        nodeId: string,
-    ) {
-        let resolvedNodeId = this.indexer.getAnchorNodeId(nodeId);
-
-        if (resolvedNodeId == null) {
-            resolvedNodeId = nodeId;
-        }
-
-        return resolvedNodeId;
-    }
-
-    private resolveRecursiveReferenceNodeId(
-        nodeId: string,
-    ) {
-        const nodeUrl = new URL(nodeId);
-        let resolvedNodeId: string | null = nodeId;
-        let currentRootNodeUrl: URL | null = new URL("", nodeUrl);
-        while (currentRootNodeUrl != null) {
-            const currentRootNodeId = String(currentRootNodeUrl);
-            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
-            if (currentRootNode == null) {
-                throw new Error("rootNode not found");
-            }
-
-            const currentNodeUrl = new URL(
-                nodeUrl.hash,
-                currentRootNode.nodeUrl,
-            );
-            const currentNodeId = String(currentNodeUrl);
-            const maybeResolvedNodeId = this.indexer.getRecursiveAnchorNodeId(
-                currentNodeId,
-            );
-            if (maybeResolvedNodeId != null) {
-                resolvedNodeId = maybeResolvedNodeId;
-            }
-
-            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
-        }
-
-        return resolvedNodeId;
     }
 
 }

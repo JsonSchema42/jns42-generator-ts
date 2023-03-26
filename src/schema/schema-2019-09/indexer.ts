@@ -42,6 +42,76 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         return this.recursiveAnchorMap.get(nodeKey);
     }
 
+    public resolveReferenceNodeId(nodeId: string, nodeRef: string) {
+        const nodeItem = this.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
+        const nodeRootId = String(nodeItem.nodeRootUrl);
+        const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+        const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+        nodeRefRetrievalUrl.hash = "";
+        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+        const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+        const resolvedNodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+        let resolvedNodeId = String(resolvedNodeUrl);
+
+        const anchorNodeId = this.getAnchorNodeId(resolvedNodeId);
+
+        if (anchorNodeId != null) {
+            resolvedNodeId = anchorNodeId;
+        }
+
+        return resolvedNodeId;
+
+    }
+
+    public resolveRecursiveReferenceNodeId(nodeId: string, nodeRecursiveRef: string) {
+        const nodeItem = this.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
+        const nodeRootId = String(nodeItem.nodeRootUrl);
+        const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+
+        const nodeRefRetrievalUrl = new URL(nodeRecursiveRef, nodeRetrievalUrl);
+        nodeRefRetrievalUrl.hash = "";
+        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+        const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+
+        const resolvedNodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+        let resolvedNodeId = String(resolvedNodeUrl);
+
+        let currentRootNodeUrl: URL | null = new URL("", resolvedNodeUrl);
+        while (currentRootNodeUrl != null) {
+            const currentRootNodeId = String(currentRootNodeUrl);
+            const currentRootNode = this.loader.getRootNodeItem(currentRootNodeId);
+            if (currentRootNode == null) {
+                throw new Error("rootNode not found");
+            }
+
+            const currentNodeUrl = new URL(
+                resolvedNodeUrl.hash,
+                currentRootNode.nodeUrl,
+            );
+            const currentNodeId = String(currentNodeUrl);
+            const maybeResolvedNodeId = this.getRecursiveAnchorNodeId(
+                currentNodeId,
+            );
+            if (maybeResolvedNodeId != null) {
+                resolvedNodeId = maybeResolvedNodeId;
+            }
+
+            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
+        }
+
+        return resolvedNodeId;
+    }
+
     protected indexNode(
         node: SchemaNode,
         nodeRootUrl: URL,
