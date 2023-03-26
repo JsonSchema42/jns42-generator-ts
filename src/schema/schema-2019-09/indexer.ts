@@ -3,7 +3,7 @@ import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeId, selectNodeInstanceEntries } from "./selectors.js";
+import { selectNodeAnchor, selectNodeId, selectNodeInstanceEntries, selectNodeRecursiveAnchor } from "./selectors.js";
 
 export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
@@ -128,4 +128,43 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         return resolvedNodeId;
     }
 
+    /*
+    override the super function to load recursive anchors
+    */
+    protected indexNode(
+        node: SchemaNode,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ) {
+        const nodeId = this.makeNodeId(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
+
+        const nodeAnchor = selectNodeAnchor(node);
+        if (nodeAnchor != null) {
+            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
+            const anchorId = String(anchorUrl);
+            if (this.anchorMap.has(anchorId)) {
+                throw new Error("duplicate anchorId");
+            }
+            this.anchorMap.set(anchorId, nodeId);
+        }
+
+        const nodeRecursiveAnchor = selectNodeRecursiveAnchor(node);
+        if (nodeRecursiveAnchor ?? false) {
+            const recursiveAnchorId = nodeId;
+            if (this.recursiveAnchorMap.has(recursiveAnchorId)) {
+                throw new Error("duplicate recursiveAnchorId");
+            }
+            this.recursiveAnchorMap.set(recursiveAnchorId, nodeId);
+        }
+
+        super.indexNode(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
+    }
 }

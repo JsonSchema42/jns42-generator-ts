@@ -3,7 +3,7 @@ import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeId, selectNodeInstanceEntries } from "./selectors.js";
+import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeId, selectNodeInstanceEntries } from "./selectors.js";
 
 export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
@@ -127,5 +127,45 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         return resolvedNodeId;
     }
 
+    /*
+    override the super function to load dnyamic anchors
+    */
+    protected indexNode(
+        node: SchemaNode,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ) {
+        const nodeId = this.makeNodeId(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
+
+        const nodeAnchor = selectNodeAnchor(node);
+        if (nodeAnchor != null) {
+            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
+            const anchorId = String(anchorUrl);
+            if (this.anchorMap.has(anchorId)) {
+                throw new Error("duplicate anchorId");
+            }
+            this.anchorMap.set(anchorId, nodeId);
+        }
+
+        const nodeDynamicAnchor = selectNodeDynamicAnchor(node);
+        if (nodeDynamicAnchor != null) {
+            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeRootUrl);
+            const dynamicAnchorId = String(dynamicAnchorUrl);
+            if (this.dynamicAnchorMap.has(dynamicAnchorId)) {
+                throw new Error("duplicate dynamicAnchorId");
+            }
+            this.dynamicAnchorMap.set(dynamicAnchorId, nodeId);
+        }
+
+        super.indexNode(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
+    }
 }
 
