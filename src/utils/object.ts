@@ -1,26 +1,30 @@
-export function* flattenObject<T>(
-    obj: Record<string, T[]>,
-) {
-    for (const indexer of generateObjectIndexers(obj)) {
-        yield Object.fromEntries(indexer.map(
-
-            ([property, index]) => [property, obj[property][index]] as const,
-        ));
-    }
+export type Unflattened<T> = {
+    [P in keyof T]: Array<T[P]>
 }
 
-function* generateObjectIndexers(
-    obj: Record<string, unknown[]>,
-): Iterable<Array<readonly [string, number]>> {
-    const objectEntries = Object.entries(obj);
+/**
+ * yields every possible combination of the provided object. The object has properties that are
+ * arrays. For every value in every project a new object, with the properties not as an array,
+ * is yielded.
+ * 
+ * @param obj object with properties as an array
+ */
+export function* flattenObject<T extends object>(
+    obj: Unflattened<T>,
+): Iterable<T> {
+    const objectEntries = Object.entries<unknown[]>(obj);
     const counters = objectEntries.
         map(() => 0);
 
     if (objectEntries.length > 0) for (; ;) {
 
-        yield objectEntries.map(([property], index) => [property, counters[index]]);
+        yield Object.fromEntries(
+            objectEntries.map(
+                ([property, values], index) => [property, values[counters[index]]] as const,
+            ),
+        ) as T;
 
-        for (let index = 0; index <= objectEntries.length; index++) {
+        for (let index = 0; ; index++) {
             if (index >= objectEntries.length) {
                 return;
             }
@@ -37,5 +41,6 @@ function* generateObjectIndexers(
         }
 
     }
+
 }
 
