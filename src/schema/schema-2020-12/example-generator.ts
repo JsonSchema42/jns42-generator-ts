@@ -2,14 +2,12 @@ import { createString, flattenObject, pointerToHash, simpleTypes } from "../../u
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
-import { SchemaLoader } from "./loader.js";
 import { SchemaNode } from "./node.js";
 import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly loader: SchemaLoader,
         private readonly indexer: SchemaIndexer,
     ) {
         super(manager);
