@@ -1,4 +1,5 @@
 export * from "./literal.js";
+export * from "./namer.js";
 export * from "./object.js";
 export * from "./package.js";
 export * from "./pointer.js";

@@ -47,6 +47,7 @@
   "dependencies": {
     "@types/yargs": "^17.0.22",
     "camelcase": "^7.0.1",
+    "crc": "^4.3.2",
     "tslib": "^2.5.0",
     "type-fest": "^3.6.1",
     "typescript": "^4.9.5",
