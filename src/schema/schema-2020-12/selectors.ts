@@ -1,101 +1,53 @@
 import { appendJsonPointer } from "../../utils/index.js";
-import { SchemaNode } from "./node.js";
+import { Applicator, Core, Validation } from "./types.js";
 
 //#region core
 
 export function selectNodeSchema(
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        typeof node === "object" &&
-        node != null
-    ) {
-        if (
-            "$schema" in node &&
-            typeof node.$schema === "string"
-        ) {
-            return node.$schema;
-        }
+    if (typeof node === "object") {
+        return node.$schema;
     }
 }
 
 export function selectNodeId(
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        typeof node === "object" &&
-        node != null
-    ) {
-        if (
-            "$id" in node &&
-            typeof node.$id === "string"
-        ) {
-            return node.$id;
-        }
+    if (typeof node === "object") {
+        return node.$id;
     }
 }
 
 export function selectNodeAnchor(
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        typeof node === "object" &&
-        node != null
-    ) {
-        if (
-            "$anchor" in node &&
-            typeof node.$anchor === "string"
-        ) {
-            return node.$anchor;
-        }
+    if (typeof node === "object") {
+        return node.$anchor;
     }
 }
 
 export function selectNodeDynamicAnchor(
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        typeof node === "object" &&
-        node != null
-    ) {
-        if (
-            "$dynamicAnchor" in node &&
-            typeof node.$dynamicAnchor === "string"
-        ) {
-            return node.$dynamicAnchor;
-        }
+    if (typeof node === "object") {
+        return node.$dynamicAnchor;
     }
 }
 
 export function selectNodeRef(
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        typeof node === "object" &&
-        node != null
-    ) {
-        if (
-            "$ref" in node &&
-            typeof node.$ref === "string"
-        ) {
-            return node.$ref;
-        }
+    if (typeof node === "object") {
+        return node.$ref;
     }
 }
 
 export function selectNodeDynamicRef(
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        typeof node === "object" &&
-        node != null
-    ) {
-        if (
-            "$dynamicRef" in node &&
-            typeof node.$dynamicRef === "string"
-        ) {
-            return node.$dynamicRef;
-        }
+    if (typeof node === "object") {
+        return node.$dynamicRef;
     }
 }
 
@@ -105,165 +57,104 @@ export function selectNodeDynamicRef(
 
 export function* selectNodeDefEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Core,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "$defs" in node &&
-            typeof node.$defs === "object" && node.$defs != null
-        ) {
-            for (const [key, subNode] of Object.entries(node.$defs)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "$defs", key);
-                yield [subNodePointer, subNode] as const;
-            }
+    if (typeof node === "object" && node.$defs != null) {
+        for (const [key, subNode] of Object.entries(node.$defs)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "$defs", key);
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodePropertyEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "properties" in node &&
-            typeof node.properties === "object" && node.properties != null
-        ) {
-            for (const [key, subNode] of Object.entries(node.properties)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
-                yield [subNodePointer, subNode] as const;
-            }
+    if (typeof node === "object" && node.properties != null) {
+        for (const [key, subNode] of Object.entries(node.properties)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodeAdditionalPropertiesEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "additionalProperties" in node &&
-            node.additionalProperties != null
-        ) {
-            const subNode = node.additionalProperties;
-            const subNodePointer = appendJsonPointer(nodePointer, "additionalProperties");
-            yield [subNodePointer, subNode] as const;
-        }
+    if (typeof node === "object" && node.additionalProperties != null) {
+        const subNode = node.additionalProperties;
+        const subNodePointer = appendJsonPointer(nodePointer, "additionalProperties");
+        yield [subNodePointer, subNode] as const;
     }
 }
 
 export function* selectNodePrefixItemsEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "prefixItems" in node &&
-            typeof node.prefixItems === "object" && node.prefixItems != null
-        ) {
-            for (const [key, subNode] of Object.entries(node.prefixItems)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "prefixItems", key);
-                yield [subNodePointer, subNode] as const;
-            }
+    if (typeof node === "object" && node.prefixItems != null) {
+        for (const [key, subNode] of Object.entries(node.prefixItems)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "prefixItems", key);
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodeItemsEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
     if (
-        node != null &&
-        typeof node === "object"
+        typeof node === "object" && node.items != null
     ) {
-        if (
-            "items" in node &&
-            node.items != null
-        ) {
-            const subNode = node.items;
-            const subNodePointer = appendJsonPointer(nodePointer, "items");
-            yield [subNodePointer, subNode] as const;
-        }
+        const subNode = node.items;
+        const subNodePointer = appendJsonPointer(nodePointer, "items");
+        yield [subNodePointer, subNode] as const;
     }
 }
 
 export function* selectNodeAnyOfEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "anyOf" in node &&
-            typeof node.anyOf === "object" && node.anyOf != null
-        ) {
-            for (const [key, subNode] of Object.entries(node.anyOf)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "anyOf", key);
-                yield [subNodePointer, subNode] as const;
-            }
+    if (typeof node === "object" && node.anyOf != null) {
+        for (const [key, subNode] of Object.entries(node.anyOf)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "anyOf", key);
+            yield [subNodePointer, subNode] as const;
+
         }
     }
 }
 
 export function* selectNodeOneOfEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "oneOf" in node &&
-            typeof node.oneOf === "object" && node.oneOf != null
-        ) {
-            for (const [key, subNode] of Object.entries(node.oneOf)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "oneOf", key);
-                yield [subNodePointer, subNode] as const;
-            }
+    if (typeof node === "object" && node.oneOf != null) {
+        for (const [key, subNode] of Object.entries(node.oneOf)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "oneOf", key);
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodeAllOfEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "allOf" in node &&
-            typeof node.allOf === "object" && node.allOf != null
-        ) {
-            for (const [key, subNode] of Object.entries(node.allOf)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "allOf", key);
-                yield [subNodePointer, subNode] as const;
-            }
+    if (typeof node === "object" && node.allOf != null) {
+        for (const [key, subNode] of Object.entries(node.allOf)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "allOf", key);
+            yield [subNodePointer, subNode] as const;
         }
     }
 }
 
 export function* selectNodeInstanceEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator & Core,
 ) {
     yield* selectNodeDefEntries(nodePointer, node);
     yield* selectNodePropertyEntries(nodePointer, node);
@@ -280,95 +171,56 @@ export function* selectNodeInstanceEntries(
 //#region type
 
 export function selectNodeTypes(
-    node: SchemaNode,
+    node: Validation,
 ) {
     if (
-        typeof node === "object" &&
-        node != null
+        typeof node === "object"
     ) {
-        if (
-            "type" in node &&
-            typeof node.type === "string"
-        ) {
-            return [node.type];
+        if (node.type == null) {
+            return [];
         }
-        else if (
-            "type" in node &&
-            Array.isArray(node.type) &&
-            node.type.every(type => typeof type === "string")
-        ) {
-            return node.type as string[];
+        if (Array.isArray(node.type)) {
+            return node.type;
+        }
+        else {
+            return [node.type];
         }
     }
 }
 
 export function* selectNodeRequiredPropertyNames(
-    node: SchemaNode,
+    node: Validation,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "required" in node &&
-            Array.isArray(node.required) &&
-            node.required.every(type => typeof type === "string")
-        ) {
-            yield* node.required as string[];
-        }
+    if (typeof node === "object" && node.required != null) {
+        yield* node.required;
     }
 }
 
 export function* selectNodePropertyNamesEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Applicator,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "properties" in node &&
-            typeof node.properties === "object" && node.properties != null
-        ) {
-            for (const propertyName of Object.keys(node.properties)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "properties", propertyName);
-                yield [subNodePointer, propertyName] as const;
-            }
+    if (typeof node === "object" && node.properties != null) {
+        for (const propertyName of Object.keys(node.properties)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "properties", propertyName);
+            yield [subNodePointer, propertyName] as const;
         }
     }
 }
 
 export function selectNodeEnum(
-    node: SchemaNode,
+    node: Validation,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "enum" in node &&
-            node.enum != null &&
-            Array.isArray(node.enum)
-        ) {
-            return node.enum;
-        }
+    if (typeof node === "object") {
+        return node.enum;
     }
 }
 
 export function selectNodeConst(
-    node: SchemaNode,
+    node: Validation,
 ) {
-    if (
-        node != null &&
-        typeof node === "object"
-    ) {
-        if (
-            "const" in node &&
-            node.const != null
-        ) {
-            return node.const;
-        }
+    if (typeof node === "object") {
+        return node.const;
     }
 }
 
@@ -377,209 +229,130 @@ export function selectNodeConst(
 //#region validation
 
 export function selectValidationMaxProperties(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "maxProperties" in node &&
-            typeof node.maxProperties === "number"
-        ) {
-            return node.maxProperties;
-        }
+    if (typeof node === "object") {
+        return node.maxProperties;
     }
 }
 
 export function selectValidationMinProperties(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "minProperties" in node &&
-            typeof node.minProperties === "number"
-        ) {
-            return node.minProperties;
-        }
+    if (typeof node === "object") {
+        return node.minProperties;
     }
 }
 
 export function selectValidationRequired(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "required" in node &&
-            Array.isArray(node.required) &&
-            node.required.every(value => typeof value === "string")
-        ) {
-            return node.required as string[];
-        }
+    if (typeof node === "object") {
+        return node.required;
     }
 }
 
 export function selectValidationMinItems(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "minItems" in node &&
-            typeof node.minItems === "number"
-
-        ) {
-            return node.minItems;
-        }
+    if (typeof node === "object") {
+        return node.minItems;
     }
 }
 
 export function selectValidationMaxItems(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "maxItems" in node &&
-            typeof node.maxItems === "number"
-        ) {
-            return node.maxItems;
-        }
+    if (typeof node === "object") {
+        return node.maxItems;
     }
 }
 
 export function selectValidationUniqueItems(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "uniqueItems" in node &&
-            typeof node.uniqueItems === "boolean"
-        ) {
-            return node.uniqueItems;
-        }
+    if (typeof node === "object") {
+        return node.uniqueItems;
     }
 }
 
 export function selectValidationMinLength(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "minLength" in node &&
-            typeof node.minLength === "number"
-        ) {
-            return node.minLength;
-        }
+    if (typeof node === "object") {
+        return node.minLength;
     }
 }
 
 export function selectValidationMaxLength(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "maxLength" in node &&
-            typeof node.maxLength === "number"
-        ) {
-            return node.maxLength;
-        }
+    if (typeof node === "object") {
+        return node.maxLength;
     }
 }
 
 export function selectValidationPattern(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "pattern" in node &&
-            typeof node.pattern === "string"
-        ) {
-            return node.pattern;
-        }
+    if (typeof node === "object") {
+        return node.pattern;
     }
 }
 
 export function selectValidationMinimum(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "minimum" in node &&
-            typeof node.minimum === "number"
-        ) {
-            return node.minimum;
-        }
+    if (typeof node === "object") {
+        return node.minimum;
     }
 }
 
 export function selectValidationExclusiveMinimum(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "exclusiveMinimum" in node &&
-            typeof node.exclusiveMinimum === "number"
-        ) {
-            return node.exclusiveMinimum;
-        }
+    if (typeof node === "object") {
+        return node.exclusiveMinimum;
     }
 }
 
 export function selectValidationMaximum(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "maximum" in node &&
-            typeof node.maximum === "number"
-        ) {
-            return node.maximum;
-        }
+    if (typeof node === "object") {
+        return node.maximum;
     }
 }
 
 export function selectValidationExclusiveMaximum(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "exclusiveMaximum" in node &&
-            typeof node.exclusiveMaximum === "number"
-        ) {
-            return node.exclusiveMaximum;
-        }
+    if (typeof node === "object") {
+        return node.exclusiveMaximum;
     }
 }
 
 export function selectValidationMultipleOf(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "multipleOf" in node &&
-            typeof node.multipleOf === "number"
-        ) {
-            return node.multipleOf;
-        }
+    if (typeof node === "object") {
+        return node.multipleOf;
     }
 }
 
 export function selectValidationConst(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if ("const" in node) {
-            return node.const;
-        }
+    if (typeof node === "object") {
+        return node.const;
     }
 }
 
 export function selectValidationEnum(
-    node: unknown,
+    node: Validation,
 ) {
-    if (node != null && typeof node === "object") {
-        if (
-            "enum" in node &&
-            Array.isArray(node.enum)
-        ) {
-            return node.enum;
-        }
+    if (typeof node === "object") {
+        return node.enum;
     }
 }
 

@@ -1,24 +1,24 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { metaSchema } from "./meta.js";
-import { SchemaNode } from "./node.js";
 import { selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
+import { Schema } from "./types.js";
 
-export class SchemaLoader extends SchemaLoaderBase<SchemaNode> {
+export class SchemaLoader extends SchemaLoaderBase<Schema> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-    protected selectNodeId(node: SchemaNode) {
+    protected selectNodeId(node: Schema) {
         return selectNodeId(node);
     }
 
     protected selectSubNodeEntries(
         nodePointer: string,
-        node: SchemaNode,
-    ): Iterable<readonly [string, SchemaNode]> {
+        node: Schema,
+    ): Iterable<readonly [string, Schema]> {
         return selectNodeInstanceEntries(nodePointer, node);
     }
 
     protected async loadFromUrl(
-        node: SchemaNode,
+        node: Schema,
         nodeUrl: URL,
         retrievalUrl: URL,
     ) {

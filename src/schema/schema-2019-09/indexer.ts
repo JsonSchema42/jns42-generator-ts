@@ -3,26 +3,26 @@ import { SchemaManager } from "../manager.js";
 import { MetaSchemaId } from "../meta.js";
 import { SchemaLoader } from "./loader.js";
 import { metaSchema } from "./meta.js";
-import { SchemaNode } from "./node.js";
 import { selectNodeAnchor, selectNodeId, selectNodeInstanceEntries, selectNodeRecursiveAnchor } from "./selectors.js";
+import { Schema } from "./types.js";
 
-export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
+export class SchemaIndexer extends SchemaIndexerBase<Schema> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-    public selectRootNodeEntries(): Iterable<[URL, SchemaNode]> {
+    public selectRootNodeEntries(): Iterable<[URL, Schema]> {
         return [...this.loader.getRootNodeItems()].
             map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
 
     public selectSubNodeEntries(
         nodePointer: string,
-        node: SchemaNode,
-    ): Iterable<readonly [string, SchemaNode]> {
+        node: Schema,
+    ): Iterable<readonly [string, Schema]> {
         return selectNodeInstanceEntries(nodePointer, node);
     }
 
     protected makeNodeId(
-        node: SchemaNode,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
     ): string {
@@ -133,7 +133,7 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
     override the super function to load recursive anchors
     */
     protected indexNode(
-        node: SchemaNode,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
         onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,

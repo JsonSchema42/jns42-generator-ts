@@ -232,7 +232,6 @@ export class SchemaManager {
                     throw new Error("duplicate root nodeId");
                 }
                 this.rootNodeMetaMap.set(nodeId, metaSchemaId);
-
             },
         );
 

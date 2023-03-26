@@ -1,10 +1,10 @@
 import { appendJsonPointer } from "../../utils/index.js";
-import { SchemaNode } from "./node.js";
+import { Schema } from "./types.js";
 
 //#region core
 
 export function selectNodeSchema(
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         typeof node === "object" &&
@@ -20,7 +20,7 @@ export function selectNodeSchema(
 }
 
 export function selectNodeId(
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         typeof node === "object" &&
@@ -36,7 +36,7 @@ export function selectNodeId(
 }
 
 export function selectNodeRef(
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         typeof node === "object" &&
@@ -57,7 +57,7 @@ export function selectNodeRef(
 
 export function* selectNodeDefinitionsEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -77,7 +77,7 @@ export function* selectNodeDefinitionsEntries(
 
 export function* selectNodePropertyEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -97,7 +97,7 @@ export function* selectNodePropertyEntries(
 
 export function* selectNodeAdditionalPropertiesEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -114,9 +114,9 @@ export function* selectNodeAdditionalPropertiesEntries(
     }
 }
 
-export function* selectNodeItemsEntries(
+export function* selectNodeItemsOneEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -124,7 +124,29 @@ export function* selectNodeItemsEntries(
     ) {
         if (
             "items" in node &&
-            typeof node.items === "object" && node.items != null
+            typeof node.items === "object" && node.items != null &&
+            !Array.isArray(node.items)
+
+        ) {
+            const subNode = node.items;
+            const subNodePointer = appendJsonPointer(nodePointer, "items");
+            yield [subNodePointer, subNode] as const;
+        }
+    }
+}
+
+export function* selectNodeItemsManyEntries(
+    nodePointer: string,
+    node: Schema,
+) {
+    if (
+        node != null &&
+        typeof node === "object"
+    ) {
+        if (
+            "items" in node &&
+            typeof node.items === "object" && node.items != null &&
+            Array.isArray(node.items)
         ) {
             for (const [key, subNode] of Object.entries(node.items)) {
                 const subNodePointer = appendJsonPointer(nodePointer, "items", key);
@@ -136,7 +158,7 @@ export function* selectNodeItemsEntries(
 
 export function* selectNodeAdditionalItemsEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -155,7 +177,7 @@ export function* selectNodeAdditionalItemsEntries(
 
 export function* selectNodeAnyOfEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -175,7 +197,7 @@ export function* selectNodeAnyOfEntries(
 
 export function* selectNodeOneOfEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -195,7 +217,7 @@ export function* selectNodeOneOfEntries(
 
 export function* selectNodeAllOfEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -215,12 +237,13 @@ export function* selectNodeAllOfEntries(
 
 export function* selectNodeInstanceEntries(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     yield* selectNodeDefinitionsEntries(nodePointer, node);
     yield* selectNodePropertyEntries(nodePointer, node);
     yield* selectNodeAdditionalPropertiesEntries(nodePointer, node);
-    yield* selectNodeItemsEntries(nodePointer, node);
+    yield* selectNodeItemsOneEntries(nodePointer, node);
+    yield* selectNodeItemsManyEntries(nodePointer, node);
     yield* selectNodeAdditionalItemsEntries(nodePointer, node);
     yield* selectNodeAllOfEntries(nodePointer, node);
     yield* selectNodeAnyOfEntries(nodePointer, node);
@@ -232,7 +255,7 @@ export function* selectNodeInstanceEntries(
 //#region type
 
 export function selectNodeType(
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         typeof node === "object" &&
@@ -255,7 +278,7 @@ export function selectNodeType(
 }
 
 export function* selectNodeRequiredProperties(
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -273,7 +296,7 @@ export function* selectNodeRequiredProperties(
 
 export function* selectNodeProperties(
     nodePointer: string,
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -292,7 +315,7 @@ export function* selectNodeProperties(
 }
 
 export function selectNodeEnum(
-    node: SchemaNode,
+    node: Schema,
 ) {
     if (
         node != null &&
@@ -313,7 +336,7 @@ export function selectNodeEnum(
 //#region validation
 
 export function selectValidationMaxProperties(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -326,7 +349,7 @@ export function selectValidationMaxProperties(
 }
 
 export function selectValidationMinProperties(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -339,7 +362,7 @@ export function selectValidationMinProperties(
 }
 
 export function selectValidationRequired(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -353,7 +376,7 @@ export function selectValidationRequired(
 }
 
 export function selectValidationMinItems(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -367,7 +390,7 @@ export function selectValidationMinItems(
 }
 
 export function selectValidationMaxItems(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -380,7 +403,7 @@ export function selectValidationMaxItems(
 }
 
 export function selectValidationUniqueItems(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -393,7 +416,7 @@ export function selectValidationUniqueItems(
 }
 
 export function selectValidationMinLength(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -406,7 +429,7 @@ export function selectValidationMinLength(
 }
 
 export function selectValidationMaxLength(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -419,7 +442,7 @@ export function selectValidationMaxLength(
 }
 
 export function selectValidationPattern(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -432,7 +455,7 @@ export function selectValidationPattern(
 }
 
 export function selectValidationMinimum(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -445,7 +468,7 @@ export function selectValidationMinimum(
 }
 
 export function selectValidationExclusiveMinimum(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -458,7 +481,7 @@ export function selectValidationExclusiveMinimum(
 }
 
 export function selectValidationMaximum(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -471,7 +494,7 @@ export function selectValidationMaximum(
 }
 
 export function selectValidationExclusiveMaximum(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -484,7 +507,7 @@ export function selectValidationExclusiveMaximum(
 }
 
 export function selectValidationMultipleOf(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
@@ -497,7 +520,7 @@ export function selectValidationMultipleOf(
 }
 
 export function selectValidationEnum(
-    node: unknown,
+    node: Schema,
 ) {
     if (node != null && typeof node === "object") {
         if (
