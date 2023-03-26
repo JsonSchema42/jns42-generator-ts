@@ -9,14 +9,14 @@ import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeInstanceEntries } 
 export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-    protected getRootNodeEntries(): Iterable<[URL, SchemaNode]> {
+    protected selectRootNodeEntries(): Iterable<[URL, SchemaNode]> {
         return [...this.loader.getRootNodeItems()].
             map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
     protected toNodeUrl(nodePointer: string, nodeRootUrl: URL): URL {
         return new URL(pointerToHash(nodePointer), nodeRootUrl);
     }
-    protected selectNodeInstanceEntries(
+    protected selectSubNodeEntries(
         nodePointer: string,
         node: SchemaNode,
     ): Iterable<readonly [string, SchemaNode]> {

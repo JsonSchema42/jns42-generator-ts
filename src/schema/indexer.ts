@@ -10,14 +10,15 @@ export interface SchemaIndexerNodeItem<N> {
 export abstract class SchemaIndexerBase<N> {
     protected abstract readonly metaSchemaId: MetaSchemaId
 
-    protected abstract getRootNodeEntries(): Iterable<[URL, N]>;
-    protected abstract toNodeUrl(nodePointer: string, nodeRootUrl: URL): URL
-    protected abstract selectNodeInstanceEntries(
+    protected abstract toNodeUrl(
+        nodePointer: string,
+        nodeRootUrl: URL
+    ): URL
+    protected abstract selectRootNodeEntries(): Iterable<[URL, N]>;
+    protected abstract selectSubNodeEntries(
         nodePointer: string,
         node: N
     ): Iterable<readonly [string, N]>
-
-    private readonly nodeMap = new Map<string, SchemaIndexerNodeItem<N>>();
 
     constructor(
         protected readonly manager: SchemaManager,
@@ -25,12 +26,14 @@ export abstract class SchemaIndexerBase<N> {
         //
     }
 
+    private readonly nodeMap = new Map<string, SchemaIndexerNodeItem<N>>();
+
     public getNodeItem(nodeId: string) {
         return this.nodeMap.get(nodeId);
     }
 
     public indexNodes() {
-        for (const [url, node] of this.getRootNodeEntries()) {
+        for (const [url, node] of this.selectRootNodeEntries()) {
             this.indexNode(
                 node,
                 url,
@@ -58,7 +61,7 @@ export abstract class SchemaIndexerBase<N> {
         this.nodeMap.set(nodeId, item);
         this.manager.registerNodeMetaSchema(nodeId, this.metaSchemaId);
 
-        for (const [subNodePointer, subNode] of this.selectNodeInstanceEntries(nodePointer, node)) {
+        for (const [subNodePointer, subNode] of this.selectSubNodeEntries(nodePointer, node)) {
             this.indexNode(
                 subNode,
                 nodeRootUrl,
