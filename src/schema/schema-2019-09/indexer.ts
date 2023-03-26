@@ -9,9 +9,16 @@ import { selectNodeAnchor, selectNodeId, selectNodeInstanceEntries, selectNodeRe
 export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-    protected selectRootNodeEntries(): Iterable<[URL, SchemaNode]> {
+    public selectRootNodeEntries(): Iterable<[URL, SchemaNode]> {
         return [...this.loader.getRootNodeItems()].
             map(({ nodeUrl, node }) => [nodeUrl, node]);
+    }
+
+    public selectSubNodeEntries(
+        nodePointer: string,
+        node: SchemaNode,
+    ): Iterable<readonly [string, SchemaNode]> {
+        return selectNodeInstanceEntries(nodePointer, node);
     }
 
     protected makeNodeId(
@@ -29,13 +36,6 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
 
         const nodeUrl = new URL(`#${nodePointer}`, nodeRootUrl);
         return String(nodeUrl);
-    }
-
-    protected selectSubNodeEntries(
-        nodePointer: string,
-        node: SchemaNode,
-    ): Iterable<readonly [string, SchemaNode]> {
-        return selectNodeInstanceEntries(nodePointer, node);
     }
 
     constructor(

@@ -15,8 +15,8 @@ export abstract class SchemaIndexerBase<N> {
         nodeRootUrl: URL,
         nodePointer: string,
     ): string
-    protected abstract selectRootNodeEntries(): Iterable<[URL, N]>;
-    protected abstract selectSubNodeEntries(
+    public abstract selectRootNodeEntries(): Iterable<[URL, N]>;
+    public abstract selectSubNodeEntries(
         nodePointer: string,
         node: N
     ): Iterable<readonly [string, N]>

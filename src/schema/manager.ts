@@ -1,3 +1,4 @@
+import camelcase from "camelcase";
 import * as fs from "fs";
 import ts from "typescript";
 import { Namer } from "../utils/namer.js";
@@ -52,28 +53,6 @@ export class SchemaManager {
         ),
     };
 
-    private readonly namers = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaNamer(
-            this,
-            this.indexers[schema202012.metaSchema.metaSchemaId],
-        ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaNamer(
-            this,
-            this.indexers[schema201909.metaSchema.metaSchemaId],
-        ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaNamer(
-            this,
-            this.indexers[schemaDraft07.metaSchema.metaSchemaId],
-        ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaNamer(
-            this,
-            this.indexers[schemaDraft06.metaSchema.metaSchemaId],
-        ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaNamer(
-            this,
-            this.indexers[schemaDraft04.metaSchema.metaSchemaId],
-        ),
-    };
     private readonly typeCodeGenerators = {
         [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaTypeCodeGenerator(
             this,
@@ -278,8 +257,7 @@ export class SchemaManager {
         }
 
         for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
-            const namer = this.namers[metaSchemaId as keyof typeof this.namers];
-            for (const [nodeId, name] of namer.getTypeNames(rootNodeId)) {
+            for (const [nodeId, name] of this.getTypeNames(metaSchemaId, rootNodeId)) {
                 this.namer.registerName(nodeId, name);
             }
         }
@@ -487,6 +465,69 @@ export class SchemaManager {
             }
             yield example;
         }
+    }
+
+    private * getTypeNames(
+        metaSchemaId: MetaSchemaId,
+        nodeId: string,
+        baseName = "",
+    ): Iterable<readonly [string, string]> {
+        const reReplace = /[^A-Za-z0-9]/gu;
+        const reFilter = /^[A-Za-z]/u;
+
+        const indexer = this.indexers[metaSchemaId];
+
+        const item = indexer.getNodeItem(nodeId);
+        if (item == null) {
+            throw new Error("item nog found");
+        }
+
+        const {
+            node,
+            nodeRootUrl,
+            nodePointer,
+        } = item;
+
+        const pathParts = nodeRootUrl.pathname.
+            split("/").
+            map(decodeURI).
+            map(value => value.toLowerCase()).
+            map(value => value.replace(reReplace, "")).
+            filter(value => reFilter.test(value));
+        const pointerParts = nodePointer.
+            split("/").
+            map(decodeURI).
+            map(value => value.toLowerCase()).
+            map(value => value.replace(reReplace, ""));
+
+        if (nodePointer === "") {
+            baseName = pathParts[pathParts.length - 1] ?? "Schema";
+        }
+
+        const nameParts = [
+            baseName,
+            pointerParts[pointerParts.length - 1],
+        ].
+            filter(value => value != null).
+            filter(value => value != "");
+
+        const name = camelcase(nameParts, { pascalCase: true });
+
+        yield [nodeId, name] as const;
+
+        for (
+            const [subNodePointer] of
+            indexer.selectSubNodeEntries(nodePointer, node)
+        ) {
+            const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
+            const subNodeId = String(subNodeUrl);
+            yield* this.getTypeNames(
+                metaSchemaId,
+                subNodeId,
+                name,
+            );
+        }
+
     }
 
 }
