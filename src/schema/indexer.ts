@@ -10,10 +10,11 @@ export interface SchemaIndexerNodeItem<N> {
 export abstract class SchemaIndexerBase<N> {
     protected abstract readonly metaSchemaId: MetaSchemaId
 
-    protected abstract toNodeUrl(
+    protected abstract makeNodeId(
+        node: N,
+        nodeRootUrl: URL,
         nodePointer: string,
-        nodeRootUrl: URL
-    ): URL
+    ): string
     protected abstract selectRootNodeEntries(): Iterable<[URL, N]>;
     protected abstract selectSubNodeEntries(
         nodePointer: string,
@@ -47,8 +48,11 @@ export abstract class SchemaIndexerBase<N> {
         nodeRootUrl: URL,
         nodePointer: string,
     ) {
-        const nodeUrl = this.toNodeUrl(nodePointer, nodeRootUrl);
-        const nodeId = String(nodeUrl);
+        const nodeId = this.makeNodeId(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
 
         const item: SchemaIndexerNodeItem<N> = {
             node,

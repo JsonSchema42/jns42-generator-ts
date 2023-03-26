@@ -1,4 +1,4 @@
-import { createString, flattenObject, pointerToHash } from "../../utils/index.js";
+import { createString, flattenObject } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
@@ -62,7 +62,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         const itemsEntries = selectNodeItemsOneEntries(nodeItem.nodePointer, nodeItem.node);
 
         for (const [subNodePointer, subNode] of itemsEntries) {
-            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+            const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeRootUrl);
             const subNodeId = String(subNodeUrl);
 
             for (const [errors, example] of this.generateFromNode(
@@ -101,7 +101,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     continue;
                 }
 
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+                const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
                 subExamples[propertyName] = [...this.generateFromNode(
@@ -135,7 +135,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     continue;
                 }
 
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+                const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
                 subExamples[propertyName] = [...this.generateFromNode(
@@ -165,7 +165,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             for (const [subNodePointer, subNode] of propertyEntries) {
 
                 const propertyName = propertyNameMap[subNodePointer];
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+                const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
                 subExamples[propertyName] = [...this.generateFromNode(

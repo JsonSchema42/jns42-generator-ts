@@ -27,6 +27,51 @@ jobs:
       - run: ( cd .package/${{ matrix.fixture }} ; npm install )
       - run: ( cd .package/${{ matrix.fixture }} ; node *.spec.js )
 
+  test-generated-package-json-schema:
+    strategy:
+      matrix:
+        fixture:
+          - schema-2020-12
+          - schema-2019-09
+          - schema-draft-07
+          - schema-draft-06
+          - schema-draft-04
+          - output-2020-12
+          - output-2019-09
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: >
+          node out/program
+          package
+          file://$PWD/fixtures/${{ matrix.fixture }}/schema
+          --package-directory .package/${{ matrix.fixture }}
+          --package-name ${{ matrix.fixture }}
+          --package-version 0.0.0
+      - run: ( cd .package/${{ matrix.fixture }} ; npm install )
+
+  test-generated-package-openapi:
+    strategy:
+      matrix:
+        fixture:
+          - openapi_v3-1_2022-10-07
+          - openapi_v3-0_2021-09-28
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: >
+          node out/program
+          package
+          file://$PWD/fixtures/openapi/${{ matrix.fixture }}.json
+          --package-directory .package/${{ matrix.fixture }}
+          --package-name ${{ matrix.fixture }}
+          --package-version 0.0.0
+      - run: ( cd .package/${{ matrix.fixture }} ; npm install )
+
   test-unit:
     runs-on: ubuntu-latest
     container: node:18

@@ -1,10 +1,9 @@
-import { pointerToHash } from "../../utils/index.js";
 import { SchemaIndexerBase } from "../indexer.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
-import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeInstanceEntries } from "./selectors.js";
+import { selectNodeId, selectNodeInstanceEntries } from "./selectors.js";
 
 export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
@@ -13,9 +12,24 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         return [...this.loader.getRootNodeItems()].
             map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
-    protected toNodeUrl(nodePointer: string, nodeRootUrl: URL): URL {
-        return new URL(pointerToHash(nodePointer), nodeRootUrl);
+
+    protected makeNodeId(
+        node: SchemaNode,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): string {
+        /*
+        if a node has an id set, use that!
+        */
+        const nodeId = selectNodeId(node);
+        if (nodeId != null) {
+            return nodeId;
+        }
+
+        const nodeUrl = new URL(`#${nodePointer}`, nodeRootUrl);
+        return String(nodeUrl);
     }
+
     protected selectSubNodeEntries(
         nodePointer: string,
         node: SchemaNode,
@@ -109,41 +123,6 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         }
 
         return resolvedNodeId;
-    }
-
-    protected indexNode(
-        node: SchemaNode,
-        nodeRootUrl: URL,
-        nodePointer: string,
-    ) {
-        const nodeUrl = new URL(pointerToHash(nodePointer), nodeRootUrl);
-        const nodeId = String(nodeUrl);
-
-        const nodeAnchor = selectNodeAnchor(node);
-        if (nodeAnchor != null) {
-            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
-            const anchorId = String(anchorUrl);
-            if (this.anchorMap.has(anchorId)) {
-                throw new Error("duplicate anchorId");
-            }
-            this.anchorMap.set(anchorId, nodeId);
-        }
-
-        const nodeDynamicAnchor = selectNodeDynamicAnchor(node);
-        if (nodeDynamicAnchor != null) {
-            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeRootUrl);
-            const dynamicAnchorId = String(dynamicAnchorUrl);
-            if (this.dynamicAnchorMap.has(dynamicAnchorId)) {
-                throw new Error("duplicate dynamicAnchorId");
-            }
-            this.dynamicAnchorMap.set(dynamicAnchorId, nodeId);
-        }
-
-        super.indexNode(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
     }
 
 }

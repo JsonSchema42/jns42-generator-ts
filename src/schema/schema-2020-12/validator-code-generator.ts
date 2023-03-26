@@ -1,5 +1,4 @@
 import ts from "typescript";
-import { pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaIndexer } from "./indexer.js";
@@ -157,7 +156,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             let index = 0;
             for (const [subNodePointer] of prefixItemsEntries) {
                 const subNodeUrl = new URL(
-                    pointerToHash(subNodePointer),
+                    `#${subNodePointer}`,
                     nodeItem.nodeRootUrl,
                 );
                 const subNodeId = String(subNodeUrl);
@@ -197,7 +196,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         );
         for (const [subNodePointer] of itemsEntries) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -318,7 +317,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         );
         for (const [subNodePointer] of additionalPropertiesEntries) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
@@ -394,7 +393,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
         for (const [subNodePointer, propertyName] of properties) {
             const subNodeUrl = new URL(
-                pointerToHash(subNodePointer),
+                `#${subNodePointer}`,
                 nodeItem.nodeRootUrl,
             );
             const subNodeId = String(subNodeUrl);
