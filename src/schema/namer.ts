@@ -19,7 +19,8 @@ export abstract class SchemaNamerBase<N> {
         nodeId: string,
         baseName = "",
     ): Iterable<readonly [string, string]> {
-        const re = /[^A-Za-z0-9]/u;
+        const reReplace = /[^A-Za-z0-9]/gu;
+        const reFilter = /^[A-Za-z]/u;
 
         const nodeRootUrl = this.selectNodeRootUrl(nodeId);
         if (nodeRootUrl == null) {
@@ -34,21 +35,25 @@ export abstract class SchemaNamerBase<N> {
         const pathParts = nodeRootUrl.pathname.
             split("/").
             map(decodeURI).
-            map(value => value.replace(re, ""));
+            map(value => value.toLowerCase()).
+            map(value => value.replace(reReplace, "")).
+            filter(value => reFilter.test(value));
         const pointerParts = nodePointer.
             split("/").
             map(decodeURI).
-            map(value => value.replace(re, ""));
+            map(value => value.toLowerCase()).
+            map(value => value.replace(reReplace, ""));
 
-        const nameParts = nodePointer === "" ?
-            [
-                pathParts[pathParts.length - 1],
-                pointerParts[pointerParts.length - 1],
-            ] :
-            [
-                baseName,
-                pointerParts[pointerParts.length - 1],
-            ];
+        if (nodePointer === "") {
+            baseName = pathParts[pathParts.length - 1] ?? "Schema";
+        }
+
+        const nameParts = [
+            baseName,
+            pointerParts[pointerParts.length - 1],
+        ].
+            filter(value => value != null).
+            filter(value => value != "");
 
         const name = camelcase(nameParts, { pascalCase: true });
 

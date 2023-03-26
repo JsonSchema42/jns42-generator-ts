@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import ts from "typescript";
+import { Namer } from "../utils/namer.js";
 import { discoverRootNodeMetaSchemaId, MetaSchemaId } from "./meta.js";
 import * as schema201909 from "./schema-2019-09/index.js";
 import * as schema202012 from "./schema-2020-12/index.js";
@@ -9,9 +10,14 @@ import * as schemaDraft07 from "./schema-draft-07/index.js";
 
 export class SchemaManager {
 
+    constructor(
+        public readonly namer: Namer,
+    ) {
+        //
+    }
+
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaId>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaId>();
-    private readonly nameMap = new Map<string, string>();
     private readonly retrievalRootNodeMap = new Map<string, URL>();
     private readonly rootNodeRetrievalMap = new Map<string, URL>();
 
@@ -68,7 +74,6 @@ export class SchemaManager {
             this.indexers[schemaDraft04.metaSchema.metaSchemaId],
         ),
     };
-
     private readonly typeCodeGenerators = {
         [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaTypeCodeGenerator(
             this,
@@ -275,10 +280,7 @@ export class SchemaManager {
         for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
             const namer = this.namers[metaSchemaId as keyof typeof this.namers];
             for (const [nodeId, name] of namer.getTypeNames(rootNodeId)) {
-                if (this.nameMap.has(nodeId)) {
-                    throw new Error("duplicate nodeId");
-                }
-                this.nameMap.set(nodeId, name);
+                this.namer.registerName(nodeId, name);
             }
         }
     }
@@ -288,7 +290,9 @@ export class SchemaManager {
             throw new Error("not yet initialized");
         }
 
-        return this.nameMap.get(nodeId);
+        const name = this.namer.getName(nodeId);
+
+        return name.join("_");
     }
 
     public getNodeRetrievalUrl(nodeRootId: string) {

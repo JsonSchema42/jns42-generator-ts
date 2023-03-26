@@ -7,14 +7,32 @@ test("namer", () => {
 
     namer.registerName("1", "Good");
 
-    assert.strictEqual(namer.getName("1"), "Good");
+    assert.deepStrictEqual(
+        namer.getName("1"),
+        ["Good"],
+    );
 
     namer.registerName("2", "Good");
-    assert.strictEqual(namer.getName("1"), "Good 1cbd3ut");
-    assert.strictEqual(namer.getName("2"), "Good fayt8f");
+    assert.deepStrictEqual(
+        namer.getName("1"),
+        ["Good", "1cbd3ut"],
+    );
+    assert.deepStrictEqual(
+        namer.getName("2"),
+        ["Good", "fayt8f"],
+    );
 
     namer.registerName("3", "Good");
-    assert.strictEqual(namer.getName("1"), "Good 1cbd3ut");
-    assert.strictEqual(namer.getName("2"), "Good fayt8f");
-    assert.strictEqual(namer.getName("3"), "Good ht4wkp");
+    assert.deepStrictEqual(
+        namer.getName("1"),
+        ["Good", "1cbd3ut"],
+    );
+    assert.deepStrictEqual(
+        namer.getName("2"),
+        ["Good", "fayt8f"],
+    );
+    assert.deepStrictEqual(
+        namer.getName("3"),
+        ["Good", "ht4wkp"],
+    );
 });

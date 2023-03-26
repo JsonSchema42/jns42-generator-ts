@@ -4,7 +4,7 @@ import { PackageJson } from "type-fest";
 import ts from "typescript";
 import * as yargs from "yargs";
 import { SchemaManager } from "../schema/index.js";
-import { packageInfo, projectRoot } from "../utils/index.js";
+import { Namer, packageInfo, projectRoot } from "../utils/index.js";
 
 export function configureLabProgram(argv: yargs.Argv) {
     return argv.
@@ -43,6 +43,11 @@ export function configureLabProgram(argv: yargs.Argv) {
                 option("generate-test", {
                     describe: "generate test for this package (use with caution!)",
                     type: "boolean",
+                }).
+                option("unique-name-seed", {
+                    describe: "seed to use when generating unique hashes, change if you ever have a naming collision (this should be very rare)",
+                    type: "number",
+                    default: 0,
                 }),
             argv => main(argv as MainOptions),
         );
@@ -55,6 +60,7 @@ interface MainOptions {
     packageName: string
     packageVersion: string
     generateTest: boolean
+    uniqueNameSeed: number
 }
 
 async function main(options: MainOptions) {
@@ -65,7 +71,8 @@ async function main(options: MainOptions) {
 
     const factory = ts.factory;
 
-    const manager = new SchemaManager();
+    const namer = new Namer(options.uniqueNameSeed);
+    const manager = new SchemaManager(namer);
 
     const rootNodeUrl = await manager.loadFromUrl(
         schemaUrl,

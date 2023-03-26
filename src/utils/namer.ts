@@ -6,7 +6,7 @@ export class Namer {
     }
 
     private nameIdMap = new Map<string, string[]>();
-    private idNameMap = new Map<string, string>();
+    private idNameMap = new Map<string, string[]>();
 
     public registerName(
         id: string,
@@ -20,32 +20,36 @@ export class Namer {
         if (ids == null) {
             ids = [id];
             this.nameIdMap.set(name, ids);
-            this.idNameMap.set(id, name);
+            this.idNameMap.set(id, [name]);
             return;
         }
 
         if (ids.length === 1) {
             for (const id of ids) {
-                const uniqueName = this.createUniqueName(name, id);
+                const suffix = this.createSuffix(id);
 
-                this.idNameMap.set(id, uniqueName);
+                this.idNameMap.set(id, [name, suffix]);
             }
         }
 
-        const uniqueName = this.createUniqueName(name, id);
+        const suffix = this.createSuffix(id);
 
         ids.push(id);
-        this.idNameMap.set(id, uniqueName);
+        this.idNameMap.set(id, [name, suffix]);
     }
 
     public getName(id: string) {
-        return this.idNameMap.get(id);
+        const name = this.idNameMap.get(id);
+
+        if (name == null) {
+            throw new Error("name not registered");
+        }
+
+        return name;
     }
 
-    protected createUniqueName(name: string, id: string) {
-        const suffix = crc32(id, this.seed).toString(36);
-
-        return `${name} ${suffix}`;
+    protected createSuffix(id: string) {
+        return crc32(id, this.seed).toString(36);
     }
 
 }
