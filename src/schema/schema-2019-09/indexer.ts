@@ -66,11 +66,12 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
 
         const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+        const hash = nodeRefRetrievalUrl.hash;
         nodeRefRetrievalUrl.hash = "";
         const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
         const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
 
-        const resolvedNodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
         let resolvedNodeId = String(resolvedNodeUrl);
 
         const anchorNodeId = this.getAnchorNodeId(resolvedNodeId);
@@ -93,11 +94,12 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
 
         const nodeRefRetrievalUrl = new URL(nodeRecursiveRef, nodeRetrievalUrl);
+        const hash = nodeRefRetrievalUrl.hash;
         nodeRefRetrievalUrl.hash = "";
         const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
         const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
 
-        const resolvedNodeUrl = new URL(nodeRefRetrievalUrl.hash, nodeRefRootUrl);
+        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
         let resolvedNodeId = String(resolvedNodeUrl);
 
         let currentRootNodeUrl: URL | null = new URL("", resolvedNodeUrl);
@@ -109,7 +111,7 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
             }
 
             const currentNodeUrl = new URL(
-                resolvedNodeUrl.hash,
+                hash,
                 currentRootNode.nodeUrl,
             );
             const currentNodeId = String(currentNodeUrl);
