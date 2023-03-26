@@ -74,8 +74,7 @@ async function main(options: MainOptions) {
         defaultMetaSchemaId,
     );
 
-    manager.indexNodes();
-    manager.nameNodes();
+    manager.initialize();
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(packageDirectoryPath, { recursive: true });

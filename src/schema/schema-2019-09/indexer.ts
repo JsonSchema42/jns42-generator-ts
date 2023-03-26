@@ -1,5 +1,6 @@
 import { SchemaIndexerBase } from "../indexer.js";
 import { SchemaManager } from "../manager.js";
+import { MetaSchemaId } from "../meta.js";
 import { SchemaLoader } from "./loader.js";
 import { metaSchema } from "./meta.js";
 import { SchemaNode } from "./node.js";
@@ -135,6 +136,7 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
         node: SchemaNode,
         nodeRootUrl: URL,
         nodePointer: string,
+        onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,
     ) {
         const nodeId = this.makeNodeId(
             node,
@@ -165,6 +167,7 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
             node,
             nodeRootUrl,
             nodePointer,
+            onNodeMetaSchema,
         );
     }
 }

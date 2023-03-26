@@ -44,6 +44,7 @@ export abstract class SchemaLoaderBase<N> {
         nodeUrl: URL,
         retrievalUrl: URL,
         referencingNodeUrl: URL | null,
+        onRootNodeMetaSchema: (rootNodeId: string, metaSchemaId: MetaSchemaId) => void,
     ) {
         let nodeId = String(nodeUrl);
 
@@ -66,7 +67,7 @@ export abstract class SchemaLoaderBase<N> {
 
         this.rootNodeMap.set(nodeId, item);
 
-        this.manager.registerRootNodeMetaSchema(nodeId, this.metaSchemaId);
+        onRootNodeMetaSchema(nodeId, this.metaSchemaId);
 
         await this.loadFromSubNodes(
             node,

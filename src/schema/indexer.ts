@@ -33,12 +33,15 @@ export abstract class SchemaIndexerBase<N> {
         return this.nodeMap.get(nodeId);
     }
 
-    public indexNodes() {
+    public indexNodes(
+        onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,
+    ) {
         for (const [url, node] of this.selectRootNodeEntries()) {
             this.indexNode(
                 node,
                 url,
                 "",
+                onNodeMetaSchema,
             );
         }
     }
@@ -47,6 +50,7 @@ export abstract class SchemaIndexerBase<N> {
         node: N,
         nodeRootUrl: URL,
         nodePointer: string,
+        onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,
     ) {
         const nodeId = this.makeNodeId(
             node,
@@ -63,13 +67,14 @@ export abstract class SchemaIndexerBase<N> {
             throw new Error("duplicate nodeId");
         }
         this.nodeMap.set(nodeId, item);
-        this.manager.registerNodeMetaSchema(nodeId, this.metaSchemaId);
+        onNodeMetaSchema(nodeId, this.metaSchemaId);
 
         for (const [subNodePointer, subNode] of this.selectSubNodeEntries(nodePointer, node)) {
             this.indexNode(
                 subNode,
                 nodeRootUrl,
                 subNodePointer,
+                onNodeMetaSchema,
             );
         }
     }
