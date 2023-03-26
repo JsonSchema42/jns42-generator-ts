@@ -44,6 +44,10 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                 factory,
                 nodeId,
             );
+            /*
+            dont't allow other keywords, this is allowed from 2019-09
+            */
+            return;
         }
 
         const enumValues = selectNodeEnum(nodeItem.node);

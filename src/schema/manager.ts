@@ -244,7 +244,7 @@ export class SchemaManager {
         const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
             defaultMetaSchemaId;
 
-        // eslint-disable-next-line security/detect-object-injection
+
         const loader = this.loaders[rootNodeSchemaMetaKey];
         return await loader.loadFromRootNode(
             node,
@@ -290,7 +290,7 @@ export class SchemaManager {
         factory: ts.NodeFactory,
     ) {
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
-            // eslint-disable-next-line security/detect-object-injection
+
             const codeGenerator = this.typeCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
@@ -324,7 +324,7 @@ export class SchemaManager {
         );
 
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
-            // eslint-disable-next-line security/detect-object-injection
+
             const codeGenerator = this.validatorCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
@@ -405,7 +405,7 @@ export class SchemaManager {
                 throw new Error("node not found");
             }
 
-            // eslint-disable-next-line security/detect-object-injection
+
             const codeGenerator = this.specCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
@@ -421,7 +421,7 @@ export class SchemaManager {
             throw new Error("node not found");
         }
 
-        // eslint-disable-next-line security/detect-object-injection
+
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
         return exampleGenerator.generateFromNode(nodeId);
     }

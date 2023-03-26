@@ -95,7 +95,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
-                // eslint-disable-next-line security/detect-object-injection
+
                 const propertyName = propertyNameMap[subNodePointer];
                 if (requiredPropertyNames.has(propertyName)) {
                     continue;
@@ -104,7 +104,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
-                // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
                     subNodeId,
                 )];
@@ -130,7 +129,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
-                // eslint-disable-next-line security/detect-object-injection
+
                 const propertyName = propertyNameMap[subNodePointer];
                 if (!requiredPropertyNames.has(propertyName)) {
                     continue;
@@ -139,12 +138,15 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
-                // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
                     subNodeId,
                 )];
             }
 
+            /*
+            this is quite ineficcient. Would be great if wel van just stream the
+            whole thing
+            */
             for (const flattened of flattenObject(subExamples)) {
                 const errors = Object.values(flattened).
                     filter(value => value != null).
@@ -165,12 +167,10 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
-                // eslint-disable-next-line security/detect-object-injection
                 const propertyName = propertyNameMap[subNodePointer];
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
-                // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
                     subNodeId,
                 )];

@@ -286,9 +286,9 @@ function withDependencies(
     return names.reduce(
         (o, name) => Object.assign(o, {
             [name]:
-                // eslint-disable-next-line security/detect-object-injection
+
                 packageInfo.dependencies?.[name] ??
-                // eslint-disable-next-line security/detect-object-injection
+
                 packageInfo.devDependencies?.[name],
         }),
         {},

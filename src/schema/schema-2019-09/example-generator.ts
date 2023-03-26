@@ -95,7 +95,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
-                // eslint-disable-next-line security/detect-object-injection
+
                 const propertyName = propertyNameMap[subNodePointer];
                 if (requiredPropertyNames.has(propertyName)) {
                     continue;
@@ -104,7 +104,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
-                // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
                     subNodeId,
                 )];
@@ -130,7 +129,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
-                // eslint-disable-next-line security/detect-object-injection
+
                 const propertyName = propertyNameMap[subNodePointer];
                 if (!requiredPropertyNames.has(propertyName)) {
                     continue;
@@ -139,7 +138,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
-                // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
                     subNodeId,
                 )];
@@ -165,12 +163,11 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             const subExamples: Record<string, Array<[number, unknown]>> = {};
 
             for (const [subNodePointer, subNode] of propertyEntries) {
-                // eslint-disable-next-line security/detect-object-injection
+
                 const propertyName = propertyNameMap[subNodePointer];
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
                 const subNodeId = String(subNodeUrl);
 
-                // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
                     subNodeId,
                 )];
