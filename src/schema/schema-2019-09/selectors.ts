@@ -182,18 +182,16 @@ export function* selectNodeInstanceEntries(
 export function selectNodeTypes(
     node: Validation,
 ) {
-    if (
-        typeof node === "object"
-    ) {
-        if (node.type == null) {
-            return [];
-        }
+    if (typeof node === "object" && node.type != null) {
         if (Array.isArray(node.type)) {
             return node.type;
         }
         else {
             return [node.type];
         }
+    }
+    else {
+        return [];
     }
 }
 

@@ -106,9 +106,7 @@ export function* selectNodeItemsEntries(
     nodePointer: string,
     node: Applicator,
 ) {
-    if (
-        typeof node === "object" && node.items != null
-    ) {
+    if (typeof node === "object" && node.items != null) {
         const subNode = node.items;
         const subNodePointer = appendJsonPointer(nodePointer, "items");
         yield [subNodePointer, subNode] as const;
@@ -173,12 +171,7 @@ export function* selectNodeInstanceEntries(
 export function selectNodeTypes(
     node: Validation,
 ) {
-    if (
-        typeof node === "object"
-    ) {
-        if (node.type == null) {
-            return [];
-        }
+    if (typeof node === "object" && node.type != null) {
         if (Array.isArray(node.type)) {
             return node.type;
         }
@@ -186,6 +179,10 @@ export function selectNodeTypes(
             return [node.type];
         }
     }
+    else {
+        return [];
+    }
+
 }
 
 export function* selectNodeRequiredPropertyNames(

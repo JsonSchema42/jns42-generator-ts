@@ -22,20 +22,6 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             throw new Error("nodeItem not found");
         }
 
-        if (nodeItem.node === true) {
-            yield factory.createKeywordTypeNode(
-                ts.SyntaxKind.AnyKeyword,
-            );
-            return;
-        }
-
-        if (nodeItem.node === false) {
-            yield factory.createKeywordTypeNode(
-                ts.SyntaxKind.NeverKeyword,
-            );
-            return;
-        }
-
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
             const nodeUrl = new URL(nodeRef, nodeItem.nodeRootUrl);
