@@ -27,6 +27,14 @@ export function selectNodeRef(
     }
 }
 
+export function selectNodeDescription(
+    node: Schema,
+) {
+    if (typeof node === "object") {
+        return node.description;
+    }
+}
+
 //#endregion
 
 //#region schema

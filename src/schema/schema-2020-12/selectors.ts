@@ -1,5 +1,5 @@
 import { appendJsonPointer } from "../../utils/index.js";
-import { Applicator, Core, Validation } from "./types.js";
+import { Applicator, Core, Metadata, Validation } from "./types.js";
 
 //#region core
 
@@ -48,6 +48,14 @@ export function selectNodeDynamicRef(
 ) {
     if (typeof node === "object") {
         return node.$dynamicRef;
+    }
+}
+
+export function selectNodeDescription(
+    node: Metadata,
+) {
+    if (typeof node === "object") {
+        return node.description;
     }
 }
 
