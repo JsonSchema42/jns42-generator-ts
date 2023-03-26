@@ -94,7 +94,14 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
                     factory.createArrayLiteralExpression([]),
                 ),
             ],
-            undefined,
+            factory.createTypeReferenceNode(
+                factory.createIdentifier("Iterable"),
+                [
+                    factory.createArrayTypeNode(
+                        factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                    ),
+                ],
+            ),
             factory.createBlock(
                 [...this.generateValidatorFunctionBodyStatements(factory, nodeId)],
                 true,
