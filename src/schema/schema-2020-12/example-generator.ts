@@ -7,8 +7,6 @@ import { SchemaNode } from "./node.js";
 import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
-    public refDepthLimit = 3;
-
     constructor(
         manager: SchemaManager,
         private readonly loader: SchemaLoader,
@@ -23,8 +21,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     ): Iterable<unknown> {
         for (const [errors, example] of this.generateFromUrl(
             nodeUrl,
-            wantErrors,
-            0,
         )) {
             if (errors !== wantErrors) {
                 continue;
@@ -35,8 +31,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
     public *generateFromUrl(
         nodeUrl: URL,
-        errorLimit: number,
-        refDepth: number,
     ): Iterable<[number, unknown]> {
         const nodeId = String(nodeUrl);
 
@@ -45,21 +39,17 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             throw new Error("item not found");
         }
 
-        yield* filterErrorLimit(this.generateFromNode(
+        yield* this.generateFromNode(
             item.node,
             nodeUrl,
             "",
-            errorLimit,
-            refDepth,
-        ), errorLimit);
+        );
     }
 
     private *generateFromNode(
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        errorLimit: number,
-        refDepth: number,
     ): Iterable<[number, unknown]> {
         const nodeId = String(nodeUrl);
         const nodeItem = this.indexer.getNodeItem(nodeId);
@@ -75,13 +65,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             );
             const resolvedNodeUrl = new URL(resolvedNodeId);
 
-            if (refDepth < this.refDepthLimit) {
-                yield* filterErrorLimit(this.generateFromUrl(
-                    resolvedNodeUrl,
-                    errorLimit,
-                    refDepth + 1,
-                ), errorLimit);
-            }
+            yield* this.generateFromUrl(
+                resolvedNodeUrl,
+            );
         }
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
@@ -92,25 +78,19 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             );
             const resolvedNodeUrl = new URL(resolvedNodeId);
 
-            if (refDepth < this.refDepthLimit) {
-                yield* filterErrorLimit(this.generateFromUrl(
-                    resolvedNodeUrl,
-                    errorLimit,
-                    refDepth + 1,
-                ), errorLimit);
-            }
+            yield* this.generateFromUrl(
+                resolvedNodeUrl,
+            );
         }
 
         const nodeTypes = selectNodeTypes(node);
         if (nodeTypes != null) {
-            yield* filterErrorLimit(this.generateForTypes(
+            yield* this.generateForTypes(
                 nodeTypes,
                 node,
                 nodeUrl,
                 nodePointer,
-                errorLimit,
-                refDepth,
-            ), errorLimit);
+            );
         }
     }
 
@@ -119,21 +99,17 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        errorLimit: number,
-        refDepth: number,
     ): Iterable<[number, unknown]> {
         const typeSet = new Set(types);
 
         for (const type of simpleTypes) {
             if (typeSet.has(type)) {
-                yield* filterErrorLimit(this.generateForType(
+                yield* this.generateForType(
                     type,
                     node,
                     nodeUrl,
                     nodePointer,
-                    errorLimit,
-                    refDepth,
-                ), errorLimit);
+                );
             }
             else {
                 switch (type) {
@@ -175,68 +151,62 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        errorLimit: number,
-        refDepth: number,
     ): Iterable<[number, unknown]> {
         switch (type) {
             case "null":
-                yield* filterErrorLimit(this.generateForNull(
+                yield* this.generateForNull(
                     node,
                     nodeUrl,
                     nodePointer,
-                ), errorLimit);
+                );
                 break;
 
             case "array":
-                yield* filterErrorLimit(this.generateForArray(
+                yield* this.generateForArray(
                     node,
                     nodeUrl,
                     nodePointer,
-                    refDepth,
-                    errorLimit,
-                ), errorLimit);
+                );
                 break;
 
             case "object":
-                yield* filterErrorLimit(this.generateForObject(
+                yield* this.generateForObject(
                     node,
                     nodeUrl,
                     nodePointer,
-                    refDepth,
-                    errorLimit,
-                ), errorLimit);
+                );
                 break;
 
             case "string":
-                yield* filterErrorLimit(this.generateForString(
+                yield* this.generateForString(
                     node,
                     nodeUrl,
                     nodePointer,
-                ), errorLimit);
+                );
                 break;
 
             case "number":
-                yield* filterErrorLimit(this.generateForNumber(
+                yield* this.generateForNumber(
                     node,
                     nodeUrl,
                     nodePointer,
-                ), errorLimit);
+                );
                 break;
 
             case "integer":
-                yield* filterErrorLimit(this.generateForInteger(
+                yield* this.generateForInteger(
                     node,
                     nodeUrl,
                     nodePointer,
-                ), errorLimit);
+                );
                 break;
 
             case "boolean":
-                yield* filterErrorLimit(this.generateForBoolean(
+                yield* this.generateForBoolean(
                     node,
                     nodeUrl,
                     nodePointer,
-                ), errorLimit);
+                );
                 break;
 
             default:
@@ -257,8 +227,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        errorLimit: number,
-        refDepth: number,
     ): Iterable<[number, unknown]> {
         const itemsEntries = selectNodeItemsEntries(nodePointer, node);
 
@@ -269,8 +237,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 subNode,
                 subNodeUrl,
                 subNodePointer,
-                errorLimit,
-                refDepth,
             )) {
                 yield [errors, [example]];
             }
@@ -281,8 +247,6 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         node: SchemaNode,
         nodeUrl: URL,
         nodePointer: string,
-        errorLimit: number,
-        refDepth: number,
     ): Iterable<[number, unknown]> {
         const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
@@ -305,13 +269,11 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = [...filterErrorLimit(this.generateFromNode(
+                subExamples[propertyName] = [...this.generateFromNode(
                     subNode,
                     subNodeUrl,
                     subNodePointer,
-                    errorLimit,
-                    refDepth,
-                ), errorLimit)];
+                )];
             }
 
             for (const flattened of flattenObject(subExamples)) {
@@ -342,13 +304,11 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = [...filterErrorLimit(this.generateFromNode(
+                subExamples[propertyName] = [...this.generateFromNode(
                     subNode,
                     subNodeUrl,
                     subNodePointer,
-                    errorLimit,
-                    refDepth,
-                ), errorLimit)];
+                )];
             }
 
             for (const flattened of flattenObject(subExamples)) {
@@ -376,13 +336,11 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
-                subExamples[propertyName] = [...filterErrorLimit(this.generateFromNode(
+                subExamples[propertyName] = [...this.generateFromNode(
                     subNode,
                     subNodeUrl,
                     subNodePointer,
-                    errorLimit,
-                    refDepth,
-                ), errorLimit)];
+                )];
             }
 
             for (const flattened of flattenObject(subExamples)) {
@@ -514,18 +472,4 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         yield [0, false];
     }
 
-}
-
-function* filterErrorLimit(
-    iterable: Iterable<[number, unknown]>,
-    errorLimit: number,
-): Iterable<[number, unknown]> {
-    for (const element of iterable) {
-        const [error] = element;
-        if (error > errorLimit) {
-            continue;
-        }
-
-        yield element;
-    }
 }
