@@ -3,7 +3,7 @@ import { generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaIndexer } from "./indexer.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeEnum, selectNodeItemsEntries as selectNodeAdditionalItemsEntries, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeType } from "./selectors.js";
+import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeTypes } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
@@ -20,6 +20,20 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         const nodeItem = this.indexer.getNodeItem(nodeId);
         if (nodeItem == null) {
             throw new Error("nodeItem not found");
+        }
+
+        if (nodeItem.node === true) {
+            yield factory.createKeywordTypeNode(
+                ts.SyntaxKind.AnyKeyword,
+            );
+            return;
+        }
+
+        if (nodeItem.node === false) {
+            yield factory.createKeywordTypeNode(
+                ts.SyntaxKind.NeverKeyword,
+            );
+            return;
         }
 
         const nodeRef = selectNodeRef(nodeItem.node);
@@ -97,7 +111,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             ));
         }
 
-        const types = selectNodeType(nodeItem.node);
+        const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 types.map(type => this.generateTypeDefinition(
@@ -210,14 +224,32 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             );
         }
 
-        const itemsEntries = [...selectNodeItemsEntries(
+        const itemsOneEntries = selectNodeItemsOneEntries(
+            nodeItem.nodePointer,
+            nodeItem.node,
+        );
+        for (const [subNodePointer] of itemsOneEntries) {
+            const subNodeUrl = new URL(
+                `#${subNodePointer}`,
+                nodeItem.nodeRootUrl,
+            );
+            const subNodeId = String(subNodeUrl);
+            return factory.createTypeReferenceNode(
+                "Array",
+                [
+                    this.generateTypeReference(factory, subNodeId),
+                ],
+            );
+        }
+
+        const itemsManyEntries = [...selectNodeItemsManyEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         )];
 
-        if (itemsEntries.length > 0) {
+        if (itemsManyEntries.length > 0) {
             return factory.createTupleTypeNode(
-                itemsEntries.map(
+                itemsManyEntries.map(
                     ([subNodePointer]) => {
                         const subNodeUrl = new URL(
                             `#${subNodePointer}`,

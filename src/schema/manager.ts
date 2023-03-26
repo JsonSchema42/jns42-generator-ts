@@ -2,6 +2,8 @@ import camelcase from "camelcase";
 import * as fs from "fs";
 import ts from "typescript";
 import { Namer } from "../utils/namer.js";
+import { SchemaIndexerBase } from "./indexer.js";
+import { SchemaLoaderBase } from "./loader.js";
 import { discoverRootNodeMetaSchemaId, MetaSchemaId } from "./meta.js";
 import * as schema201909 from "./schema-2019-09/index.js";
 import * as schema202012 from "./schema-2020-12/index.js";
@@ -221,13 +223,16 @@ export class SchemaManager {
         const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
             defaultMetaSchemaId;
 
-        const loader = this.loaders[rootNodeSchemaMetaKey];
+        const loader: SchemaLoaderBase<unknown> = this.loaders[rootNodeSchemaMetaKey];
+        /*
+        typescript breaks here so we cast to any
+        */
         return await loader.loadFromRootNode(
             node,
             nodeUrl,
             retrievalUrl,
             referencingNodeUrl,
-            (nodeId, metaSchemaId) => {
+            (nodeId: string, metaSchemaId: MetaSchemaId) => {
                 if (this.rootNodeMetaMap.has(nodeId)) {
                     throw new Error("duplicate root nodeId");
                 }
@@ -474,7 +479,7 @@ export class SchemaManager {
         const reReplace = /[^A-Za-z0-9]/gu;
         const reFilter = /^[A-Za-z]/u;
 
-        const indexer = this.indexers[metaSchemaId];
+        const indexer: SchemaIndexerBase<unknown> = this.indexers[metaSchemaId];
 
         const item = indexer.getNodeItem(nodeId);
         if (item == null) {
@@ -516,6 +521,9 @@ export class SchemaManager {
 
         for (
             const [subNodePointer] of
+            /*
+            ye typescript breaks here
+            */
             indexer.selectSubNodeEntries(nodePointer, node)
         ) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);

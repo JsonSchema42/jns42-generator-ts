@@ -2,7 +2,7 @@ import ts from "typescript";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaIndexer } from "./indexer.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeItemsEntries as selectNodeAdditionalItemsEntries, selectNodeItemsEntries, selectNodeProperties, selectNodeType, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeItemsOneEntries, selectNodeProperties, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
@@ -23,7 +23,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
         // yield* this.generateCommonValidationStatements(nodeItem);
 
-        const types = selectNodeType(nodeItem.node);
+        const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             let statement: ts.Statement = factory.createBlock([
                 factory.createExpressionStatement(factory.createYieldExpression(
@@ -88,7 +88,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             );
         }
 
-        const itemsEntries = selectNodeItemsEntries(
+        const itemsEntries = selectNodeItemsOneEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );

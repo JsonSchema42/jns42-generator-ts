@@ -84,7 +84,7 @@ export function* selectNodeItemsManyEntries(
     ) {
         for (const [key, subNode] of Object.entries(node.items)) {
             const subNodePointer = appendJsonPointer(nodePointer, "items", key);
-            yield [subNodePointer, subNode] as const;
+            yield [subNodePointer, subNode] as [string, Schema];
         }
     }
 }
@@ -107,7 +107,7 @@ export function* selectNodeAnyOfEntries(
     if (node.anyOf != null) {
         for (const [key, subNode] of Object.entries(node.anyOf)) {
             const subNodePointer = appendJsonPointer(nodePointer, "anyOf", key);
-            yield [subNodePointer, subNode] as const;
+            yield [subNodePointer, subNode] as [string, Schema];
         }
     }
 }
@@ -119,7 +119,7 @@ export function* selectNodeOneOfEntries(
     if (node.oneOf != null) {
         for (const [key, subNode] of Object.entries(node.oneOf)) {
             const subNodePointer = appendJsonPointer(nodePointer, "oneOf", key);
-            yield [subNodePointer, subNode] as const;
+            yield [subNodePointer, subNode] as [string, Schema];
         }
     }
 }
@@ -131,7 +131,7 @@ export function* selectNodeAllOfEntries(
     if (node.allOf != null) {
         for (const [key, subNode] of Object.entries(node.allOf)) {
             const subNodePointer = appendJsonPointer(nodePointer, "allOf", key);
-            yield [subNodePointer, subNode] as const;
+            yield [subNodePointer, subNode] as [string, Schema];
         }
     }
 }
