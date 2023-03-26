@@ -3,7 +3,7 @@ import { metaSchema } from "./meta.js";
 import { selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
 import { Schema } from "./types.js";
 
-export class SchemaLoader extends SchemaLoaderBase<Schema> {
+export class SchemaLoader extends SchemaLoaderBase<Schema | boolean> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
     protected selectNodeId(node: Schema) {
@@ -12,8 +12,8 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
 
     protected selectSubNodeEntries(
         nodePointer: string,
-        node: Schema,
-    ): Iterable<readonly [string, Schema]> {
+        node: Schema | boolean,
+    ): Iterable<readonly [string, Schema | boolean]> {
         return selectNodeInstanceEntries(nodePointer, node);
     }
 

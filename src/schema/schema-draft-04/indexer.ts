@@ -5,18 +5,18 @@ import { metaSchema } from "./meta.js";
 import { selectNodeId, selectNodeInstanceEntries } from "./selectors.js";
 import { Schema } from "./types.js";
 
-export class SchemaIndexer extends SchemaIndexerBase<Schema> {
+export class SchemaIndexer extends SchemaIndexerBase<Schema | boolean> {
     protected readonly metaSchemaId = metaSchema.metaSchemaId;
 
-    public selectRootNodeEntries(): Iterable<[URL, Schema]> {
+    public selectRootNodeEntries(): Iterable<[URL, Schema | boolean]> {
         return [...this.loader.getRootNodeItems()].
             map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
 
     public selectSubNodeEntries(
         nodePointer: string,
-        node: Schema,
-    ): Iterable<readonly [string, Schema]> {
+        node: Schema | boolean,
+    ): Iterable<readonly [string, Schema | boolean]> {
         return selectNodeInstanceEntries(nodePointer, node);
     }
 
