@@ -3,7 +3,7 @@ import { generatePrimitiveLiteral, pointerToHash } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaIndexer } from "./indexer.js";
-import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredProperties, selectNodeType } from "./selectors.js";
+import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodePropertyNamesEntries, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
@@ -131,7 +131,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             ));
         }
 
-        const types = selectNodeType(nodeItem.node);
+        const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 types.map(type => this.generateTypeDefinition(
@@ -179,9 +179,9 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             );
         }
 
-        const propertiesEntries = [...selectNodeProperties(nodeItem.nodePointer, nodeItem.node)];
-        const propertiesSet = new Set(propertiesEntries.map(([name]) => name));
-        const requiredPropertiesSet = new Set(selectNodeRequiredProperties(nodeItem.node));
+        const propertiesEntries =
+            [...selectNodePropertyNamesEntries(nodeItem.nodePointer, nodeItem.node)];
+        const requiredPropertiesSet = new Set(selectNodeRequiredPropertyNames(nodeItem.node));
 
         return factory.createTypeLiteralNode([
             ...propertiesEntries.map(
@@ -204,16 +204,6 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                     );
                 },
             ),
-            ...[...requiredPropertiesSet].
-                filter(propertyName => !propertiesSet.has(propertyName)).
-                map(propertyName => factory.createPropertySignature(
-                    undefined,
-                    propertyName,
-                    undefined,
-                    factory.createKeywordTypeNode(
-                        ts.SyntaxKind.AnyKeyword,
-                    ),
-                )),
         ]);
     }
 

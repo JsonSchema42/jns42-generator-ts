@@ -1,8 +1,7 @@
-import { createString, flattenObject, pointerToHash, simpleTypes } from "../../utils/index.js";
+import { createString, flattenObject, pointerToHash } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
-import { SchemaNode } from "./node.js";
 import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
@@ -13,43 +12,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         super(manager);
     }
 
-    public *generateExamplesFromUrl(
-        nodeUrl: URL,
-        wantErrors: number,
-    ): Iterable<unknown> {
-        for (const [errors, example] of this.generateFromUrl(
-            nodeUrl,
-        )) {
-            if (errors !== wantErrors) {
-                continue;
-            }
-            yield example;
-        }
-    }
-
-    public *generateFromUrl(
-        nodeUrl: URL,
+    protected *generateFromNode(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeId = String(nodeUrl);
-
-        const item = this.indexer.getNodeItem(nodeId);
-        if (item == null) {
-            throw new Error("item not found");
-        }
-
-        yield* this.generateFromNode(
-            item.node,
-            nodeUrl,
-            "",
-        );
-    }
-
-    private *generateFromNode(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
-    ): Iterable<[number, unknown]> {
-        const nodeId = String(nodeUrl);
         const nodeItem = this.indexer.getNodeItem(nodeId);
         if (!nodeItem) {
             throw new Error("node item nod found");
@@ -61,10 +26,8 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 nodeId,
                 nodeRef,
             );
-            const resolvedNodeUrl = new URL(resolvedNodeId);
-
-            yield* this.generateFromUrl(
-                resolvedNodeUrl,
+            yield* this.generateFromNode(
+                resolvedNodeId,
             );
         }
 
@@ -74,182 +37,56 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 nodeId,
                 nodeDynamicRef,
             );
-            const resolvedNodeUrl = new URL(resolvedNodeId);
-
-            yield* this.generateFromUrl(
-                resolvedNodeUrl,
+            yield* this.generateFromNode(
+                resolvedNodeId,
             );
         }
 
-        const nodeTypes = selectNodeTypes(node);
+        const nodeTypes = selectNodeTypes(nodeItem.node);
         if (nodeTypes != null) {
             yield* this.generateForTypes(
+                nodeId,
                 nodeTypes,
-                node,
-                nodeUrl,
-                nodePointer,
             );
         }
     }
 
-    private *generateForTypes(
-        types: string[],
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
+    protected * generateForArray(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
-        const typeSet = new Set(types);
-
-        for (const type of simpleTypes) {
-            if (typeSet.has(type)) {
-                yield* this.generateForType(
-                    type,
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-            }
-            else {
-                switch (type) {
-                    case "null":
-                        yield [1, null];
-                        break;
-
-                    case "array":
-                        yield [1, []];
-                        break;
-
-                    case "object":
-                        yield [1, {}];
-                        break;
-
-                    case "string":
-                        yield [1, "fail!!"];
-                        break;
-
-                    case "number":
-                        yield [1, 10.1];
-                        break;
-
-                    case "integer":
-                        yield [1, 10];
-                        break;
-
-                    case "boolean":
-                        yield [1, true];
-                        yield [1, false];
-                        break;
-                }
-            }
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
         }
-    }
 
-    private * generateForType(
-        type: string,
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
-    ): Iterable<[number, unknown]> {
-        switch (type) {
-            case "null":
-                yield* this.generateForNull(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            case "array":
-                yield* this.generateForArray(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            case "object":
-                yield* this.generateForObject(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            case "string":
-                yield* this.generateForString(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            case "number":
-                yield* this.generateForNumber(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            case "integer":
-                yield* this.generateForInteger(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            case "boolean":
-                yield* this.generateForBoolean(
-                    node,
-                    nodeUrl,
-                    nodePointer,
-                );
-                break;
-
-            default:
-                throw new Error("type not supported");
-
-        }
-    }
-
-    private * generateForNull(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
-    ): Iterable<[number, unknown]> {
-        yield [0, null];
-    }
-
-    private * generateForArray(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
-    ): Iterable<[number, unknown]> {
-        const itemsEntries = selectNodeItemsEntries(nodePointer, node);
+        const itemsEntries = selectNodeItemsEntries(nodeItem.nodePointer, nodeItem.node);
 
         for (const [subNodePointer, subNode] of itemsEntries) {
-            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+            const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+            const subNodeId = String(subNodeUrl);
 
             for (const [errors, example] of this.generateFromNode(
-                subNode,
-                subNodeUrl,
-                subNodePointer,
+                subNodeId,
             )) {
                 yield [errors, [example]];
             }
         }
     }
 
-    private * generateForObject(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
+    protected * generateForObject(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
-        const propertyNameEntries = [...selectNodePropertyNamesEntries(nodePointer, node)];
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
+        }
+
+        const propertyNameEntries =
+            [...selectNodePropertyNamesEntries(nodeItem.nodePointer, nodeItem.node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
-        const propertyEntries = [...selectNodePropertyEntries(nodePointer, node)];
-        const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(node));
+        const propertyEntries =
+            [...selectNodePropertyEntries(nodeItem.nodePointer, nodeItem.node)];
+        const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(nodeItem.node));
 
         {
             /*
@@ -264,13 +101,12 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                     continue;
                 }
 
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+                const subNodeId = String(subNodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
-                    subNode,
-                    subNodeUrl,
-                    subNodePointer,
+                    subNodeId,
                 )];
             }
 
@@ -299,13 +135,13 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
                 if (!requiredPropertyNames.has(propertyName)) {
                     continue;
                 }
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+                const subNodeId = String(subNodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
-                    subNode,
-                    subNodeUrl,
-                    subNodePointer,
+                    subNodeId,
                 )];
             }
 
@@ -331,13 +167,12 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             for (const [subNodePointer, subNode] of propertyEntries) {
                 // eslint-disable-next-line security/detect-object-injection
                 const propertyName = propertyNameMap[subNodePointer];
-                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeUrl);
+                const subNodeUrl = new URL(pointerToHash(subNodePointer), nodeItem.nodeRootUrl);
+                const subNodeId = String(subNodeUrl);
 
                 // eslint-disable-next-line security/detect-object-injection
                 subExamples[propertyName] = [...this.generateFromNode(
-                    subNode,
-                    subNodeUrl,
-                    subNodePointer,
+                    subNodeId,
                 )];
             }
 
@@ -356,14 +191,17 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
     }
 
-    private * generateForString(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
+    protected * generateForString(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
-        const minLength = selectValidationMinLength(node);
-        const maxLength = selectValidationMaxLength(node);
-        const pattern = selectValidationPattern(node);
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
+        }
+
+        const minLength = selectValidationMinLength(nodeItem.node);
+        const maxLength = selectValidationMaxLength(nodeItem.node);
+        const pattern = selectValidationPattern(nodeItem.node);
 
         if (minLength != null) {
             yield [1, createString(minLength - 1)];
@@ -387,16 +225,19 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         ];
     }
 
-    private * generateForNumber(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
+    protected * generateForNumber(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
-        const minimum = selectValidationMinimum(node);
-        const exclusiveMinimum = selectValidationExclusiveMinimum(node);
-        const maximum = selectValidationMaximum(node);
-        const exclusiveMaximum = selectValidationExclusiveMaximum(node);
-        const multipleOf = selectValidationMultipleOf(node);
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
+        }
+
+        const minimum = selectValidationMinimum(nodeItem.node);
+        const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
+        const maximum = selectValidationMaximum(nodeItem.node);
+        const exclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
+        const multipleOf = selectValidationMultipleOf(nodeItem.node);
 
         if (minimum != null) {
             yield [1, minimum - 1];
@@ -424,16 +265,19 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         ];
     }
 
-    private * generateForInteger(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
+    protected * generateForInteger(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
-        const minimum = selectValidationMinimum(node);
-        const exclusiveMinimum = selectValidationExclusiveMinimum(node);
-        const maximum = selectValidationMaximum(node);
-        const exclusiveMaximum = selectValidationExclusiveMaximum(node);
-        const multipleOf = selectValidationMultipleOf(node);
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (!nodeItem) {
+            throw new Error("node item nod found");
+        }
+
+        const minimum = selectValidationMinimum(nodeItem.node);
+        const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
+        const maximum = selectValidationMaximum(nodeItem.node);
+        const exclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
+        const multipleOf = selectValidationMultipleOf(nodeItem.node);
 
         if (minimum != null) {
             yield [1, minimum - 1];
@@ -461,10 +305,8 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         ];
     }
 
-    private * generateForBoolean(
-        node: SchemaNode,
-        nodeUrl: URL,
-        nodePointer: string,
+    protected * generateForBoolean(
+        nodeId: string,
     ): Iterable<[number, unknown]> {
         yield [0, true];
         yield [0, false];

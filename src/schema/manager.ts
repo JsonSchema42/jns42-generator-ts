@@ -424,7 +424,7 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateExamplesFromUrl(nodeUrl, 0);
+        yield* exampleGenerator.generateFromUrl(nodeUrl, 0);
     }
 
     public *generateInvalidExamples(nodeUrl: URL) {
@@ -437,7 +437,7 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateExamplesFromUrl(nodeUrl, 1);
+        yield* exampleGenerator.generateFromUrl(nodeUrl, 1);
     }
 
 }

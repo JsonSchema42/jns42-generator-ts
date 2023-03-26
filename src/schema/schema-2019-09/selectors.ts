@@ -302,7 +302,7 @@ export function* selectNodeInstanceEntries(
 
 //#region type
 
-export function selectNodeType(
+export function selectNodeTypes(
     node: SchemaNode,
 ) {
     if (
@@ -325,7 +325,7 @@ export function selectNodeType(
     }
 }
 
-export function* selectNodeRequiredProperties(
+export function* selectNodeRequiredPropertyNames(
     node: SchemaNode,
 ) {
     if (
@@ -342,7 +342,7 @@ export function* selectNodeRequiredProperties(
     }
 }
 
-export function* selectNodeProperties(
+export function* selectNodePropertyNamesEntries(
     nodePointer: string,
     node: SchemaNode,
 ) {
@@ -354,9 +354,9 @@ export function* selectNodeProperties(
             "properties" in node &&
             typeof node.properties === "object" && node.properties != null
         ) {
-            for (const [key] of Object.entries(node.properties)) {
-                const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
-                yield [key, subNodePointer] as const;
+            for (const propertyName of Object.keys(node.properties)) {
+                const subNodePointer = appendJsonPointer(nodePointer, "properties", propertyName);
+                yield [subNodePointer, propertyName] as const;
             }
         }
     }
