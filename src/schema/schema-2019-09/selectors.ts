@@ -59,6 +59,14 @@ export function selectNodeDescription(
     }
 }
 
+export function selectNodeDeprecated(
+    node: Metadata,
+) {
+    if (typeof node === "object") {
+        return node.deprecated;
+    }
+}
+
 //#endregion
 
 //#region schema

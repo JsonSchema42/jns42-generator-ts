@@ -3,7 +3,7 @@ import { generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaIndexer } from "./indexer.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
+import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
@@ -11,6 +11,27 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         private readonly indexer: SchemaIndexer,
     ) {
         super(manager);
+    }
+
+    protected getComments(nodeId: string): string {
+        const nodeItem = this.indexer.getNodeItem(nodeId);
+        if (nodeItem == null) {
+            throw new Error("nodeItem not found");
+        }
+
+        const description = selectNodeDescription(nodeItem.node) ?? "";
+        const deprecated = selectNodeDeprecated(nodeItem.node) ?? false;
+
+        const lines = [
+            description,
+            deprecated ? "@deprecated" : "",
+        ].
+            map(line => line.trim()).
+            filter(line => line.length > 0).
+            map(line => line + "\n").
+            join("");
+
+        return lines;
     }
 
     protected * generateTypeNodes(

@@ -2,6 +2,7 @@ import ts from "typescript";
 import { SchemaCodeGeneratorBase } from "./code-generator.js";
 
 export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBase {
+    protected abstract getComments(nodeId: string): string
 
     protected generateNullTypeDefinition(
         factory: ts.NodeFactory,
@@ -80,7 +81,7 @@ export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBas
         nodeId: string,
         typeName: string,
     ) {
-        return factory.createTypeAliasDeclaration(
+        const declaration = factory.createTypeAliasDeclaration(
             [
                 factory.createToken(ts.SyntaxKind.ExportKeyword),
             ],
@@ -91,6 +92,18 @@ export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBas
                 nodeId,
             ),
         );
+
+        const comments = this.getComments(nodeId);
+        if (comments.length > 0) {
+            ts.addSyntheticLeadingComment(
+                declaration,
+                ts.SyntaxKind.MultiLineCommentTrivia,
+                "*\n" + this.getComments(nodeId),
+                true,
+            );
+        }
+
+        return declaration;
     }
 
     protected generateTypeNode(
@@ -98,14 +111,12 @@ export abstract class SchemaTypeCodeGeneratorBase extends SchemaCodeGeneratorBas
         nodeId: string,
     ): ts.TypeNode {
         const typeNodes = [...this.generateTypeNodes(factory, nodeId)];
-        if (typeNodes.length === 0) {
-            return factory.createKeywordTypeNode(
-                ts.SyntaxKind.UnknownKeyword,
-            );
-        }
-        return factory.createParenthesizedType(factory.createIntersectionTypeNode(
-            typeNodes,
-        ));
+        const node = typeNodes.length === 0 ?
+            factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword) :
+            factory.createParenthesizedType(factory.createIntersectionTypeNode(
+                typeNodes,
+            ));
+        return node;
     }
 
     protected generateTypeDefinition(
