@@ -244,7 +244,6 @@ export class SchemaManager {
         const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
             defaultMetaSchemaId;
 
-
         const loader = this.loaders[rootNodeSchemaMetaKey];
         return await loader.loadFromRootNode(
             node,
@@ -405,7 +404,6 @@ export class SchemaManager {
                 throw new Error("node not found");
             }
 
-
             const codeGenerator = this.specCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
@@ -420,7 +418,6 @@ export class SchemaManager {
         if (metaSchemaId == null) {
             throw new Error("node not found");
         }
-
 
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
         return exampleGenerator.generateFromNode(nodeId);

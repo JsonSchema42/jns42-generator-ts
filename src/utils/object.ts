@@ -26,7 +26,6 @@ function* generateObjectIndexers(
 
             counters[index]++;
 
-
             if (counters[index] < values.length) {
                 break;
             }
@@ -34,7 +33,6 @@ function* generateObjectIndexers(
             if (index >= objectEntries.length - 1) {
                 return;
             }
-
 
             counters[index] = 0;
         }
