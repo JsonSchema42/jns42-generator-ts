@@ -20,7 +20,10 @@ function* generateObjectIndexers(
 
         yield objectEntries.map(([property], index) => [property, counters[index]]);
 
-        for (let index = 0; index < objectEntries.length; index++) {
+        for (let index = 0; index <= objectEntries.length; index++) {
+            if (index >= objectEntries.length) {
+                return;
+            }
 
             const [, values] = objectEntries[index];
 
@@ -28,10 +31,6 @@ function* generateObjectIndexers(
 
             if (counters[index] < values.length) {
                 break;
-            }
-
-            if (index >= objectEntries.length - 1) {
-                return;
             }
 
             counters[index] = 0;
