@@ -114,11 +114,11 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
                 currentRootNode.nodeUrl,
             );
             const currentNodeId = String(currentNodeUrl);
-            const maybeResolvedNodeId = this.getDynamicAnchorNodeId(
+            const dynamicAnchorNodeId = this.getDynamicAnchorNodeId(
                 currentNodeId,
             );
-            if (maybeResolvedNodeId != null) {
-                resolvedNodeId = maybeResolvedNodeId;
+            if (dynamicAnchorNodeId != null) {
+                resolvedNodeId = dynamicAnchorNodeId;
             }
 
             currentRootNodeUrl = currentRootNode.referencingNodeUrl;

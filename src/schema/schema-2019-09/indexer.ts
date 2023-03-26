@@ -115,11 +115,11 @@ export class SchemaIndexer extends SchemaIndexerBase<SchemaNode> {
                 currentRootNode.nodeUrl,
             );
             const currentNodeId = String(currentNodeUrl);
-            const maybeResolvedNodeId = this.getRecursiveAnchorNodeId(
+            const recursiveAnchorNodeId = this.getRecursiveAnchorNodeId(
                 currentNodeId,
             );
-            if (maybeResolvedNodeId != null) {
-                resolvedNodeId = maybeResolvedNodeId;
+            if (recursiveAnchorNodeId != null) {
+                resolvedNodeId = recursiveAnchorNodeId;
             }
 
             currentRootNodeUrl = currentRootNode.referencingNodeUrl;
