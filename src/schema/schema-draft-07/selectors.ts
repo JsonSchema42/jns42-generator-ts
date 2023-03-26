@@ -166,10 +166,6 @@ export function selectNodeTypes(
             return [node.type];
         }
     }
-    else {
-        return [];
-    }
-
 }
 
 export function* selectNodeRequiredProperties(
