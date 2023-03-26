@@ -2,7 +2,7 @@ import { simpleTypes } from "../utils/index.js";
 import { SchemaManager } from "./manager.js";
 
 export abstract class SchemaExampleGeneratorBase {
-    protected abstract generateFromNode(
+    public abstract generateFromNode(
         nodeId: string,
     ): Iterable<[number, unknown]>
 
@@ -11,17 +11,11 @@ export abstract class SchemaExampleGeneratorBase {
     ) {
     }
 
-    public *generateFromUrl(
+    public generateFromUrl(
         nodeUrl: URL,
-        wantErrors: number,
-    ): Iterable<unknown> {
+    ): Iterable<[number, unknown]> {
         const nodeId = String(nodeUrl);
-        for (const [errors, example] of this.generateFromNode(nodeId)) {
-            if (errors !== wantErrors) {
-                continue;
-            }
-            yield example;
-        }
+        return this.generateFromNode(nodeId);
     }
 
     protected *generateForTypes(

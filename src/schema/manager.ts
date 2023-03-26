@@ -415,8 +415,7 @@ export class SchemaManager {
 
     }
 
-    public *generateValidExamples(nodeUrl: URL) {
-        const nodeId = String(nodeUrl);
+    public generateExamples(nodeId: string) {
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
             throw new Error("node not found");
@@ -424,20 +423,27 @@ export class SchemaManager {
 
         // eslint-disable-next-line security/detect-object-injection
         const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateFromUrl(nodeUrl, 0);
+        return exampleGenerator.generateFromNode(nodeId);
+    }
+
+    public *generateValidExamples(nodeUrl: URL) {
+        const nodeId = String(nodeUrl);
+        for (const [error, example] of this.generateExamples(nodeId)) {
+            if (error > 0) {
+                continue;
+            }
+            yield example;
+        }
     }
 
     public *generateInvalidExamples(nodeUrl: URL) {
         const nodeId = String(nodeUrl);
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("node nopt found");
-
+        for (const [error, example] of this.generateExamples(nodeId)) {
+            if (error !== 1) {
+                continue;
+            }
+            yield example;
         }
-
-        // eslint-disable-next-line security/detect-object-injection
-        const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        yield* exampleGenerator.generateFromUrl(nodeUrl, 1);
     }
 
 }

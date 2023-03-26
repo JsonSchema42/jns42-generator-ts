@@ -4,7 +4,7 @@ import { SchemaIndexer } from "./indexer.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
-    protected generateFromNode(nodeId: string): Iterable<[number, unknown]> {
+    public generateFromNode(nodeId: string): Iterable<[number, unknown]> {
         throw new Error("Method not implemented.");
     }
     protected generateForArray(nodeId: string): Iterable<[number, unknown]> {

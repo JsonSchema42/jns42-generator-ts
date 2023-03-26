@@ -12,7 +12,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
         super(manager);
     }
 
-    protected *generateFromNode(
+    public *generateFromNode(
         nodeId: string,
     ): Iterable<[number, unknown]> {
         const nodeItem = this.indexer.getNodeItem(nodeId);
