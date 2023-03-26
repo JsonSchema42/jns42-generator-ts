@@ -86,15 +86,37 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package openapi-v3_1",
+      "name": "package openapi_v3-0_2021-09-28",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/openapi-v3_1.json",
+        "file://${workspaceFolder}/fixtures/openapi/openapi_v3-0_2021-09-28.json",
         "--package-directory",
-        ".package/openapi-v3_1",
+        ".package/openapi_v3-0_2021-09-28",
         "--package-name",
-        "openapi-v3_1",
+        "openapi_v3-0_2021-09-28",
+        "--package-version",
+        "0.0.0"
+      ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
+      "preLaunchTask": "watch"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "package openapi_v3-1_2022-10-07",
+      "program": "${workspaceFolder}/src/program.ts",
+      "args": [
+        "package",
+        "file://${workspaceFolder}/fixtures/openapi/openapi_v3-1_2022-10-07.json",
+        "--package-directory",
+        ".package/openapi_v3-1_2022-10-07",
+        "--package-name",
+        "openapi_v3-1_2022-10-07",
         "--package-version",
         "0.0.0"
       ],
