@@ -17,11 +17,14 @@ export abstract class SchemaLoaderBase<N> {
         nodePointer: string,
         node: N
     ): Iterable<readonly [string, N]>
+
     protected abstract loadFromUrl(
         node: N,
         nodeUrl: URL,
         retrievalUrl: URL,
     ): Promise<void>
+
+    public abstract validateSchema(node: N): boolean
 
     constructor(
         protected readonly manager: SchemaManager,

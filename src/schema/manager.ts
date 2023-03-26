@@ -224,6 +224,10 @@ export class SchemaManager {
             defaultMetaSchemaId;
 
         const loader: SchemaLoaderBase<unknown> = this.loaders[rootNodeSchemaMetaKey];
+
+        if (!loader.validateSchema(node)) {
+            throw new Error("invalid schema");
+        }
         /*
         typescript breaks here so we cast to any
         */
