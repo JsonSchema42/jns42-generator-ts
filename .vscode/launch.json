@@ -130,15 +130,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package schema-2020-12",
+      "name": "package draft-2020-12",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/schema-2020-12/schema",
+        "file://${workspaceFolder}/fixtures/draft-2020-12/schema",
         "--package-directory",
-        ".package/schema-2020-12",
+        ".package/draft-2020-12",
         "--package-name",
-        "schema-2020-12",
+        "draft-2020-12",
         "--package-version",
         "0.0.0"
       ],
@@ -152,15 +152,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package schema-2019-09",
+      "name": "package draft-2019-09",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/schema-2019-09/schema",
+        "file://${workspaceFolder}/fixtures/draft-2019-09/schema",
         "--package-directory",
-        ".package/schema-2019-09",
+        ".package/draft-2019-09",
         "--package-name",
-        "schema-2019-09",
+        "draft-2019-09",
         "--package-version",
         "0.0.0"
       ],
@@ -174,15 +174,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package schema-draft-07",
+      "name": "package draft-07",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/schema-draft-07/schema",
+        "file://${workspaceFolder}/fixtures/draft-07/schema",
         "--package-directory",
-        ".package/schema-draft-07",
+        ".package/draft-07",
         "--package-name",
-        "schema-draft-07",
+        "draft-07",
         "--package-version",
         "0.0.0"
       ],
@@ -196,15 +196,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package schema-draft-06",
+      "name": "package draft-06",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/schema-draft-06/schema",
+        "file://${workspaceFolder}/fixtures/draft-06/schema",
         "--package-directory",
-        ".package/schema-draft-06",
+        ".package/draft-06",
         "--package-name",
-        "schema-draft-06",
+        "draft-06",
         "--package-version",
         "0.0.0"
       ],
@@ -218,15 +218,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package schema-draft-04",
+      "name": "package draft-04",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/schema-draft-04/schema",
+        "file://${workspaceFolder}/fixtures/draft-04/schema",
         "--package-directory",
-        ".package/schema-draft-04",
+        ".package/draft-04",
         "--package-name",
-        "schema-draft-04",
+        "draft-04",
         "--package-version",
         "0.0.0"
       ],

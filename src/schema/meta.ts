@@ -1,8 +1,8 @@
-import * as schema201909 from "./schema-2019-09/index.js";
-import * as schema202012 from "./schema-2020-12/index.js";
-import * as schemaDraft04 from "./schema-draft-04/index.js";
-import * as schemaDraft07 from "./schema-draft-06/index.js";
-import * as schemaDraft06 from "./schema-draft-07/index.js";
+import * as schemaDraft04 from "./draft-04/index.js";
+import * as schemaDraft07 from "./draft-06/index.js";
+import * as schemaDraft06 from "./draft-07/index.js";
+import * as schema201909 from "./draft-2019-09/index.js";
+import * as schema202012 from "./draft-2020-12/index.js";
 
 export interface MetaSchemaInfo<K extends string, N> {
     metaSchemaId: K;
