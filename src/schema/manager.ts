@@ -215,6 +215,7 @@ export class SchemaManager {
 
         return rootNodeUrl;
     }
+
     private async fetchSchemaRootNodeFromUrl(
         url: URL,
     ) {
