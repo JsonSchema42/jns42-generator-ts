@@ -159,7 +159,7 @@ export class SchemaManager {
             return rootNodeUrl;
         }
 
-        const schemaRootNode = await this.loadSchemaRootNodeFromUrl(
+        const schemaRootNode = await this.fetchSchemaRootNodeFromUrl(
             retrievalUrl,
         );
 
@@ -177,33 +177,6 @@ export class SchemaManager {
         this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
 
         return rootNodeUrl;
-    }
-
-    private async loadSchemaRootNodeFromUrl(
-        url: URL,
-    ) {
-        if (this.initialized) {
-            throw new Error("cannot load after initialized");
-        }
-
-        switch (url.protocol) {
-            case "http:":
-            case "http2:": {
-                const result = await fetch(url);
-                const schemaRootNode = await result.json() as unknown;
-
-                return schemaRootNode;
-            }
-
-            case "file:": {
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                const content = fs.readFileSync(url.pathname, "utf-8");
-
-                const schemaRootNode = JSON.parse(content) as unknown;
-
-                return schemaRootNode;
-            }
-        }
     }
 
     public async loadFromRootNode(
@@ -241,6 +214,33 @@ export class SchemaManager {
             },
         );
 
+    }
+
+    private async fetchSchemaRootNodeFromUrl(
+        url: URL,
+    ) {
+        if (this.initialized) {
+            throw new Error("cannot load after initialized");
+        }
+
+        switch (url.protocol) {
+            case "http:":
+            case "http2:": {
+                const result = await fetch(url);
+                const schemaRootNode = await result.json() as unknown;
+
+                return schemaRootNode;
+            }
+
+            case "file:": {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename
+                const content = fs.readFileSync(url.pathname, "utf-8");
+
+                const schemaRootNode = JSON.parse(content) as unknown;
+
+                return schemaRootNode;
+            }
+        }
     }
 
     private initialized = false;
