@@ -142,43 +142,6 @@ export class SchemaManager {
         ),
     };
 
-    public async loadFromUrl(
-        nodeUrl: URL,
-        retrievalUrl: URL,
-        referencingUrl: URL | null,
-        defaultMetaSchemaId: MetaSchemaId,
-    ) {
-        if (this.initialized) {
-            throw new Error("cannot load after initialized");
-        }
-
-        const retrievalId = String(retrievalUrl);
-
-        let rootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
-        if (rootNodeUrl != null) {
-            return rootNodeUrl;
-        }
-
-        const schemaRootNode = await this.fetchSchemaRootNodeFromUrl(
-            retrievalUrl,
-        );
-
-        rootNodeUrl = await this.loadFromRootNode(
-            schemaRootNode,
-            nodeUrl,
-            retrievalUrl,
-            referencingUrl,
-            defaultMetaSchemaId,
-        );
-
-        const rootNodeId = String(rootNodeUrl);
-
-        this.retrievalRootNodeMap.set(retrievalId, rootNodeUrl);
-        this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
-
-        return rootNodeUrl;
-    }
-
     public async loadFromRootNode(
         node: unknown,
         nodeUrl: URL,
@@ -216,6 +179,42 @@ export class SchemaManager {
 
     }
 
+    public async loadFromUrl(
+        nodeUrl: URL,
+        retrievalUrl: URL,
+        referencingUrl: URL | null,
+        defaultMetaSchemaId: MetaSchemaId,
+    ) {
+        if (this.initialized) {
+            throw new Error("cannot load after initialized");
+        }
+
+        const retrievalId = String(retrievalUrl);
+
+        let rootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
+        if (rootNodeUrl != null) {
+            return rootNodeUrl;
+        }
+
+        const schemaRootNode = await this.fetchSchemaRootNodeFromUrl(
+            retrievalUrl,
+        );
+
+        rootNodeUrl = await this.loadFromRootNode(
+            schemaRootNode,
+            nodeUrl,
+            retrievalUrl,
+            referencingUrl,
+            defaultMetaSchemaId,
+        );
+
+        const rootNodeId = String(rootNodeUrl);
+
+        this.retrievalRootNodeMap.set(retrievalId, rootNodeUrl);
+        this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
+
+        return rootNodeUrl;
+    }
     private async fetchSchemaRootNodeFromUrl(
         url: URL,
     ) {
