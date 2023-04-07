@@ -18,7 +18,7 @@ export abstract class SchemaLoaderBase<N> {
         node: N
     ): Iterable<readonly [string, N]>
 
-    protected abstract loadFromUrl(
+    protected abstract loadFromNode(
         node: N,
         nodeUrl: URL,
         retrievalUrl: URL,
@@ -80,7 +80,7 @@ export abstract class SchemaLoaderBase<N> {
 
         onRootNodeMetaSchema(nodeId, this.metaSchemaId);
 
-        await this.loadFromUrl(node, nodeUrl, retrievalUrl);
+        await this.loadFromNode(node, nodeUrl, retrievalUrl);
 
         await this.loadFromSubNodes(
             node,
@@ -99,7 +99,7 @@ export abstract class SchemaLoaderBase<N> {
         nodePointer: string,
     ) {
         for (const [subNodePointer, subNode] of this.selectSubNodeEntries(nodePointer, node)) {
-            await this.loadFromUrl(subNode, nodeUrl, retrievalUrl);
+            await this.loadFromNode(subNode, nodeUrl, retrievalUrl);
 
             await this.loadFromSubNodes(
                 subNode,

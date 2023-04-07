@@ -25,7 +25,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         return selectNodeInstanceEntries(nodePointer, node);
     }
 
-    protected async loadFromUrl(
+    protected async loadFromNode(
         node: Schema,
         nodeUrl: URL,
         retrievalUrl: URL,
