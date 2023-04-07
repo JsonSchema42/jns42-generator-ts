@@ -80,6 +80,8 @@ export abstract class SchemaLoaderBase<N> {
 
         onRootNodeMetaSchema(nodeId, this.metaSchemaId);
 
+        await this.loadFromUrl(node, nodeUrl, retrievalUrl);
+
         await this.loadFromSubNodes(
             node,
             nodeUrl,
@@ -96,9 +98,9 @@ export abstract class SchemaLoaderBase<N> {
         retrievalUrl: URL,
         nodePointer: string,
     ) {
-        await this.loadFromUrl(node, nodeUrl, retrievalUrl);
-
         for (const [subNodePointer, subNode] of this.selectSubNodeEntries(nodePointer, node)) {
+            await this.loadFromUrl(subNode, nodeUrl, retrievalUrl);
+
             await this.loadFromSubNodes(
                 subNode,
                 nodeUrl,
