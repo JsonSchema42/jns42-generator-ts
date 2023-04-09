@@ -6,7 +6,7 @@ import { crc32 } from "crc";
 export class Namer {
     /**
      * Namer unique name generator class
-     * @param seed if a name collision happend namer will suffix the name with a crc of the id. If
+     * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
      * this would ever result in a collision then change the seed!
      */
     constructor(private readonly seed: number) {
@@ -75,7 +75,7 @@ export class Namer {
     }
 
     protected createSuffix(id: string) {
-        return crc32(id, this.seed).toString(36);
+        return String(crc32(id, this.seed) % 1000000).padStart(6, "0");
     }
 
 }
