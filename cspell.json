@@ -1,17 +1,19 @@
 {
-  "words": [
-    "camelcase",
-    "cobertura",
-    "endregion",
-    "goodschema",
-    "lcov",
-    "Unflattened"
-  ],
+  "version": "0.2",
+  "language": "en",
   "ignorePaths": [
     ".package/",
     "node_modules/",
     "coverage/",
     "out/",
     "fixtures/"
+  ],
+  "words": [
+    "camelcase",
+    "cobertura",
+    "endregion",
+    "goodschema",
+    "lcov",
+    "unflattened"
   ]
 }
