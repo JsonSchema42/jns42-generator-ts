@@ -4,6 +4,7 @@
     "source.fixAll": true,
     "source.organizeImports": true
   },
-  "editor.rulers": [100],
-  "cSpell.words": ["camelcase", "cobertura", "endregion", "goodschema", "lcov"]
+  "editor.rulers": [
+    100
+  ]
 }
