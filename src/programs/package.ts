@@ -154,7 +154,7 @@ async function main(options: MainOptions) {
 function getMainFileContent(
     factory: ts.NodeFactory,
 ) {
-    const banner = "/* eslint-disable */\n";
+    const banner = "/* eslint-disable */\n/* spellchecker: disable */\n";
 
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,
@@ -190,7 +190,7 @@ function getTypesFileContent(
     factory: ts.NodeFactory,
     manager: SchemaManager,
 ) {
-    const banner = "/* eslint-disable */\n";
+    const banner = "/* eslint-disable */\n/* spellchecker: disable */\n";
 
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,
@@ -213,7 +213,7 @@ function getValidatorsFileContent(
     factory: ts.NodeFactory,
     manager: SchemaManager,
 ) {
-    const banner = "/* eslint-disable */\n";
+    const banner = "/* eslint-disable */\n/* spellchecker: disable */\n";
 
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,
@@ -237,7 +237,7 @@ function getSpecFileContent(
     manager: SchemaManager,
     nodeUrl: URL,
 ) {
-    const banner = "/* eslint-disable */\n";
+    const banner = "/* eslint-disable */\n/* spellchecker: disable */\n";
 
     const printer = ts.createPrinter({
         newLine: ts.NewLineKind.LineFeed,

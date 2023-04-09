@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* spellchecker: disable */
 export type Schema = (({
     $id?: SchemaId;
     $schema?: SchemaSchema;

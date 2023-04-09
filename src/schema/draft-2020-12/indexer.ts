@@ -120,7 +120,7 @@ export class SchemaIndexer extends SchemaIndexerBase<Schema> {
     }
 
     /*
-    override the super function to load dnyamic anchors
+    override the super function to load dynamic anchors
     */
     protected indexNode(
         node: Schema,

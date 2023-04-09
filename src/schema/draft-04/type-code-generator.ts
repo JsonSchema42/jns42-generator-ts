@@ -58,7 +58,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                 nodeId,
             );
             /*
-            dont't allow other keywords, this is allowed from 2019-09
+            don't allow other keywords, this is allowed from 2019-09
             */
             return;
         }

@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* spellchecker: disable */
 export type Schema = ((Schema0 & Schema1 & Schema2 & Schema3 & Schema4 & Schema5 & Schema6) & ({
     definitions?: SchemaDefinitions;
     dependencies?: SchemaDependencies;

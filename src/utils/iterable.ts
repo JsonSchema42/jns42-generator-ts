@@ -4,8 +4,8 @@ export function iterableElementsEqual<T>(
 ) {
     const set = new Set(iterable);
     for (const element of otherIterable) {
-        const exsisted = set.delete(element);
-        if (!exsisted) {
+        const existed = set.delete(element);
+        if (!existed) {
             return false;
         }
     }

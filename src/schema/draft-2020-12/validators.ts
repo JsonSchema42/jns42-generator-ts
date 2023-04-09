@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* spellchecker: disable */
 import * as validation from "../../includes/validation.js";
 import * as types from "./types.js";
 export function* validateSchema(value: types.Schema, path: string[] = []): Iterable<validation.PathError> {

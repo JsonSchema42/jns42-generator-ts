@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* spellchecker: disable */
 /**
 Core schema meta-schema
 */

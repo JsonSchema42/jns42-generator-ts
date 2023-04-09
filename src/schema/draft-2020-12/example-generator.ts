@@ -2,7 +2,7 @@ import { createString, flattenObject } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaIndexer } from "./indexer.js";
-import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxLength, selectValidationMinimum, selectValidationMinLength, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
+import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxLength, selectValidationMaximum, selectValidationMinLength, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
@@ -135,7 +135,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             }
 
             /*
-            this is quite ineficcient. Would be great if wel van just stream the
+            this is quite inefficient. Would be great if wel van just stream the
             whole thing
             */
             for (const flattened of flattenObject(subExamples)) {
