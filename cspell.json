@@ -4,6 +4,7 @@
     "cobertura",
     "endregion",
     "goodschema",
-    "lcov"
+    "lcov",
+    "Unflattened"
   ]
 }

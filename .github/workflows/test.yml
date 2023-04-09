@@ -88,6 +88,13 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
+  test-spelling:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npx --yes cspell src
+
   test-audit:
     runs-on: ubuntu-latest
     container: node:18
