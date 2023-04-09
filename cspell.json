@@ -6,5 +6,12 @@
     "goodschema",
     "lcov",
     "Unflattened"
+  ],
+  "ignorePaths": [
+    ".package/",
+    "node_modules/",
+    "coverage/",
+    "out/",
+    "fixtures/"
   ]
 }

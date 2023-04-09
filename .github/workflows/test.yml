@@ -93,7 +93,7 @@ jobs:
     container: node:18
     steps:
       - uses: actions/checkout@v3
-      - run: npx --yes cspell src
+      - run: npx --yes cspell .
 
   test-audit:
     runs-on: ubuntu-latest
