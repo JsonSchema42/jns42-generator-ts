@@ -71,7 +71,7 @@ export function selectNodeDeprecated(
 
 //#region schema
 
-export function* selectNodeDefEntries(
+export function* selectSubNodeDefEntries(
     nodePointer: string,
     node: Core,
 ) {
@@ -83,7 +83,7 @@ export function* selectNodeDefEntries(
     }
 }
 
-export function* selectNodePropertyEntries(
+export function* selectSubNodePropertyEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -95,7 +95,7 @@ export function* selectNodePropertyEntries(
     }
 }
 
-export function* selectNodeAdditionalPropertiesEntries(
+export function* selectSubNodeAdditionalPropertiesEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -106,7 +106,7 @@ export function* selectNodeAdditionalPropertiesEntries(
     }
 }
 
-export function* selectNodePrefixItemsEntries(
+export function* selectSubNodePrefixItemsEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -118,7 +118,7 @@ export function* selectNodePrefixItemsEntries(
     }
 }
 
-export function* selectNodeItemsEntries(
+export function* selectSubNodeItemsEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -129,7 +129,7 @@ export function* selectNodeItemsEntries(
     }
 }
 
-export function* selectNodeAnyOfEntries(
+export function* selectSubNodeAnyOfEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -142,7 +142,7 @@ export function* selectNodeAnyOfEntries(
     }
 }
 
-export function* selectNodeOneOfEntries(
+export function* selectSubNodeOneOfEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -154,7 +154,7 @@ export function* selectNodeOneOfEntries(
     }
 }
 
-export function* selectNodeAllOfEntries(
+export function* selectSubNodeAllOfEntries(
     nodePointer: string,
     node: Applicator,
 ) {
@@ -166,37 +166,37 @@ export function* selectNodeAllOfEntries(
     }
 }
 
-export function* selectNodeInstanceEntries(
+export function* selectSubNodes(
     nodePointer: string,
     node: Applicator & Core,
 ): Iterable<readonly [string, Applicator & Core]> {
-    yield* selectNodeDefEntries(nodePointer, node);
-    yield* selectNodePropertyEntries(nodePointer, node);
-    yield* selectNodeAdditionalPropertiesEntries(nodePointer, node);
-    yield* selectNodePrefixItemsEntries(nodePointer, node);
-    yield* selectNodeItemsEntries(nodePointer, node);
-    yield* selectNodeAllOfEntries(nodePointer, node);
-    yield* selectNodeAnyOfEntries(nodePointer, node);
-    yield* selectNodeOneOfEntries(nodePointer, node);
+    yield* selectSubNodeDefEntries(nodePointer, node);
+    yield* selectSubNodePropertyEntries(nodePointer, node);
+    yield* selectSubNodeAdditionalPropertiesEntries(nodePointer, node);
+    yield* selectSubNodePrefixItemsEntries(nodePointer, node);
+    yield* selectSubNodeItemsEntries(nodePointer, node);
+    yield* selectSubNodeAllOfEntries(nodePointer, node);
+    yield* selectSubNodeAnyOfEntries(nodePointer, node);
+    yield* selectSubNodeOneOfEntries(nodePointer, node);
 }
 
-export function* selectAllNodeInstanceEntries(
+export function* selectAllSubNodes(
     nodePointer: string,
     node: Applicator & Core,
 ): Iterable<readonly [string, Applicator & Core]> {
-    const subNodes = [...selectNodeInstanceEntries(nodePointer, node)];
+    const subNodes = [...selectSubNodes(nodePointer, node)];
     yield* subNodes;
     for (const [subPointer, subNode] of subNodes) {
-        yield* selectAllNodeInstanceEntries(subPointer, subNode);
+        yield* selectAllSubNodes(subPointer, subNode);
     }
 }
 
-export function* selectAllNodeInstanceEntriesAndSelf(
+export function* selectAllSubNodesAndSelf(
     nodePointer: string,
     node: Applicator & Core,
 ): Iterable<readonly [string, Applicator & Core]> {
     yield [nodePointer, node] as const;
-    yield* selectAllNodeInstanceEntries(nodePointer, node);
+    yield* selectAllSubNodes(nodePointer, node);
 }
 
 //#endregion

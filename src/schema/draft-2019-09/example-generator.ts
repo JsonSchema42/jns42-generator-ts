@@ -2,7 +2,7 @@ import { createString, flattenObject } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeItemsOneEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxLength, selectValidationMaximum, selectValidationMinLength, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
+import { selectNodePropertyNamesEntries, selectNodeRecursiveRef, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectSubNodeItemsOneEntries, selectSubNodePropertyEntries, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxLength, selectValidationMaximum, selectValidationMinLength, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
@@ -53,7 +53,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     ): Iterable<[number, unknown]> {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const itemsEntries = selectNodeItemsOneEntries(nodeItem.nodePointer, nodeItem.node);
+        const itemsEntries = selectSubNodeItemsOneEntries(nodeItem.nodePointer, nodeItem.node);
 
         for (const [subNodePointer, subNode] of itemsEntries) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeItem.nodeRootUrl);
@@ -76,7 +76,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
             [...selectNodePropertyNamesEntries(nodeItem.nodePointer, nodeItem.node)];
         const propertyNameMap = Object.fromEntries(propertyNameEntries);
         const propertyEntries =
-            [...selectNodePropertyEntries(nodeItem.nodePointer, nodeItem.node)];
+            [...selectSubNodePropertyEntries(nodeItem.nodePointer, nodeItem.node)];
         const requiredPropertyNames = new Set(selectNodeRequiredPropertyNames(nodeItem.node));
 
         {

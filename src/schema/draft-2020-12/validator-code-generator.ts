@@ -2,7 +2,7 @@ import ts from "typescript";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeDynamicRef, selectNodeItemsEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeDynamicRef, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeItemsEntries, selectSubNodePrefixItemsEntries, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMaximum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
@@ -142,7 +142,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             );
         }
 
-        const prefixItemsEntries = selectNodePrefixItemsEntries(
+        const prefixItemsEntries = selectSubNodePrefixItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
@@ -181,7 +181,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             }
         }
 
-        const itemsEntries = selectNodeItemsEntries(
+        const itemsEntries = selectSubNodeItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
@@ -299,7 +299,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             );
         }
 
-        const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
+        const additionalPropertiesEntries = selectSubNodeAdditionalPropertiesEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );

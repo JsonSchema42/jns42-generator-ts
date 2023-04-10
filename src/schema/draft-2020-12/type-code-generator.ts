@@ -3,7 +3,7 @@ import { generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
+import { selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicRef, selectNodeEnum, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
@@ -95,7 +95,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             ));
         }
 
-        const anyOfEntries = [...selectNodeAnyOfEntries(nodeItem.nodePointer, nodeItem.node)];
+        const anyOfEntries = [...selectSubNodeAnyOfEntries(nodeItem.nodePointer, nodeItem.node)];
         if (anyOfEntries.length > 0) {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 anyOfEntries.map(([subNodePointer]) => {
@@ -112,7 +112,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             ));
         }
 
-        const oneOfEntries = [...selectNodeOneOfEntries(nodeItem.nodePointer, nodeItem.node)];
+        const oneOfEntries = [...selectSubNodeOneOfEntries(nodeItem.nodePointer, nodeItem.node)];
         if (oneOfEntries.length > 0) {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 oneOfEntries.map(([subNodePointer]) => {
@@ -129,7 +129,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             ));
         }
 
-        const allOfEntries = [...selectNodeAllOfEntries(nodeItem.nodePointer, nodeItem.node)];
+        const allOfEntries = [...selectSubNodeAllOfEntries(nodeItem.nodePointer, nodeItem.node)];
         if (allOfEntries.length > 0) {
             yield factory.createParenthesizedType(factory.createIntersectionTypeNode(
                 allOfEntries.map(([subNodePointer]) => {
@@ -165,7 +165,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     ): ts.TypeNode {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
+        const additionalPropertiesEntries = selectSubNodeAdditionalPropertiesEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
@@ -225,7 +225,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     ): ts.TypeNode {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const itemsEntries = selectNodeItemsEntries(
+        const itemsEntries = selectSubNodeItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         );
@@ -243,7 +243,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             );
         }
 
-        const prefixItemsEntries = [...selectNodePrefixItemsEntries(
+        const prefixItemsEntries = [...selectSubNodePrefixItemsEntries(
             nodeItem.nodePointer,
             nodeItem.node,
         )];

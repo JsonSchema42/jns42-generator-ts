@@ -1,6 +1,6 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { metaSchema } from "./meta.js";
-import { selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
+import { selectNodeId, selectNodeRef, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -40,7 +40,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema | boolean> {
         nodePointer: string,
         node: Schema | boolean,
     ): Iterable<readonly [string, Schema | boolean]> {
-        return selectNodeInstanceEntries(nodePointer, node);
+        return selectSubNodes(nodePointer, node);
     }
 
     protected async loadFromNode(

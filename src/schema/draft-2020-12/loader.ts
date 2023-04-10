@@ -1,7 +1,7 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { MetaSchemaId } from "../meta.js";
 import { metaSchema } from "./meta.js";
-import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeId, selectNodeInstanceEntries, selectNodeRef } from "./selectors.js";
+import { selectNodeAnchor, selectNodeDynamicAnchor, selectNodeId, selectNodeRef, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -41,7 +41,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         nodePointer: string,
         node: Schema,
     ): Iterable<readonly [string, Schema]> {
-        return selectNodeInstanceEntries(nodePointer, node);
+        return selectSubNodes(nodePointer, node);
     }
 
     protected async loadFromNode(
