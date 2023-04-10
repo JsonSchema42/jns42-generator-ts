@@ -7,4 +7,3 @@ export * from "./type-code-generator.js";
 export * from "./types.js";
 export * from "./validator-code-generator.js";
 
-
