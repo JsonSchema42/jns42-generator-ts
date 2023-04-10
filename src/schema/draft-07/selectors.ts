@@ -147,7 +147,7 @@ export function* selectNodeAllOfEntries(
 export function* selectNodeInstanceEntries(
     nodePointer: string,
     node: Schema,
-) {
+): Iterable<readonly [string, Schema]> {
     yield* selectNodeDefinitionsEntries(nodePointer, node);
     yield* selectNodePropertyEntries(nodePointer, node);
     yield* selectNodeAdditionalPropertiesEntries(nodePointer, node);
@@ -157,6 +157,25 @@ export function* selectNodeInstanceEntries(
     yield* selectNodeAllOfEntries(nodePointer, node);
     yield* selectNodeAnyOfEntries(nodePointer, node);
     yield* selectNodeOneOfEntries(nodePointer, node);
+}
+
+export function* selectAllNodeInstanceEntries(
+    nodePointer: string,
+    node: Schema,
+): Iterable<readonly [string, Schema]> {
+    const subNodes = [...selectNodeInstanceEntries(nodePointer, node)];
+    yield* subNodes;
+    for (const [subPointer, subNode] of subNodes) {
+        yield* selectAllNodeInstanceEntries(subPointer, subNode);
+    }
+}
+
+export function* selectAllNodeInstanceEntriesAndSelf(
+    nodePointer: string,
+    node: Schema,
+): Iterable<readonly [string, Schema]> {
+    yield [nodePointer, node] as const;
+    yield* selectAllNodeInstanceEntries(nodePointer, node);
 }
 
 //#endregion
