@@ -125,10 +125,6 @@ export class SchemaManager {
         referencingNodeUrl: URL | null,
         defaultMetaSchemaId: MetaSchemaId,
     ) {
-        if (this.initialized) {
-            throw new Error("cannot load after initialized");
-        }
-
         const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
             defaultMetaSchemaId;
 
@@ -161,10 +157,6 @@ export class SchemaManager {
         referencingUrl: URL | null,
         defaultMetaSchemaId: MetaSchemaId,
     ) {
-        if (this.initialized) {
-            throw new Error("cannot load after initialized");
-        }
-
         const retrievalId = String(retrievalUrl);
 
         let rootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
@@ -195,10 +187,6 @@ export class SchemaManager {
     private async fetchSchemaRootNodeFromUrl(
         url: URL,
     ) {
-        if (this.initialized) {
-            throw new Error("cannot load after initialized");
-        }
-
         switch (url.protocol) {
             case "http:":
             case "http2:": {
@@ -219,13 +207,10 @@ export class SchemaManager {
         }
     }
 
-    private initialized = false;
+    /**
+     * @deprecated
+     */
     public async initialize() {
-        if (this.initialized) {
-            throw new Error("already initialized");
-        }
-        this.initialized = true;
-
         for (const loader of Object.values(this.loaders)) {
             loader.indexNodes(
                 (nodeId, metaSchemaId) => {
@@ -245,28 +230,16 @@ export class SchemaManager {
     }
 
     public getName(nodeId: string) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         const name = this.namer.getName(nodeId);
 
         return name.join("_");
     }
 
     public getNodeRetrievalUrl(nodeRootId: string) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         return this.rootNodeRetrievalMap.get(nodeRootId);
     }
 
     public getNodeRootUrl(nodeRetrievalId: string) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         return this.retrievalRootNodeMap.get(nodeRetrievalId);
     }
 
@@ -287,10 +260,6 @@ export class SchemaManager {
     public *generateValidatorStatements(
         factory: ts.NodeFactory,
     ) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         yield factory.createImportDeclaration(
             undefined,
             factory.createImportClause(
@@ -325,10 +294,6 @@ export class SchemaManager {
         factory: ts.NodeFactory,
         nodeUrl: URL,
     ) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         const nodeId = String(nodeUrl);
 
         yield factory.createImportDeclaration(
@@ -407,10 +372,6 @@ export class SchemaManager {
     }
 
     public generateExamples(nodeId: string) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
             throw new Error("node not found");
@@ -421,10 +382,6 @@ export class SchemaManager {
     }
 
     public *generateValidExamples(nodeUrl: URL) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         const nodeId = String(nodeUrl);
         for (const [error, example] of this.generateExamples(nodeId)) {
             if (error > 0) {
@@ -435,10 +392,6 @@ export class SchemaManager {
     }
 
     public *generateInvalidExamples(nodeUrl: URL) {
-        if (!this.initialized) {
-            throw new Error("not yet initialized");
-        }
-
         const nodeId = String(nodeUrl);
         for (const [error, example] of this.generateExamples(nodeId)) {
             if (error !== 1) {
