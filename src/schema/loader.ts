@@ -115,50 +115,15 @@ export abstract class SchemaLoaderBase<N> {
         }
 
         for (const [subPointer, subNode] of this.selectAllSubNodeEntriesAndSelf("", rootItem.node)) {
-            const subNodeUrl = new URL(`#${subPointer}`, rootNodeUrl);
-            const subNodeId = String(subNodeUrl);
+            yield* this.indexNode(subNode, rootNodeUrl, subPointer);
 
-            const item: SchemaLoaderNodeItem<N> = {
-                node: subNode,
-                nodePointer: subPointer,
-                nodeRootUrl: rootNodeUrl,
-            };
-            this.nodeMap.set(subNodeId, item);
-
-            yield subNodeUrl;
         }
     }
 
-    public hasNodeItem(nodeId: string) {
-        return this.nodeMap.has(nodeId);
-    }
-
-    public getNodeItem(nodeId: string) {
-        const item = this.nodeMap.get(nodeId);
-        if (item == null) {
-            throw new Error("node item not found");
-        }
-        return item;
-    }
-
-    public indexNodes(
-        onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,
-    ) {
-        for (const [url, node] of this.selectRootNodeEntries()) {
-            this.indexNode(
-                node,
-                url,
-                "",
-                onNodeMetaSchema,
-            );
-        }
-    }
-
-    protected indexNode(
+    protected *indexNode(
         node: N,
         nodeRootUrl: URL,
         nodePointer: string,
-        onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,
     ) {
         const nodeUrl = this.makeNodeUrl(
             node,
@@ -176,16 +141,19 @@ export abstract class SchemaLoaderBase<N> {
             throw new Error("duplicate nodeId");
         }
         this.nodeMap.set(nodeId, item);
-        onNodeMetaSchema(nodeId, this.metaSchemaId);
+        yield nodeUrl;
+    }
 
-        for (const [subNodePointer, subNode] of this.selectSubNodeEntries(nodePointer, node)) {
-            this.indexNode(
-                subNode,
-                nodeRootUrl,
-                subNodePointer,
-                onNodeMetaSchema,
-            );
+    public hasNodeItem(nodeId: string) {
+        return this.nodeMap.has(nodeId);
+    }
+
+    public getNodeItem(nodeId: string) {
+        const item = this.nodeMap.get(nodeId);
+        if (item == null) {
+            throw new Error("node item not found");
         }
+        return item;
     }
 
 }

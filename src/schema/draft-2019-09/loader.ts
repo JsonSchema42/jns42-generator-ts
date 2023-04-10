@@ -184,11 +184,10 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
     /*
     override the super function to load recursive anchors
     */
-    protected indexNode(
+    protected * indexNode(
         node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
-        onNodeMetaSchema: (nodeId: string, metaSchemaId: any) => void,
     ) {
         const nodeUrl = this.makeNodeUrl(
             node,
@@ -205,6 +204,8 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
                 throw new Error("duplicate anchorId");
             }
             this.anchorMap.set(anchorId, nodeId);
+
+            yield anchorUrl;
         }
 
         const nodeRecursiveAnchor = selectNodeRecursiveAnchor(node);
@@ -216,11 +217,10 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             this.recursiveAnchorMap.set(recursiveAnchorId, nodeId);
         }
 
-        super.indexNode(
+        yield* super.indexNode(
             node,
             nodeRootUrl,
             nodePointer,
-            onNodeMetaSchema,
         );
     }
 
