@@ -7,7 +7,7 @@ export function selectNodeSchema(
     node: Schema | boolean,
 ) {
     if (typeof node === "object") {
-        return node.$schema;
+        return node.$schema?.toLowerCase();
     }
 }
 
@@ -15,7 +15,7 @@ export function selectNodeId(
     node: Schema | boolean,
 ) {
     if (typeof node === "object") {
-        return node.id;
+        return node.id?.toLowerCase();
     }
 }
 
@@ -24,7 +24,7 @@ export function selectNodeRef(
 ) {
     // $ref is not in the schema
     if (typeof node === "object" && "$ref" in node && typeof node.$ref === "string") {
-        return node.$ref;
+        return node.$ref?.toLowerCase();
     }
 }
 

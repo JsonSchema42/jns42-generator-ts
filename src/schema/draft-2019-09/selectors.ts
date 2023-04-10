@@ -7,7 +7,7 @@ export function selectNodeSchema(
     node: Core,
 ) {
     if (typeof node === "object") {
-        return node.$schema;
+        return node.$schema?.toLowerCase();
     }
 }
 
@@ -15,7 +15,7 @@ export function selectNodeId(
     node: Core,
 ) {
     if (typeof node === "object") {
-        return node.$id;
+        return node.$id?.toLowerCase();
     }
 }
 
@@ -23,7 +23,7 @@ export function selectNodeAnchor(
     node: Core,
 ) {
     if (typeof node === "object") {
-        return node.$anchor;
+        return node.$anchor?.toLowerCase();
     }
 }
 
@@ -39,7 +39,7 @@ export function selectNodeRef(
     node: Core,
 ) {
     if (typeof node === "object") {
-        return node.$ref;
+        return node.$ref?.toLowerCase();
     }
 }
 
@@ -47,7 +47,7 @@ export function selectNodeRecursiveRef(
     node: Core,
 ) {
     if (typeof node === "object") {
-        return node.$recursiveRef;
+        return node.$recursiveRef?.toLowerCase();
     }
 }
 
