@@ -2,19 +2,19 @@ import ts from "typescript";
 import { generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
-import { SchemaIndexer } from "./indexer.js";
+import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicRef, selectNodeEnum, selectNodeItemsEntries, selectNodeOneOfEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly indexer: SchemaIndexer,
+        private readonly loader: SchemaLoader,
     ) {
         super(manager);
     }
 
     protected getComments(nodeId: string): string {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const description = selectNodeDescription(nodeItem.node) ?? "";
         const deprecated = selectNodeDeprecated(nodeItem.node) ?? false;
@@ -35,7 +35,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         if (nodeItem.node === true) {
             yield factory.createKeywordTypeNode(
@@ -53,7 +53,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+            const resolvedNodeId = this.loader.resolveReferenceNodeId(
                 nodeId,
                 nodeRef,
             );
@@ -66,7 +66,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
         if (nodeDynamicRef != null) {
-            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
+            const resolvedNodeId = this.loader.resolveDynamicReferenceNodeId(
                 nodeId,
                 nodeDynamicRef,
             );
@@ -163,7 +163,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): ts.TypeNode {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
             nodeItem.nodePointer,
@@ -223,7 +223,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): ts.TypeNode {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const itemsEntries = selectNodeItemsEntries(
             nodeItem.nodePointer,

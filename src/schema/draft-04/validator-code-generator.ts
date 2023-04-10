@@ -1,13 +1,13 @@
 import ts from "typescript";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
-import { SchemaIndexer } from "./indexer.js";
+import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeItemsOneEntries, selectNodeProperties, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly indexer: SchemaIndexer,
+        private readonly loader: SchemaLoader,
     ) {
         super(manager);
     }
@@ -16,7 +16,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ): Iterable<ts.Statement> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         // yield* this.generateCommonValidationStatements(nodeItem);
 
@@ -51,7 +51,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minItems = selectValidationMinItems(nodeItem.node);
         const maxItems = selectValidationMaxItems(nodeItem.node);
@@ -208,7 +208,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minProperties = selectValidationMinProperties(nodeItem.node);
         const maxProperties = selectValidationMaxProperties(nodeItem.node);
@@ -373,7 +373,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minLength = selectValidationMinLength(nodeItem.node);
         const maxLength = selectValidationMaxLength(nodeItem.node);
@@ -418,7 +418,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minimum = selectValidationMinimum(nodeItem.node);
         const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);

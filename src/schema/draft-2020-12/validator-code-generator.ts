@@ -1,13 +1,13 @@
 import ts from "typescript";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
-import { SchemaIndexer } from "./indexer.js";
+import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalPropertiesEntries, selectNodeDynamicRef, selectNodeItemsEntries, selectNodePrefixItemsEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaximum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMinimum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
 
 export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly indexer: SchemaIndexer,
+        private readonly loader: SchemaLoader,
     ) {
         super(manager);
     }
@@ -16,7 +16,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ): Iterable<ts.Statement> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         yield* this.generateCommonValidationStatements(factory, nodeId);
 
@@ -50,11 +50,11 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ): Iterable<ts.Statement> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+            const resolvedNodeId = this.loader.resolveReferenceNodeId(
                 nodeId,
                 nodeRef,
             );
@@ -77,7 +77,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
         if (nodeDynamicRef != null) {
-            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
+            const resolvedNodeId = this.loader.resolveDynamicReferenceNodeId(
                 nodeId,
                 nodeDynamicRef,
             );
@@ -102,7 +102,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minItems = selectValidationMinItems(nodeItem.node);
         const maxItems = selectValidationMaxItems(nodeItem.node);
@@ -259,7 +259,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minProperties = selectValidationMinProperties(nodeItem.node);
         const maxProperties = selectValidationMaxProperties(nodeItem.node);
@@ -424,7 +424,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minLength = selectValidationMinLength(nodeItem.node);
         const maxLength = selectValidationMaxLength(nodeItem.node);
@@ -469,7 +469,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
         factory: ts.NodeFactory,
         nodeId: string,
     ) {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minimum = selectValidationMinimum(nodeItem.node);
         const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);

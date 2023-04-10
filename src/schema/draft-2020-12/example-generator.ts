@@ -1,13 +1,13 @@
 import { createString, flattenObject } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
-import { SchemaIndexer } from "./indexer.js";
+import { SchemaLoader } from "./loader.js";
 import { selectNodeDynamicRef, selectNodeItemsEntries, selectNodePropertyEntries, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxLength, selectValidationMaximum, selectValidationMinLength, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly indexer: SchemaIndexer,
+        private readonly loader: SchemaLoader,
     ) {
         super(manager);
     }
@@ -15,11 +15,11 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     public *generateFromNode(
         nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const nodeRef = selectNodeRef(nodeItem.node);
         if (nodeRef != null) {
-            const resolvedNodeId = this.indexer.resolveReferenceNodeId(
+            const resolvedNodeId = this.loader.resolveReferenceNodeId(
                 nodeId,
                 nodeRef,
             );
@@ -30,7 +30,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
         const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
         if (nodeDynamicRef != null) {
-            const resolvedNodeId = this.indexer.resolveDynamicReferenceNodeId(
+            const resolvedNodeId = this.loader.resolveDynamicReferenceNodeId(
                 nodeId,
                 nodeDynamicRef,
             );
@@ -51,7 +51,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     protected * generateForArray(
         nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const itemsEntries = selectNodeItemsEntries(nodeItem.nodePointer, nodeItem.node);
 
@@ -70,7 +70,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     protected * generateForObject(
         nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const propertyNameEntries =
             [...selectNodePropertyNamesEntries(nodeItem.nodePointer, nodeItem.node)];
@@ -185,7 +185,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     protected * generateForString(
         nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const validationMinLength = selectValidationMinLength(nodeItem.node);
         const validationMaxLength = selectValidationMaxLength(nodeItem.node);
@@ -222,7 +222,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     protected * generateForNumber(
         nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const validationMinimum = selectValidationMinimum(nodeItem.node);
         const validationExclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
@@ -271,7 +271,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     protected * generateForInteger(
         nodeId: string,
     ): Iterable<[number, unknown]> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const minimum = selectValidationMinimum(nodeItem.node);
         const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);

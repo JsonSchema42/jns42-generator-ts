@@ -1,6 +1,6 @@
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
-import { SchemaIndexer } from "./indexer.js";
+import { SchemaLoader } from "./loader.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
@@ -28,7 +28,7 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
 
     constructor(
         manager: SchemaManager,
-        private readonly indexer: SchemaIndexer,
+        private readonly loader: SchemaLoader,
     ) {
         super(manager);
     }

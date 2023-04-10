@@ -2,19 +2,19 @@ import ts from "typescript";
 import { generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
-import { SchemaIndexer } from "./indexer.js";
+import { SchemaLoader } from "./loader.js";
 import { selectNodeAdditionalItemsEntries, selectNodeAdditionalPropertiesEntries, selectNodeAllOfEntries, selectNodeAnyOfEntries, selectNodeDescription, selectNodeEnum, selectNodeItemsManyEntries, selectNodeItemsOneEntries, selectNodeOneOfEntries, selectNodeProperties, selectNodeRef, selectNodeRequiredProperties, selectNodeTypes } from "./selectors.js";
 
 export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
     constructor(
         manager: SchemaManager,
-        private readonly indexer: SchemaIndexer,
+        private readonly loader: SchemaLoader,
     ) {
         super(manager);
     }
 
     protected getComments(nodeId: string): string {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const description = selectNodeDescription(nodeItem.node) ?? "";
 
@@ -33,7 +33,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         if (nodeItem.node === true) {
             yield factory.createKeywordTypeNode(
@@ -142,7 +142,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): ts.TypeNode {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const additionalPropertiesEntries = selectNodeAdditionalPropertiesEntries(
             nodeItem.nodePointer,
@@ -212,7 +212,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
         factory: ts.NodeFactory,
         nodeId: string,
     ): ts.TypeNode {
-        const nodeItem = this.indexer.getNodeItem(nodeId);
+        const nodeItem = this.loader.getNodeItem(nodeId);
 
         const additionalItemsEntries = selectNodeAdditionalItemsEntries(
             nodeItem.nodePointer,
