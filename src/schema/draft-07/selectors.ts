@@ -7,7 +7,7 @@ export function selectNodeSchema(
     node: Schema,
 ) {
     if (typeof node === "object") {
-        return node.$schema?.toLowerCase();
+        return node.$schema;
     }
 }
 
@@ -15,7 +15,7 @@ export function selectNodeId(
     node: Schema,
 ) {
     if (typeof node === "object") {
-        return node.$id?.toLowerCase();
+        return node.$id;
     }
 }
 
@@ -23,7 +23,7 @@ export function selectNodeRef(
     node: Schema,
 ) {
     if (typeof node === "object") {
-        return node.$ref?.toLowerCase();
+        return node.$ref;
     }
 }
 
