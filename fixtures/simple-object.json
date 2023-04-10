@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://jns42-generator.org/simple-object",
+  "$id": "https://JsonSchema42.org/simple-object",
   "description": "A very simple object",
   "type": [
     "object"
