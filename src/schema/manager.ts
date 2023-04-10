@@ -137,7 +137,7 @@ export class SchemaManager {
 
         for (const nodeUrl of loader.indexRootNode(rootNodeUrl)) {
             const nodeId = String(nodeUrl);
-            this.rootNodeMetaMap.set(nodeId, metaSchemaId);
+            this.nodeMetaMap.set(nodeId, metaSchemaId);
         }
 
     }
