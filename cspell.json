@@ -2,15 +2,21 @@
   "version": "0.2",
   "language": "en",
   "useGitignore": true,
+  "enableGlobDot": true,
   "ignorePaths": [
     "fixtures/"
   ],
   "words": [
     "camelcase",
     "cobertura",
+    "dbaeumer",
     "endregion",
     "goodschema",
     "lcov",
+    "npmjs",
+    "npmrc",
+    "openapi",
+    "ryanluker",
     "unflattened"
   ]
 }
