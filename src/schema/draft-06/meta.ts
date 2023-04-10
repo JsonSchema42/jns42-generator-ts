@@ -1,10 +1,2 @@
-import { MetaSchemaInfo } from "../meta.js";
-import { isSchemaRootNode } from "./node.js";
-import { Schema } from "./types.js";
+export const metaSchemaId = "http://json-schema.org/draft-06/schema#";
 
-const metaSchemaId = "http://json-schema.org/draft-06/schema#";
-
-export const metaSchema: MetaSchemaInfo<typeof metaSchemaId, Schema> = {
-    metaSchemaId,
-    isSchemaRootNode,
-};

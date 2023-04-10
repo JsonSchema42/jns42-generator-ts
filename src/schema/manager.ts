@@ -8,7 +8,7 @@ import * as schemaDraft07 from "./draft-07/index.js";
 import * as schema201909 from "./draft-2019-09/index.js";
 import * as schema202012 from "./draft-2020-12/index.js";
 import { SchemaLoaderBase } from "./loader.js";
-import { discoverRootNodeMetaSchemaId, MetaSchemaId } from "./meta.js";
+import { MetaSchemaId } from "./meta.js";
 
 export class SchemaManager {
 
@@ -24,97 +24,97 @@ export class SchemaManager {
     private readonly rootNodeRetrievalMap = new Map<string, URL>();
 
     private readonly loaders = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaLoader(this),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaLoader(this),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaLoader(this),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaLoader(this),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
+        [schema202012.metaSchemaId]: new schema202012.SchemaLoader(this),
+        [schema201909.metaSchemaId]: new schema201909.SchemaLoader(this),
+        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaLoader(this),
+        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaLoader(this),
+        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
     };
 
     private readonly typeCodeGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaTypeCodeGenerator(
+        [schema202012.metaSchemaId]: new schema202012.SchemaTypeCodeGenerator(
             this,
-            this.loaders[schema202012.metaSchema.metaSchemaId],
+            this.loaders[schema202012.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaTypeCodeGenerator(
+        [schema201909.metaSchemaId]: new schema201909.SchemaTypeCodeGenerator(
             this,
-            this.loaders[schema201909.metaSchema.metaSchemaId],
+            this.loaders[schema201909.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaTypeCodeGenerator(
+        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaTypeCodeGenerator(
             this,
-            this.loaders[schemaDraft07.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft07.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaTypeCodeGenerator(
+        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaTypeCodeGenerator(
             this,
-            this.loaders[schemaDraft06.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft06.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaTypeCodeGenerator(
+        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaTypeCodeGenerator(
             this,
-            this.loaders[schemaDraft04.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft04.metaSchemaId],
         ),
     };
 
     private readonly validatorCodeGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaValidatorCodeGenerator(
+        [schema202012.metaSchemaId]: new schema202012.SchemaValidatorCodeGenerator(
             this,
-            this.loaders[schema202012.metaSchema.metaSchemaId],
+            this.loaders[schema202012.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaValidatorCodeGenerator(
+        [schema201909.metaSchemaId]: new schema201909.SchemaValidatorCodeGenerator(
             this,
-            this.loaders[schema201909.metaSchema.metaSchemaId],
+            this.loaders[schema201909.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaValidatorCodeGenerator(
+        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaValidatorCodeGenerator(
             this,
-            this.loaders[schemaDraft07.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft07.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaValidatorCodeGenerator(
+        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaValidatorCodeGenerator(
             this,
-            this.loaders[schemaDraft06.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft06.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaValidatorCodeGenerator(
+        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaValidatorCodeGenerator(
             this,
-            this.loaders[schemaDraft04.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft04.metaSchemaId],
         ),
     };
 
     private readonly specCodeGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaSpecCodeGenerator(
+        [schema202012.metaSchemaId]: new schema202012.SchemaSpecCodeGenerator(
             this,
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaSpecCodeGenerator(
+        [schema201909.metaSchemaId]: new schema201909.SchemaSpecCodeGenerator(
             this,
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaSpecCodeGenerator(
+        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaSpecCodeGenerator(
             this,
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaSpecCodeGenerator(
+        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaSpecCodeGenerator(
             this,
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaSpecCodeGenerator(
+        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaSpecCodeGenerator(
             this,
         ),
     };
 
     private readonly exampleGenerators = {
-        [schema202012.metaSchema.metaSchemaId]: new schema202012.SchemaExampleGenerator(
+        [schema202012.metaSchemaId]: new schema202012.SchemaExampleGenerator(
             this,
-            this.loaders[schema202012.metaSchema.metaSchemaId],
+            this.loaders[schema202012.metaSchemaId],
         ),
-        [schema201909.metaSchema.metaSchemaId]: new schema201909.SchemaExampleGenerator(
+        [schema201909.metaSchemaId]: new schema201909.SchemaExampleGenerator(
             this,
-            this.loaders[schema201909.metaSchema.metaSchemaId],
+            this.loaders[schema201909.metaSchemaId],
         ),
-        [schemaDraft07.metaSchema.metaSchemaId]: new schemaDraft07.SchemaExampleGenerator(
+        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaExampleGenerator(
             this,
-            this.loaders[schemaDraft07.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft07.metaSchemaId],
         ),
-        [schemaDraft06.metaSchema.metaSchemaId]: new schemaDraft06.SchemaExampleGenerator(
+        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaExampleGenerator(
             this,
-            this.loaders[schemaDraft06.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft06.metaSchemaId],
         ),
-        [schemaDraft04.metaSchema.metaSchemaId]: new schemaDraft04.SchemaExampleGenerator(
+        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaExampleGenerator(
             this,
-            this.loaders[schemaDraft04.metaSchema.metaSchemaId],
+            this.loaders[schemaDraft04.metaSchemaId],
         ),
     };
 
@@ -124,7 +124,7 @@ export class SchemaManager {
         referencingNodeUrl: URL | null,
         defaultMetaSchemaId: MetaSchemaId,
     ) {
-        const metaSchemaId = discoverRootNodeMetaSchemaId(rootNode) ??
+        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ??
             defaultMetaSchemaId;
 
         const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
@@ -159,7 +159,7 @@ export class SchemaManager {
             retrievalUrl,
         );
 
-        const metaSchemaId = discoverRootNodeMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
+        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
         const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
 
@@ -215,21 +215,20 @@ export class SchemaManager {
         }
     }
 
+    private discoverMetaSchemaId(
+        node: unknown,
+    ) {
+        for (const [metaSchemaId, loader] of Object.entries(this.loaders)) {
+            if (loader.isSchemaRootNode(node)) {
+                return metaSchemaId as MetaSchemaId;
+            }
+        }
+    }
+
     /**
      * @deprecated
      */
     public async initialize() {
-        for (const loader of Object.values(this.loaders)) {
-            loader.indexNodes(
-                (nodeId, metaSchemaId) => {
-                    if (this.nodeMetaMap.has(nodeId)) {
-                        throw new Error("duplicate nodeId");
-                    }
-                    this.nodeMetaMap.set(nodeId, metaSchemaId);
-                },
-            );
-        }
-
         for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
             for (const [nodeId, name] of this.getTypeNames(metaSchemaId, rootNodeId)) {
                 this.namer.registerName(nodeId, name);

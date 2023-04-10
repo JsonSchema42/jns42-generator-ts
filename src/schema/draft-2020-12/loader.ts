@@ -1,13 +1,20 @@
 import { SchemaLoaderBase } from "../loader.js";
-import { MetaSchemaId } from "../meta.js";
-import { metaSchema } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeDynamicAnchor, selectNodeId, selectNodeRef, selectSubNodes } from "./selectors.js";
+import { metaSchemaId } from "./meta.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeDynamicAnchor, selectNodeId, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
 export class SchemaLoader extends SchemaLoaderBase<Schema> {
 
-    protected readonly metaSchemaId = metaSchema.metaSchemaId;
+    protected readonly metaSchemaId = metaSchemaId;
+
+    public isSchemaRootNode(node: unknown): node is Schema {
+        const schemaId = selectNodeSchema(node as any);
+        if (schemaId == null) {
+            return false;
+        }
+        return schemaId === this.metaSchemaId;
+    }
 
     public validateSchema(node: Schema): boolean {
         for (const error of validateSchema(node, [])) {
@@ -181,7 +188,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
-        onNodeMetaSchema: (nodeId: string, metaSchemaId: MetaSchemaId) => void,
+        onNodeMetaSchema: (nodeId: string, metaSchemaId: any) => void,
     ) {
         const nodeUrl = this.makeNodeUrl(
             node,

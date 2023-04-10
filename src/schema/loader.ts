@@ -16,6 +16,8 @@ export interface SchemaLoaderNodeItem<N> {
 export abstract class SchemaLoaderBase<N> {
     protected abstract readonly metaSchemaId: MetaSchemaId
 
+    public abstract isSchemaRootNode(node: unknown): node is N;
+
     public abstract getReferencedNodeUrls(
         rootNode: N,
         rootNodeUrl: URL,
