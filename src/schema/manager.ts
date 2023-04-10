@@ -143,16 +143,16 @@ export class SchemaManager {
     }
 
     public async loadFromUrl(
-        nodeUrl: URL,
+        rootNodeUrl: URL,
         retrievalUrl: URL,
         referencingUrl: URL | null,
         defaultMetaSchemaId: MetaSchemaId,
     ) {
         const retrievalId = String(retrievalUrl);
 
-        let rootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
-        if (rootNodeUrl != null) {
-            return rootNodeUrl;
+        const maybeRootNodeUrl = this.retrievalRootNodeMap.get(retrievalId);
+        if (maybeRootNodeUrl != null) {
+            return maybeRootNodeUrl;
         }
 
         const rootNode = await this.fetchJsonFromUrl(
@@ -167,7 +167,7 @@ export class SchemaManager {
             throw new Error("invalid schema");
         }
 
-        rootNodeUrl = loader.selectNodeUrl(rootNode) ?? nodeUrl;
+        rootNodeUrl = loader.selectNodeUrl(rootNode) ?? rootNodeUrl;
 
         const rootNodeId = String(rootNodeUrl);
 
@@ -184,7 +184,7 @@ export class SchemaManager {
 
         await this.loadRootNode(
             rootNode,
-            nodeUrl,
+            rootNodeUrl,
             referencingUrl,
             defaultMetaSchemaId,
         );
