@@ -1,11 +1,8 @@
 {
   "version": "0.2",
   "language": "en",
+  "useGitignore": true,
   "ignorePaths": [
-    ".package/",
-    "node_modules/",
-    "coverage/",
-    "out/",
     "fixtures/"
   ],
   "words": [
