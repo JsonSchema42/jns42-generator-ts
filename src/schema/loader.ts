@@ -16,7 +16,13 @@ export interface SchemaLoaderNodeItem<N> {
 export abstract class SchemaLoaderBase<N> {
     protected abstract readonly metaSchemaId: MetaSchemaId
 
-    protected abstract selectNodeUrl(
+    public abstract getReferencedNodeUrls(
+        rootNode: N,
+        rootNodeUrl: URL,
+        retrievalUrl: URL,
+    ): Iterable<readonly [URL, URL]>
+
+    public abstract selectNodeUrl(
         node: N
     ): URL | undefined
 
@@ -38,6 +44,16 @@ export abstract class SchemaLoaderBase<N> {
     }
 
     public abstract selectSubNodeEntries(
+        nodePointer: string,
+        node: N
+    ): Iterable<readonly [string, N]>
+
+    public abstract selectAllSubNodeEntries(
+        nodePointer: string,
+        node: N
+    ): Iterable<readonly [string, N]>
+
+    public abstract selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
         node: N
     ): Iterable<readonly [string, N]>
@@ -69,63 +85,45 @@ export abstract class SchemaLoaderBase<N> {
         return this.rootNodeMap.values();
     }
 
-    public async loadFromRootNode(
+    public async loadRootNode(
         node: N,
         nodeUrl: URL,
-        retrievalUrl: URL,
         referencingNodeUrl: URL | null,
-        onRootNodeMetaSchema: (rootNodeId: string, metaSchemaId: MetaSchemaId) => void,
     ) {
-        let nodeId = String(nodeUrl);
+        const nodeId = String(nodeUrl);
 
-        const maybeNodeId = this.selectNodeUrl(node);
-        if (maybeNodeId != null) {
-            nodeUrl = new URL(maybeNodeId);
-            nodeId = String(nodeUrl);
+        if (this.rootNodeMap.has(nodeId)) {
+            throw new Error("rootNode already present");
         }
 
-        let item = this.rootNodeMap.get(nodeId);
-        if (item != null) {
-            return nodeUrl;
-        }
-
-        item = {
+        const item = {
             node,
             nodeUrl,
             referencingNodeUrl,
         };
 
         this.rootNodeMap.set(nodeId, item);
-
-        onRootNodeMetaSchema(nodeId, this.metaSchemaId);
-
-        await this.loadFromNode(node, nodeUrl, retrievalUrl);
-
-        await this.loadFromSubNodes(
-            node,
-            nodeUrl,
-            retrievalUrl,
-            "",
-        );
-
-        return nodeUrl;
     }
 
-    private async loadFromSubNodes(
-        node: N,
-        nodeUrl: URL,
-        retrievalUrl: URL,
-        nodePointer: string,
-    ) {
-        for (const [subNodePointer, subNode] of this.selectSubNodeEntries(nodePointer, node)) {
-            await this.loadFromNode(subNode, nodeUrl, retrievalUrl);
+    public * indexRootNode(rootNodeUrl: URL): Iterable<URL> {
+        const rootNodeId = String(rootNodeUrl);
+        const rootItem = this.rootNodeMap.get(rootNodeId);
+        if (rootItem == null) {
+            throw new Error("rootItem not found");
+        }
 
-            await this.loadFromSubNodes(
-                subNode,
-                nodeUrl,
-                retrievalUrl,
-                subNodePointer,
-            );
+        for (const [subPointer, subNode] of this.selectAllSubNodeEntriesAndSelf("", rootItem.node)) {
+            const subNodeUrl = new URL(`#${subPointer}`, rootNodeUrl);
+            const subNodeId = String(subNodeUrl);
+
+            const item: SchemaLoaderNodeItem<N> = {
+                node: subNode,
+                nodePointer: subPointer,
+                nodeRootUrl: rootNodeUrl,
+            };
+            this.nodeMap.set(subNodeId, item);
+
+            yield subNodeUrl;
         }
     }
 

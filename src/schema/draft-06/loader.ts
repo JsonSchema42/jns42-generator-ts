@@ -1,6 +1,6 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { metaSchema } from "./meta.js";
-import { selectNodeId, selectNodeRef, selectSubNodes } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeId, selectNodeRef, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -14,7 +14,27 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         return true;
     }
 
-    protected selectNodeUrl(node: Schema) {
+    public *getReferencedNodeUrls(
+        rootNode: Schema,
+        rootNodeUrl: URL,
+        retrievalUrl: URL,
+    ): Iterable<readonly [URL, URL]> {
+        for (const [pointer, node] of selectAllSubNodesAndSelf("", rootNode)) {
+            const nodeRef = selectNodeRef(node);
+            if (nodeRef == null) {
+                continue;
+            }
+
+            const refNodeUrl = new URL(nodeRef, rootNodeUrl);
+            const refRetrievalUrl = new URL(nodeRef, retrievalUrl);
+            refRetrievalUrl.hash = "";
+
+            yield [refNodeUrl, refRetrievalUrl] as const;
+
+        }
+    }
+
+    public selectNodeUrl(node: Schema) {
         const nodeId = selectNodeId(node);
         if (nodeId != null) {
             const nodeUrl = new URL(nodeId);
@@ -41,6 +61,20 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         node: Schema,
     ): Iterable<readonly [string, Schema]> {
         return selectSubNodes(nodePointer, node);
+    }
+
+    public selectAllSubNodeEntries(
+        nodePointer: string,
+        node: Schema,
+    ): Iterable<readonly [string, Schema]> {
+        return selectAllSubNodes(nodePointer, node);
+    }
+
+    public selectAllSubNodeEntriesAndSelf(
+        nodePointer: string,
+        node: Schema,
+    ): Iterable<readonly [string, Schema]> {
+        return selectAllSubNodesAndSelf(nodePointer, node);
     }
 
     protected async loadFromNode(

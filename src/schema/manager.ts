@@ -118,36 +118,27 @@ export class SchemaManager {
         ),
     };
 
-    public async loadFromRootNode(
-        node: unknown,
-        nodeUrl: URL,
-        retrievalUrl: URL,
+    public async loadRootNode(
+        rootNode: unknown,
+        rootNodeUrl: URL,
         referencingNodeUrl: URL | null,
         defaultMetaSchemaId: MetaSchemaId,
     ) {
-        const rootNodeSchemaMetaKey = discoverRootNodeMetaSchemaId(node) ??
+        const metaSchemaId = discoverRootNodeMetaSchemaId(rootNode) ??
             defaultMetaSchemaId;
 
-        const loader: SchemaLoaderBase<unknown> = this.loaders[rootNodeSchemaMetaKey];
+        const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
 
-        if (!loader.validateSchema(node)) {
-            throw new Error("invalid schema");
-        }
-        /*
-        typescript breaks here so we cast to any
-        */
-        return await loader.loadFromRootNode(
-            node,
-            nodeUrl,
-            retrievalUrl,
+        await loader.loadRootNode(
+            rootNode,
+            rootNodeUrl,
             referencingNodeUrl,
-            (nodeId: string, metaSchemaId: MetaSchemaId) => {
-                if (this.rootNodeMetaMap.has(nodeId)) {
-                    throw new Error("duplicate root nodeId");
-                }
-                this.rootNodeMetaMap.set(nodeId, metaSchemaId);
-            },
         );
+
+        for (const nodeUrl of loader.indexRootNode(rootNodeUrl)) {
+            const nodeId = String(nodeUrl);
+            this.rootNodeMetaMap.set(nodeId, metaSchemaId);
+        }
 
     }
 
@@ -164,27 +155,44 @@ export class SchemaManager {
             return rootNodeUrl;
         }
 
-        const schemaRootNode = await this.fetchSchemaRootNodeFromUrl(
+        const rootNode = await this.fetchJsonFromUrl(
             retrievalUrl,
         );
 
-        rootNodeUrl = await this.loadFromRootNode(
-            schemaRootNode,
-            nodeUrl,
-            retrievalUrl,
-            referencingUrl,
-            defaultMetaSchemaId,
-        );
+        const metaSchemaId = discoverRootNodeMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
+
+        const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
+
+        if (!loader.validateSchema(rootNode)) {
+            throw new Error("invalid schema");
+        }
+
+        rootNodeUrl = loader.selectNodeUrl(rootNode) ?? nodeUrl;
 
         const rootNodeId = String(rootNodeUrl);
 
         this.retrievalRootNodeMap.set(retrievalId, rootNodeUrl);
         this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
+        this.rootNodeMetaMap.set(rootNodeId, metaSchemaId);
+
+        for (
+            const [subNodeUrl, subRetrievalUrl] of
+            loader.getReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
+        ) {
+            this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
+        }
+
+        await this.loadRootNode(
+            rootNode,
+            nodeUrl,
+            referencingUrl,
+            defaultMetaSchemaId,
+        );
 
         return rootNodeUrl;
     }
 
-    private async fetchSchemaRootNodeFromUrl(
+    private async fetchJsonFromUrl(
         url: URL,
     ) {
         switch (url.protocol) {
