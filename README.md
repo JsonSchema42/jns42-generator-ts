@@ -1,1 +1,1 @@
-# goodschema, TypeScript edition
+# jns42-generator, TypeScript edition
