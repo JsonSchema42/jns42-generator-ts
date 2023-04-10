@@ -7,22 +7,40 @@ export interface SchemaLoaderRootNodeItem<N> {
     referencingNodeUrl: URL | null;
 }
 
+export interface SchemaLoaderNodeItem<N> {
+    node: N;
+    nodeRootUrl: URL;
+    nodePointer: string;
+}
+
 export abstract class SchemaLoaderBase<N> {
     protected abstract readonly metaSchemaId: MetaSchemaId
 
-    protected abstract selectNodeId(
+    protected abstract selectNodeUrl(
         node: N
-    ): string | undefined
-    protected abstract selectSubNodeEntries(
-        nodePointer: string,
-        node: N
-    ): Iterable<readonly [string, N]>
+    ): URL | undefined
 
     protected abstract loadFromNode(
         node: N,
         nodeUrl: URL,
         retrievalUrl: URL,
     ): Promise<void>
+
+    protected abstract makeNodeUrl(
+        node: N,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): URL
+
+    public selectRootNodeEntries(): Iterable<[URL, N]> {
+        return [...this.getRootNodeItems()].
+            map(({ nodeUrl, node }) => [nodeUrl, node]);
+    }
+
+    public abstract selectSubNodeEntries(
+        nodePointer: string,
+        node: N
+    ): Iterable<readonly [string, N]>
 
     public abstract validateSchema(node: N): boolean
 
@@ -33,6 +51,7 @@ export abstract class SchemaLoaderBase<N> {
     }
 
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem<N>>();
+    private readonly nodeMap = new Map<string, SchemaLoaderNodeItem<N>>();
 
     public hasRootNodeItem(nodeId: string) {
         return this.rootNodeMap.has(nodeId);
@@ -59,7 +78,7 @@ export abstract class SchemaLoaderBase<N> {
     ) {
         let nodeId = String(nodeUrl);
 
-        const maybeNodeId = this.selectNodeId(node);
+        const maybeNodeId = this.selectNodeUrl(node);
         if (maybeNodeId != null) {
             nodeUrl = new URL(maybeNodeId);
             nodeId = String(nodeUrl);

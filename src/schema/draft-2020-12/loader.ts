@@ -14,11 +14,29 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         return true;
     }
 
-    protected selectNodeId(node: Schema) {
-        return selectNodeId(node);
+    protected selectNodeUrl(node: Schema) {
+        const nodeId = selectNodeId(node);
+        if (nodeId != null) {
+            const nodeUrl = new URL(nodeId);
+            return nodeUrl;
+        }
     }
 
-    protected selectSubNodeEntries(
+    protected makeNodeUrl(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): URL {
+        let nodeUrl = this.selectNodeUrl(node);
+        if (nodeUrl != null) {
+            return nodeUrl;
+        }
+
+        nodeUrl = new URL(`#${nodePointer}`, nodeRootUrl);
+        return nodeUrl;
+    }
+
+    public selectSubNodeEntries(
         nodePointer: string,
         node: Schema,
     ): Iterable<readonly [string, Schema]> {
