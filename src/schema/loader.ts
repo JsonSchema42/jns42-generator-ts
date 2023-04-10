@@ -61,8 +61,8 @@ export abstract class SchemaLoaderBase<N> {
 
         const maybeNodeId = this.selectNodeId(node);
         if (maybeNodeId != null) {
-            nodeId = maybeNodeId;
-            nodeUrl = new URL(nodeId);
+            nodeUrl = new URL(maybeNodeId);
+            nodeId = String(nodeUrl);
         }
 
         let item = this.rootNodeMap.get(nodeId);

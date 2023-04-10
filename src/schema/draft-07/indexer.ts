@@ -20,21 +20,22 @@ export class SchemaIndexer extends SchemaIndexerBase<Schema> {
         return selectNodeInstanceEntries(nodePointer, node);
     }
 
-    protected makeNodeId(
+    protected makeNodeUrl(
         node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): string {
+    ): URL {
         /*
         if a node has an id set, use that!
         */
         const nodeId = selectNodeId(node);
         if (nodeId != null) {
-            return nodeId;
+            const nodeUrl = new URL(nodeId);
+            return nodeUrl;
         }
 
         const nodeUrl = new URL(`#${nodePointer}`, nodeRootUrl);
-        return String(nodeUrl);
+        return nodeUrl;
     }
 
     constructor(
