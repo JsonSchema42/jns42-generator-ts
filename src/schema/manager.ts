@@ -179,7 +179,7 @@ export class SchemaManager {
             const [subNodeUrl, subRetrievalUrl] of
             loader.getReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
         ) {
-            this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
+            await this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
         }
 
         await this.loadRootNode(
