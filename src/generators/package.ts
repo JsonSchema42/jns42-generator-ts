@@ -6,12 +6,13 @@ import { Namer, formatData, formatStatements, projectRoot } from "../utils/index
 import { getMainTsStatements } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
+import { getTypesTsStatements } from "./types-ts.js";
+import { getValidatorsTsStatements } from "./validators-ts.js";
 
 export interface PackageOptions {
     name: string
     version: string
     directoryPath: string
-    generateTest: boolean
     rootNodeUrl: URL
 }
 
@@ -46,17 +47,17 @@ export function generatePackage(
     }
 
     {
-        const content = getTypesFileContent(factory, manager);
+        const statements = getTypesTsStatements(factory, manager);
         const filePath = path.join(options.directoryPath, "types.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.writeFileSync(filePath, content);
+        fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const content = getValidatorsFileContent(factory, manager);
+        const statements = getValidatorsTsStatements(factory, manager);
         const filePath = path.join(options.directoryPath, "validators.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.writeFileSync(filePath, content);
+        fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
@@ -64,48 +65,6 @@ export function generatePackage(
         const filePath = path.join(options.directoryPath, "validation.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.copyFileSync(content, filePath);
-    }
-    if (options.generateTest) {
-        const content = getSpecFileContent(factory, manager, options.rootNodeUrl);
-        const filePath = path.join(options.directoryPath, "schema.spec.ts");
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.writeFileSync(filePath, content);
-
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.mkdirSync(path.join(options.directoryPath, "examples", "valid"), { recursive: true });
-        {
-            let index = 0;
-            for (const example of manager.generateValidExamples(options.rootNodeUrl)) {
-                index++;
-                const content = JSON.stringify(example, undefined, 2);
-                const filePath = path.join(
-                    options.directoryPath,
-                    "examples",
-                    "valid",
-                    `valid-${options.name}-${index}.json`,
-                );
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                fs.writeFileSync(filePath, content);
-            }
-        }
-
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.mkdirSync(path.join(options.directoryPath, "examples", "invalid"), { recursive: true });
-        {
-            let index = 0;
-            for (const example of manager.generateInvalidExamples(options.rootNodeUrl)) {
-                index++;
-                const content = JSON.stringify(example, undefined, 2);
-                const filePath = path.join(
-                    options.directoryPath,
-                    "examples",
-                    "invalid",
-                    `invalid-${options.name}-${index}.json`,
-                );
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                fs.writeFileSync(filePath, content);
-            }
-        }
     }
 
 }

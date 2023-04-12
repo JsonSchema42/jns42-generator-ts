@@ -3,8 +3,9 @@ import * as path from "node:path";
 import { PackageJson } from "type-fest";
 import ts from "typescript";
 import * as yargs from "yargs";
+import { generatePackage } from "../generators/index.js";
 import { SchemaManager } from "../schema/index.js";
-import { Namer, packageInfo, projectRoot } from "../utils/index.js";
+import { Namer, packageInfo } from "../utils/index.js";
 
 export function configureLabProgram(argv: yargs.Argv) {
     return argv.
@@ -83,38 +84,12 @@ async function main(options: MainOptions) {
 
     manager.initialize();
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(packageDirectoryPath, { recursive: true });
-
-    const packageFileContent = getPackageFileContent(packageName, packageVersion);
-    const packageFilePath = path.join(packageDirectoryPath, "package.json");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(packageFilePath, packageFileContent);
-
-    const tsconfigFileContent = getTsconfigFileContent();
-    const tsconfigFilePath = path.join(packageDirectoryPath, "tsconfig.json");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(tsconfigFilePath, tsconfigFileContent);
-
-    const mainFileContent = getMainFileContent(factory);
-    const mainFilePath = path.join(packageDirectoryPath, "main.ts");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(mainFilePath, mainFileContent);
-
-    const typesFileContent = getTypesFileContent(factory, manager);
-    const typesFilePath = path.join(packageDirectoryPath, "types.ts");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(typesFilePath, typesFileContent);
-
-    const validatorsFileContent = getValidatorsFileContent(factory, manager);
-    const validatorsFilePath = path.join(packageDirectoryPath, "validators.ts");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(validatorsFilePath, validatorsFileContent);
-
-    const validationSourceFileContent = path.join(projectRoot, "src", "includes", "validation.ts");
-    const validationFilePath = path.join(packageDirectoryPath, "validation.ts");
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.copyFileSync(validationSourceFileContent, validationFilePath);
+    generatePackage(factory, manager, namer, {
+        directoryPath: packageDirectoryPath,
+        name: packageName,
+        version: packageVersion,
+        rootNodeUrl,
+    });
 
     if (options.generateTest) {
         const specFileContent = getSpecFileContent(factory, manager, rootNodeUrl);
