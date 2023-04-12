@@ -1,3 +1,4 @@
+export * from "./file.js";
 export * from "./literal.js";
 export * from "./namer.js";
 export * from "./object.js";

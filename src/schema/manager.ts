@@ -236,6 +236,9 @@ export class SchemaManager {
         }
     }
 
+    /**
+     * @deprecated
+     */
     public getName(nodeId: string) {
         const name = this.namer.getName(nodeId);
 
@@ -250,6 +253,9 @@ export class SchemaManager {
         return this.retrievalRootNodeMap.get(nodeRetrievalId);
     }
 
+    /**
+     * @deprecated
+     */
     public *generateTypeStatements(
         factory: ts.NodeFactory,
     ) {
@@ -264,6 +270,9 @@ export class SchemaManager {
 
     }
 
+    /**
+     * @deprecated
+     */
     public *generateValidatorStatements(
         factory: ts.NodeFactory,
     ) {
@@ -297,6 +306,9 @@ export class SchemaManager {
         }
     }
 
+    /**
+     * @deprecated
+     */
     public *generateSpecStatements(
         factory: ts.NodeFactory,
         nodeUrl: URL,
@@ -378,6 +390,9 @@ export class SchemaManager {
 
     }
 
+    /**
+     * @deprecated
+     */
     public generateExamples(nodeId: string) {
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
@@ -388,6 +403,9 @@ export class SchemaManager {
         return exampleGenerator.generateFromNode(nodeId);
     }
 
+    /**
+     * @deprecated
+     */
     public *generateValidExamples(nodeUrl: URL) {
         const nodeId = String(nodeUrl);
         for (const [error, example] of this.generateExamples(nodeId)) {
@@ -398,6 +416,9 @@ export class SchemaManager {
         }
     }
 
+    /**
+     * @deprecated
+     */
     public *generateInvalidExamples(nodeUrl: URL) {
         const nodeId = String(nodeUrl);
         for (const [error, example] of this.generateExamples(nodeId)) {
@@ -408,6 +429,9 @@ export class SchemaManager {
         }
     }
 
+    /**
+     * @deprecated
+     */
     private * getTypeNames(
         metaSchemaId: MetaSchemaId,
         nodeId: string,
