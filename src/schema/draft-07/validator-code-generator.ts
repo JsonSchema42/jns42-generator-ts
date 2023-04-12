@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { Namer } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaLoader } from "./loader.js";
@@ -14,6 +15,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     protected *generateValidatorFunctionBodyStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -37,6 +39,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             for (const type of types) {
                 statement = this.generateTypeValidationIfStatement(
                     factory,
+                    namer,
                     nodeId,
                     type,
                     statement,
@@ -49,6 +52,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     protected *generateArrayTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -104,7 +108,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
                 );
                 const subNodeId = String(subNodeUrl);
 
-                const typeName = this.manager.getName(subNodeId);
+                const typeName = namer.getName(subNodeId).join("_");
 
                 yield factory.createExpressionStatement(factory.createYieldExpression(
                     factory.createToken(ts.SyntaxKind.AsteriskToken),
@@ -141,7 +145,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             );
             const subNodeId = String(subNodeUrl);
 
-            const typeName = this.manager.getName(subNodeId);
+            const typeName = namer.getName(subNodeId).join("_");
 
             yield factory.createForOfStatement(
                 undefined,
@@ -206,6 +210,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     protected *generateObjectTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -259,7 +264,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             );
             const subNodeId = String(subNodeUrl);
 
-            const typeName = this.manager.getName(subNodeId);
+            const typeName = namer.getName(subNodeId).join("_");
 
             yield factory.createForOfStatement(
                 undefined,
@@ -332,7 +337,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
             );
             const subNodeId = String(subNodeUrl);
 
-            const typeName = this.manager.getName(subNodeId);
+            const typeName = namer.getName(subNodeId).join("_");
 
             yield factory.createIfStatement(
                 factory.createBinaryExpression(
@@ -371,6 +376,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     protected * generateStringTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -416,6 +422,7 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
 
     protected * generateNumberTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);

@@ -47,14 +47,14 @@ export function generatePackage(
     }
 
     {
-        const statements = getTypesTsStatements(factory, manager);
+        const statements = getTypesTsStatements(factory, namer, manager);
         const filePath = path.join(options.directoryPath, "types.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const statements = getValidatorsTsStatements(factory, manager);
+        const statements = getValidatorsTsStatements(factory, namer, manager);
         const filePath = path.join(options.directoryPath, "validators.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));

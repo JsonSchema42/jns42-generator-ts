@@ -1,47 +1,56 @@
 import ts from "typescript";
-import { generateLiteral } from "../utils/index.js";
+import { Namer, generateLiteral } from "../utils/index.js";
 import { SchemaCodeGeneratorBase } from "./code-generator.js";
 
 export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGeneratorBase {
 
     protected abstract generateValidatorFunctionBodyStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement>
 
     protected generateNullTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
         return [];
     }
     protected abstract generateArrayTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string
     ): Iterable<ts.Statement>
     protected abstract generateObjectTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string
     ): Iterable<ts.Statement>
     protected abstract generateStringTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string
     ): Iterable<ts.Statement>
     protected abstract generateNumberTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string
     ): Iterable<ts.Statement>
     protected generateIntegerTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
         return this.generateNumberTypeValidationStatements(
             factory,
+            namer,
             nodeId,
         );
     }
     protected generateBooleanTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
         return [];
@@ -49,12 +58,14 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
 
     public *generateStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ) {
-        const typeName = this.manager.getName(nodeId);
+        const typeName = namer.getName(nodeId).join("_");
 
         yield this.generateValidatorFunctionDeclarationStatement(
             factory,
+            namer,
             nodeId,
             typeName,
         );
@@ -62,6 +73,7 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
 
     protected generateValidatorFunctionDeclarationStatement(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
         typeName: string,
     ): ts.FunctionDeclaration {
@@ -78,7 +90,7 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
                     undefined,
                     "value",
                     undefined,
-                    this.generateTypeReference(factory, nodeId),
+                    this.generateTypeReference(factory, namer, nodeId),
                 ),
                 factory.createParameterDeclaration(
                     undefined,
@@ -102,7 +114,7 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
                 ],
             ),
             factory.createBlock(
-                [...this.generateValidatorFunctionBodyStatements(factory, nodeId)],
+                [...this.generateValidatorFunctionBodyStatements(factory, namer, nodeId)],
                 true,
             ),
         );
@@ -110,12 +122,13 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
 
     protected generateTypeValidationIfStatement(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
         type: string,
         elseStatement: ts.Statement,
     ) {
         const thenBlock = factory.createBlock(
-            [...this.generateTypeValidationStatements(factory, nodeId, type)],
+            [...this.generateTypeValidationStatements(factory, namer, nodeId, type)],
             true,
         );
 
@@ -133,36 +146,37 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
 
     protected *generateTypeValidationStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
         type: string,
     ) {
         switch (type) {
             case "null":
-                yield* this.generateNullTypeValidationStatements(factory, nodeId);
+                yield* this.generateNullTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             case "array":
-                yield* this.generateArrayTypeValidationStatements(factory, nodeId);
+                yield* this.generateArrayTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             case "object":
-                yield* this.generateObjectTypeValidationStatements(factory, nodeId);
+                yield* this.generateObjectTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             case "string":
-                yield* this.generateStringTypeValidationStatements(factory, nodeId);
+                yield* this.generateStringTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             case "number":
-                yield* this.generateNumberTypeValidationStatements(factory, nodeId);
+                yield* this.generateNumberTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             case "integer":
-                yield* this.generateIntegerTypeValidationStatements(factory, nodeId);
+                yield* this.generateIntegerTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             case "boolean":
-                yield* this.generateBooleanTypeValidationStatements(factory, nodeId);
+                yield* this.generateBooleanTypeValidationStatements(factory, namer, nodeId);
                 break;
 
             default:
@@ -311,9 +325,10 @@ export abstract class SchemaValidatorCodeGeneratorBase extends SchemaCodeGenerat
 
     protected generateTypeReference(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ) {
-        const typeName = this.manager.getName(nodeId);
+        const typeName = namer.getName(nodeId).join("_");
         return factory.createTypeReferenceNode(
             factory.createQualifiedName(
                 factory.createIdentifier("types"),

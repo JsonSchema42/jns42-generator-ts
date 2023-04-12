@@ -1,7 +1,7 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
 import ts from "typescript";
-import { Namer } from "../utils/namer.js";
+import { Namer } from "../utils/index.js";
 import * as schemaDraft04 from "./draft-04/index.js";
 import * as schemaDraft06 from "./draft-06/index.js";
 import * as schemaDraft07 from "./draft-07/index.js";
@@ -12,9 +12,7 @@ import { MetaSchemaId } from "./meta.js";
 
 export class SchemaManager {
 
-    constructor(
-        private readonly namer: Namer,
-    ) {
+    constructor() {
         //
     }
 
@@ -225,26 +223,6 @@ export class SchemaManager {
         }
     }
 
-    /**
-     * @deprecated
-     */
-    public async initialize() {
-        for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
-            for (const [nodeId, name] of this.getTypeNames(metaSchemaId, rootNodeId)) {
-                this.namer.registerName(nodeId, name);
-            }
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public getName(nodeId: string) {
-        const name = this.namer.getName(nodeId);
-
-        return name.join("_");
-    }
-
     public getNodeRetrievalUrl(nodeRootId: string) {
         return this.rootNodeRetrievalMap.get(nodeRootId);
     }
@@ -258,12 +236,14 @@ export class SchemaManager {
      */
     public *generateTypeStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
     ) {
         for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
 
             const codeGenerator = this.typeCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
+                namer,
                 nodeId,
             );
         }
@@ -275,6 +255,7 @@ export class SchemaManager {
      */
     public *generateValidatorStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
     ) {
         yield factory.createImportDeclaration(
             undefined,
@@ -301,6 +282,7 @@ export class SchemaManager {
             const codeGenerator = this.validatorCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
+                namer,
                 nodeId,
             );
         }
@@ -311,6 +293,7 @@ export class SchemaManager {
      */
     public *generateSpecStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeUrl: URL,
     ) {
         const nodeId = String(nodeUrl);
@@ -384,6 +367,7 @@ export class SchemaManager {
             const codeGenerator = this.specCodeGenerators[metaSchemaId];
             yield* codeGenerator.generateStatements(
                 factory,
+                namer,
                 nodeId,
             );
         }

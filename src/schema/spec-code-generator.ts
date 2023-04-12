@@ -1,9 +1,11 @@
 import ts from "typescript";
+import { Namer } from "../utils/index.js";
 import { SchemaCodeGeneratorBase } from "./code-generator.js";
 
 export abstract class SchemaSpecCodeGeneratorBase extends SchemaCodeGeneratorBase {
     public * generateStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
         yield factory.createExpressionStatement(factory.createCallExpression(
@@ -25,7 +27,7 @@ export abstract class SchemaSpecCodeGeneratorBase extends SchemaCodeGeneratorBas
                     undefined,
                     factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                     factory.createBlock(
-                        [...this.generateTestValidStatements(factory, nodeId)],
+                        [...this.generateTestValidStatements(factory, namer, nodeId)],
                         true,
                     ),
                 ),
@@ -51,7 +53,7 @@ export abstract class SchemaSpecCodeGeneratorBase extends SchemaCodeGeneratorBas
                     undefined,
                     factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                     factory.createBlock(
-                        [...this.generateTestInvalidStatements(factory, nodeId)],
+                        [...this.generateTestInvalidStatements(factory, namer, nodeId)],
                         true,
                     ),
                 ),
@@ -62,9 +64,10 @@ export abstract class SchemaSpecCodeGeneratorBase extends SchemaCodeGeneratorBas
 
     public * generateTestValidStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
-        const name = this.manager.getName(nodeId);
+        const name = namer.getName(nodeId).join("_");
 
         yield factory.createVariableStatement(
             undefined,
@@ -225,9 +228,10 @@ export abstract class SchemaSpecCodeGeneratorBase extends SchemaCodeGeneratorBas
 
     public * generateTestInvalidStatements(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.Statement> {
-        const name = this.manager.getName(nodeId);
+        const name = namer.getName(nodeId).join("_");
 
         yield factory.createVariableStatement(
             undefined,

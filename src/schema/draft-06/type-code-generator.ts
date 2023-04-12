@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { generatePrimitiveLiteral } from "../../utils/index.js";
+import { Namer, generatePrimitiveLiteral } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaTypeCodeGeneratorBase } from "../type-code-generator.js";
 import { SchemaLoader } from "./loader.js";
@@ -31,6 +31,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
     protected * generateTypeNodes(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): Iterable<ts.TypeNode> {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -55,6 +56,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             const nodeId = String(nodeUrl);
             yield this.generateTypeReference(
                 factory,
+                namer,
                 nodeId,
             );
 
@@ -85,6 +87,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                     const subNodeId = String(subNodeUrl);
                     return this.generateTypeReference(
                         factory,
+                        namer,
                         subNodeId,
                     );
                 }),
@@ -102,6 +105,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                     const subNodeId = String(subNodeUrl);
                     return this.generateTypeReference(
                         factory,
+                        namer,
                         subNodeId,
                     );
                 }),
@@ -119,6 +123,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                     const subNodeId = String(subNodeUrl);
                     return this.generateTypeReference(
                         factory,
+                        namer,
                         subNodeId,
                     );
                 }),
@@ -130,6 +135,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             yield factory.createParenthesizedType(factory.createUnionTypeNode(
                 types.map(type => this.generateTypeDefinition(
                     factory,
+                    namer,
                     nodeId,
                     type,
                 )),
@@ -140,6 +146,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
     protected generateObjectTypeDefinition(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): ts.TypeNode {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -164,6 +171,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                     ),
                     this.generateTypeReference(
                         factory,
+                        namer,
                         subNodeId,
                     ),
                 ],
@@ -190,6 +198,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                             factory.createToken(ts.SyntaxKind.QuestionToken),
                         this.generateTypeReference(
                             factory,
+                            namer,
                             subNodeId,
                         ),
                     );
@@ -210,6 +219,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
 
     protected generateArrayTypeDefinition(
         factory: ts.NodeFactory,
+        namer: Namer,
         nodeId: string,
     ): ts.TypeNode {
         const nodeItem = this.loader.getNodeItem(nodeId);
@@ -227,7 +237,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             return factory.createTypeReferenceNode(
                 "Array",
                 [
-                    this.generateTypeReference(factory, subNodeId),
+                    this.generateTypeReference(factory, namer, subNodeId),
                 ],
             );
         }
@@ -245,7 +255,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
             return factory.createTypeReferenceNode(
                 "Array",
                 [
-                    this.generateTypeReference(factory, subNodeId),
+                    this.generateTypeReference(factory, namer, subNodeId),
                 ],
             );
         }
@@ -264,7 +274,7 @@ export class SchemaTypeCodeGenerator extends SchemaTypeCodeGeneratorBase {
                             nodeItem.nodeRootUrl,
                         );
                         const subNodeId = String(subNodeUrl);
-                        return this.generateTypeReference(factory, subNodeId);
+                        return this.generateTypeReference(factory, namer, subNodeId);
                     },
                 ),
             );

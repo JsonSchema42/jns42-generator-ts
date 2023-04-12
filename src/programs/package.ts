@@ -72,7 +72,7 @@ async function main(options: MainOptions) {
     const factory = ts.factory;
 
     const namer = new Namer(options.uniqueNameSeed);
-    const manager = new SchemaManager(namer);
+    const manager = new SchemaManager();
 
     const rootNodeUrl = await manager.loadFromUrl(
         schemaUrl,
@@ -80,8 +80,6 @@ async function main(options: MainOptions) {
         null,
         defaultMetaSchemaId,
     );
-
-    manager.initialize();
 
     generatePackage(factory, manager, namer, {
         directoryPath: packageDirectoryPath,
@@ -91,7 +89,7 @@ async function main(options: MainOptions) {
     });
 
     if (options.generateTest) {
-        const statements = getSpecTsStatements(factory, manager, rootNodeUrl);
+        const statements = getSpecTsStatements(factory, namer, manager, rootNodeUrl);
         const filePath = path.join(packageDirectoryPath, "schema.spec.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));
@@ -127,11 +125,12 @@ async function main(options: MainOptions) {
 
 function getSpecTsStatements(
     factory: ts.NodeFactory,
+    namer: Namer,
     manager: SchemaManager,
     nodeUrl: URL,
 ) {
 
-    const statements = manager.generateSpecStatements(factory, nodeUrl);
+    const statements = manager.generateSpecStatements(factory, namer, nodeUrl);
 
     return statements;
 }
