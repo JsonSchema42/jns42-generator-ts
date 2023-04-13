@@ -247,7 +247,6 @@ export class SchemaManager {
                 nodeId,
             );
         }
-
     }
 
     /**
@@ -371,7 +370,6 @@ export class SchemaManager {
                 nodeId,
             );
         }
-
     }
 
     /**
@@ -476,7 +474,6 @@ export class SchemaManager {
                 name,
             );
         }
-
     }
 
 }

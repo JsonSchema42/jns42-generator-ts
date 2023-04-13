@@ -20,7 +20,6 @@ export class MainTsCodeGenerator extends CodeGeneratorBase {
             factory.createStringLiteral("./validators.js"),
             undefined,
         );
-
     }
 
 }
