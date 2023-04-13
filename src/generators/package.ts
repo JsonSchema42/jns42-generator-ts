@@ -13,7 +13,6 @@ export interface PackageOptions {
     name: string
     version: string
     directoryPath: string
-    rootNodeUrl: URL
 }
 
 export function generatePackage(

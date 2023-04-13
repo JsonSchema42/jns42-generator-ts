@@ -80,7 +80,6 @@ async function main(options: MainOptions) {
         null,
         defaultMetaSchemaId,
     );
-    const rootNodeId = String(rootNodeUrl);
 
     for (const [nodeId, typeName] of manager.getTypeNames()) {
         namer.registerName(nodeId, typeName);
@@ -90,7 +89,6 @@ async function main(options: MainOptions) {
         directoryPath: packageDirectoryPath,
         name: packageName,
         version: packageVersion,
-        rootNodeUrl,
     });
 
     if (options.generateTest) {
