@@ -4,7 +4,9 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        yield* this.manager.generateTypeStatements(this.factory, this.namer);
+        for (const [nodeId, typeName] of this.manager.getTypeNames()) {
+            yield* this.generateNodeStatements(nodeId);
+        }
     }
 
     protected * generateNodeStatements(

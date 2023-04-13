@@ -5,7 +5,20 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        yield* this.manager.generateValidatorStatements(this.factory, this.namer);
+        for (const [nodeId, typeName] of this.manager.getTypeNames()) {
+            yield* this.generateNodeStatements(nodeId);
+        }
+    }
+
+    protected *generateNodeStatements(
+        nodeId: string,
+    ) {
+        const typeName = this.namer.getName(nodeId).join("_");
+
+        yield this.generateValidatorFunctionDeclarationStatement(
+            nodeId,
+            typeName,
+        );
     }
 
     protected generateValidatorFunctionBodyStatements(
@@ -50,17 +63,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         nodeId: string,
     ): Iterable<ts.Statement> {
         return [];
-    }
-
-    public *generateStatements(
-        nodeId: string,
-    ) {
-        const typeName = this.namer.getName(nodeId).join("_");
-
-        yield this.generateValidatorFunctionDeclarationStatement(
-            nodeId,
-            typeName,
-        );
     }
 
     protected generateValidatorFunctionDeclarationStatement(
