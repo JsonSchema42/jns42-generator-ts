@@ -3,11 +3,11 @@ import path from "node:path";
 import ts from "typescript";
 import { SchemaManager } from "../schema/manager.js";
 import { Namer, formatData, formatStatements, projectRoot } from "../utils/index.js";
-import { getMainTsStatements } from "./main-ts.js";
+import { MainTsCodeGenerator } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
-import { getTypesTsStatements } from "./types-ts.js";
-import { getValidatorsTsStatements } from "./validators-ts.js";
+import { TypesTsCodeGenerator } from "./types-ts.js";
+import { ValidatorsTsCodeGenerator } from "./validators-ts.js";
 
 export interface PackageOptions {
     name: string
@@ -40,21 +40,36 @@ export function generatePackage(
     }
 
     {
-        const statements = getMainTsStatements(factory);
+        const codeGenerator = new MainTsCodeGenerator(
+            factory,
+            namer,
+            manager,
+        );
+        const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const statements = getTypesTsStatements(factory, namer, manager);
+        const codeGenerator = new TypesTsCodeGenerator(
+            factory,
+            namer,
+            manager,
+        );
+        const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "types.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const statements = getValidatorsTsStatements(factory, namer, manager);
+        const codeGenerator = new ValidatorsTsCodeGenerator(
+            factory,
+            namer,
+            manager,
+        );
+        const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));

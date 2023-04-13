@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2020",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "outDir": "./out",
     "rootDir": "./src",
     "sourceMap": true,
@@ -13,5 +13,7 @@
     "strict": true,
     "experimentalDecorators": true
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ]
 }

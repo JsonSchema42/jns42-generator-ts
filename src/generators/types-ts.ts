@@ -1,12 +1,9 @@
-import ts from "typescript";
-import { SchemaManager } from "../schema/manager.js";
-import { Namer } from "../utils/index.js";
+import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export function* getTypesTsStatements(
-    factory: ts.NodeFactory,
-    namer: Namer,
-    manager: SchemaManager,
-) {
-    yield* manager.generateTypeStatements(factory, namer);
+export class TypesTsCodeGenerator extends CodeGeneratorBase {
+
+    public * getStatements() {
+        yield* this.manager.generateTypeStatements(this.factory, this.namer);
+    }
 
 }

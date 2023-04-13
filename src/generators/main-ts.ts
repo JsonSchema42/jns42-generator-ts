@@ -1,23 +1,26 @@
-import ts from "typescript";
+import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export function* getMainTsStatements(
-    factory: ts.NodeFactory,
-) {
+export class MainTsCodeGenerator extends CodeGeneratorBase {
 
-    yield factory.createExportDeclaration(
-        undefined,
-        false,
-        undefined,
-        factory.createStringLiteral("./types.js"),
-        undefined,
-    );
+    public * getStatements() {
+        const { factory } = this;
 
-    yield factory.createExportDeclaration(
-        undefined,
-        false,
-        undefined,
-        factory.createStringLiteral("./validators.js"),
-        undefined,
-    );
+        yield factory.createExportDeclaration(
+            undefined,
+            false,
+            undefined,
+            factory.createStringLiteral("./types.js"),
+            undefined,
+        );
+
+        yield factory.createExportDeclaration(
+            undefined,
+            false,
+            undefined,
+            factory.createStringLiteral("./validators.js"),
+            undefined,
+        );
+
+    }
 
 }
