@@ -413,12 +413,15 @@ export class SchemaManager {
         }
     }
 
-    /**
-     * @deprecated
-     */
-    private * getTypeNames(
-        metaSchemaId: MetaSchemaId,
+    public * getTypeNames() {
+        for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
+            yield* this.getNodeTypeNames(rootNodeId, metaSchemaId);
+        }
+    }
+
+    private * getNodeTypeNames(
         nodeId: string,
+        metaSchemaId: MetaSchemaId,
         baseName = "",
     ): Iterable<readonly [string, string]> {
         const reReplace = /[^A-Za-z0-9]/gu;
@@ -463,16 +466,13 @@ export class SchemaManager {
 
         for (
             const [subNodePointer] of
-            /*
-            ye typescript breaks here
-            */
             loader.selectSubNodeEntries(nodePointer, node)
         ) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
             const subNodeId = String(subNodeUrl);
-            yield* this.getTypeNames(
-                metaSchemaId,
+            yield* this.getNodeTypeNames(
                 subNodeId,
+                metaSchemaId,
                 name,
             );
         }
