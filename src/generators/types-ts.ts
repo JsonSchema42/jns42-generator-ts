@@ -67,13 +67,6 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         );
     }
 
-    protected generateTypeNodes(
-        nodeId: string,
-    ): Iterable<ts.TypeNode> {
-        throw new Error("todo");
-
-    }
-
     protected generateSchemaTypeDeclarationStatement(
         nodeId: string,
         typeName: string,
@@ -84,7 +77,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             ],
             typeName,
             undefined,
-            this.generateTypeNode(
+            this.generateComposedTypeNode(
                 nodeId,
             ),
         );
@@ -102,7 +95,13 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         return declaration;
     }
 
-    protected generateTypeNode(
+    protected generateTypeNodes(
+        nodeId: string,
+    ): Iterable<ts.TypeNode> {
+        throw new Error("todo");
+    }
+
+    protected generateComposedTypeNode(
         nodeId: string,
     ): ts.TypeNode {
         const typeNodes = [...this.generateTypeNodes(nodeId)];
