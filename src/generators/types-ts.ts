@@ -21,12 +21,6 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     }
 
-    protected getComments(
-        nodeId: string,
-    ): string {
-        throw new Error("todo");
-    }
-
     protected generateNullTypeDefinition(
         nodeId: string,
     ): ts.TypeNode {
@@ -95,12 +89,12 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             ),
         );
 
-        const comments = this.getComments(nodeId);
+        const comments = this.manager.getComments(nodeId);
         if (comments.length > 0) {
             ts.addSyntheticLeadingComment(
                 declaration,
                 ts.SyntaxKind.MultiLineCommentTrivia,
-                "*\n" + this.getComments(nodeId),
+                "*\n" + comments,
                 true,
             );
         }
