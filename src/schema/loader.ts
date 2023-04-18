@@ -13,7 +13,15 @@ export interface SchemaLoaderNodeItem<N> {
     nodePointer: string;
 }
 
-export abstract class SchemaLoaderBase<N> {
+export interface LoaderStrategy {
+    getComments(nodeId: string): string;
+
+}
+
+export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
+
+    public abstract getComments(nodeId: string): string
+
     protected abstract readonly metaSchemaId: MetaSchemaId
 
     public abstract isSchemaRootNode(node: unknown): node is N;

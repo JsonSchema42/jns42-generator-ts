@@ -7,10 +7,10 @@ import * as schemaDraft06 from "./draft-06/index.js";
 import * as schemaDraft07 from "./draft-07/index.js";
 import * as schema201909 from "./draft-2019-09/index.js";
 import * as schema202012 from "./draft-2020-12/index.js";
-import { SchemaLoaderBase } from "./loader.js";
+import { LoaderStrategy, SchemaLoaderBase } from "./loader.js";
 import { MetaSchemaId } from "./meta.js";
 
-export class SchemaManager {
+export class SchemaManager implements LoaderStrategy {
 
     constructor() {
         //
@@ -474,6 +474,16 @@ export class SchemaManager {
                 name,
             );
         }
+    }
+
+    public getComments(nodeId: string) {
+        const metaSchemaId = this.nodeMetaMap.get(nodeId);
+        if (metaSchemaId == null) {
+            throw new Error("meta schema id not found");
+        }
+
+        const loader = this.loaders[metaSchemaId];
+        return loader.getComments(nodeId);
     }
 
 }

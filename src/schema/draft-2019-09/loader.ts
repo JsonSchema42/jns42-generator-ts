@@ -1,6 +1,6 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeId, selectNodeRecursiveAnchor, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeDeprecated, selectNodeDescription, selectNodeId, selectNodeRecursiveAnchor, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -222,6 +222,24 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             nodeRootUrl,
             nodePointer,
         );
+    }
+
+    public getComments(nodeId: string): string {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        const description = selectNodeDescription(nodeItem.node) ?? "";
+        const deprecated = selectNodeDeprecated(nodeItem.node) ?? false;
+
+        const lines = [
+            description,
+            deprecated ? "@deprecated" : "",
+        ].
+            map(line => line.trim()).
+            filter(line => line.length > 0).
+            map(line => line + "\n").
+            join("");
+
+        return lines;
     }
 
 }
