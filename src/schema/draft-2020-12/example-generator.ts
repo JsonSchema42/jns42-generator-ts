@@ -2,7 +2,7 @@ import { createString, flattenObject } from "../../utils/index.js";
 import { SchemaExampleGeneratorBase } from "../example-generator.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeDynamicRef, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectSubNodeItemsEntries, selectSubNodePropertyEntries, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxLength, selectValidationMaximum, selectValidationMinLength, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern } from "./selectors.js";
+import { selectNodeDynamicRef, selectNodePropertyNamesEntries, selectNodeRef, selectNodeRequiredPropertyNames, selectNodeTypes, selectSubNodeItemsEntries, selectSubNodePropertyEntries, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumLength, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumLength, selectValidationMultipleOf, selectValidationValuePattern } from "./selectors.js";
 
 export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     constructor(
@@ -187,9 +187,9 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     ): Iterable<[number, unknown]> {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const validationMinLength = selectValidationMinLength(nodeItem.node);
-        const validationMaxLength = selectValidationMaxLength(nodeItem.node);
-        const validationPattern = selectValidationPattern(nodeItem.node);
+        const validationMinLength = selectValidationMinimumLength(nodeItem.node);
+        const validationMaxLength = selectValidationMaximumLength(nodeItem.node);
+        const validationPattern = selectValidationValuePattern(nodeItem.node);
 
         if (validationMinLength != null) {
             yield [1, createString(validationMinLength - 1)];
@@ -224,10 +224,10 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     ): Iterable<[number, unknown]> {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const validationMinimum = selectValidationMinimum(nodeItem.node);
-        const validationExclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
-        const validationMaximum = selectValidationMaximum(nodeItem.node);
-        const validationExclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
+        const validationMinimum = selectValidationMinimumInclusive(nodeItem.node);
+        const validationExclusiveMinimum = selectValidationMinimumExclusive(nodeItem.node);
+        const validationMaximum = selectValidationMaximumInclusive(nodeItem.node);
+        const validationExclusiveMaximum = selectValidationMaximumExclusive(nodeItem.node);
         const validationMultipleOf = selectValidationMultipleOf(nodeItem.node);
 
         if (validationMinimum != null) {
@@ -273,10 +273,10 @@ export class SchemaExampleGenerator extends SchemaExampleGeneratorBase {
     ): Iterable<[number, unknown]> {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const minimum = selectValidationMinimum(nodeItem.node);
-        const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
-        const maximum = selectValidationMaximum(nodeItem.node);
-        const exclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
+        const minimum = selectValidationMinimumInclusive(nodeItem.node);
+        const exclusiveMinimum = selectValidationMinimumExclusive(nodeItem.node);
+        const maximum = selectValidationMaximumInclusive(nodeItem.node);
+        const exclusiveMaximum = selectValidationMaximumExclusive(nodeItem.node);
         const multipleOf = selectValidationMultipleOf(nodeItem.node);
 
         if (minimum != null) {

@@ -1,5 +1,6 @@
 import { SchemaManager } from "./manager.js";
 import { MetaSchemaId } from "./meta.js";
+import { TypeDescriptorUnion } from "./type-descriptors.js";
 
 export interface SchemaLoaderRootNodeItem<N> {
     node: N;
@@ -15,19 +16,18 @@ export interface SchemaLoaderNodeItem<N> {
 
 export interface LoaderStrategy {
     getComments(nodeId: string): string
-    selectNodeIsAny(nodeId: string): boolean
-    selectNodeIsNever(nodeId: string): boolean
-    selectNodeReference(nodeId: string): string | undefined
-    selectNodeConstantValues(nodeId: string): Iterable<string | number | boolean> | undefined
-    selectNodeAnyOf(nodeId: string): Iterable<string> | undefined;
-    selectNodeOneOf(nodeId: string): Iterable<string> | undefined;
-    selectNodeAllOf(nodeId: string): Iterable<string> | undefined;
-    selectNodeTypes(nodeId: string): Iterable<string> | undefined;
+    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> | undefined;
 }
 
 export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
 
-    public abstract getComments(nodeId: string): string
+    public abstract getComments(
+        nodeId: string
+    ): string
+
+    public abstract selectNodeTypeDescriptors(
+        nodeId: string
+    ): Iterable<TypeDescriptorUnion> | undefined;
 
     protected abstract readonly metaSchemaId: MetaSchemaId
 
@@ -81,21 +81,6 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
         protected readonly manager: SchemaManager,
     ) {
         //
-    }
-    selectNodeConstantValue(nodeId: string) {
-        throw new Error("Method not implemented.");
-    }
-    selectNodeReference(nodeId: string): string | undefined {
-        throw new Error("Method not implemented.");
-    }
-    selectNodeIsAny(nodeId: string): boolean {
-        selectNodeReference(nodeId: string): string {
-            throw new Error("Method not implemented.");
-        }
-        throw new Error("Method not implemented.");
-    }
-    selectNodeIsNever(nodeId: string): boolean {
-        throw new Error("Method not implemented.");
     }
 
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem<N>>();

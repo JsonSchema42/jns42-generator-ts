@@ -3,7 +3,7 @@ import { Namer } from "../../utils/index.js";
 import { SchemaManager } from "../manager.js";
 import { SchemaValidatorCodeGeneratorBase } from "../validator-code-generator.js";
 import { SchemaLoader } from "./loader.js";
-import { selectNodeDynamicRef, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeItemsEntries, selectSubNodePrefixItemsEntries, selectValidationExclusiveMaximum, selectValidationExclusiveMinimum, selectValidationMaxItems, selectValidationMaxLength, selectValidationMaxProperties, selectValidationMaximum, selectValidationMinItems, selectValidationMinLength, selectValidationMinProperties, selectValidationMinimum, selectValidationMultipleOf, selectValidationPattern, selectValidationRequired, selectValidationUniqueItems } from "./selectors.js";
+import { selectNodeDynamicRef, selectNodePropertyNamesEntries, selectNodeRef, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeItemsEntries, selectSubNodePrefixItemsEntries, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 
 export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBase {
     constructor(
@@ -109,8 +109,8 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const minItems = selectValidationMinItems(nodeItem.node);
-        const maxItems = selectValidationMaxItems(nodeItem.node);
+        const minItems = selectValidationMinimumItems(nodeItem.node);
+        const maxItems = selectValidationMaximumItems(nodeItem.node);
         const uniqueItems = selectValidationUniqueItems(nodeItem.node);
 
         if (minItems != null) {
@@ -267,8 +267,8 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const minProperties = selectValidationMinProperties(nodeItem.node);
-        const maxProperties = selectValidationMaxProperties(nodeItem.node);
+        const minProperties = selectValidationMinimumProperties(nodeItem.node);
+        const maxProperties = selectValidationMaximumProperties(nodeItem.node);
         const required = selectValidationRequired(nodeItem.node);
 
         if (minProperties != null) {
@@ -433,9 +433,9 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const minLength = selectValidationMinLength(nodeItem.node);
-        const maxLength = selectValidationMaxLength(nodeItem.node);
-        const pattern = selectValidationPattern(nodeItem.node);
+        const minLength = selectValidationMinimumLength(nodeItem.node);
+        const maxLength = selectValidationMaximumLength(nodeItem.node);
+        const pattern = selectValidationValuePattern(nodeItem.node);
 
         if (minLength != null) {
             yield this.wrapValidationExpression(
@@ -479,10 +479,10 @@ export class SchemaValidatorCodeGenerator extends SchemaValidatorCodeGeneratorBa
     ) {
         const nodeItem = this.loader.getNodeItem(nodeId);
 
-        const minimum = selectValidationMinimum(nodeItem.node);
-        const exclusiveMinimum = selectValidationExclusiveMinimum(nodeItem.node);
-        const maximum = selectValidationMaximum(nodeItem.node);
-        const exclusiveMaximum = selectValidationExclusiveMaximum(nodeItem.node);
+        const minimum = selectValidationMinimumInclusive(nodeItem.node);
+        const exclusiveMinimum = selectValidationMinimumExclusive(nodeItem.node);
+        const maximum = selectValidationMaximumInclusive(nodeItem.node);
+        const exclusiveMaximum = selectValidationMaximumExclusive(nodeItem.node);
         const multipleOf = selectValidationMultipleOf(nodeItem.node);
 
         if (minimum != null) {

@@ -5,5 +5,6 @@ export * from "./manager.js";
 export * from "./meta.js";
 export * from "./spec-code-generator.js";
 export * from "./type-code-generator.js";
+export * from "./type-descriptors.js";
 export * from "./validator-code-generator.js";
 

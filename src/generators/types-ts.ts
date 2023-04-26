@@ -1,62 +1,6 @@
 import ts from "typescript";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export interface NullTypeDescriptor {
-    type: "null"
-}
-
-export interface BooleanTypeDescriptor {
-    type: "boolean"
-    options?: boolean[]
-}
-
-export interface NumberTypeDescriptor {
-    type: "number"
-    numberType: "integer" | "float"
-    options?: number[]
-    minimumInclusive?: number
-    minimumExclusive?: number
-    maximumInclusive?: number
-    maximumExclusive?: number
-    multipleOf?: number
-}
-
-export interface StringTypeDescriptor {
-    type: "string"
-    options?: string[]
-    minimumLength?: number
-    maximumLength?: number
-    valuePattern?: RegExp
-}
-
-export interface InterfaceTypeDescriptor {
-    type: "interface"
-    requiredProperties: string[]
-}
-
-export interface RecordTypeDescriptor {
-    type: "record"
-    requiredProperties: string[]
-    minimumProperties?: number
-    maximumProperties?: number
-    propertyNamePattern?: RegExp
-    propertyTypeNodeId: string | boolean
-}
-
-export interface TupleTypeDescriptor {
-    type: "tuple"
-    uniqueItems?: boolean
-    propertyTypeNodeId: string | boolean
-}
-
-export interface ArrayTypeDescriptor {
-    type: "array"
-    minimumItems?: number
-    maximumItems?: number
-    uniqueItems?: boolean
-    itemTypeNodeId: string | boolean
-}
-
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {

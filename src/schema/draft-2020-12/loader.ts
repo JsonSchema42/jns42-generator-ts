@@ -1,11 +1,11 @@
 import { SchemaLoaderBase } from "../loader.js";
+import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeId, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeItemsEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
 export class SchemaLoader extends SchemaLoaderBase<Schema> {
-
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {
@@ -244,6 +244,270 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             join("");
 
         return lines;
+    }
+
+    public *selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> | undefined {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        if (nodeItem.node === true) {
+            yield {
+                type: "any",
+            };
+        }
+
+        if (nodeItem.node === false) {
+            yield {
+                type: "never",
+            };
+        }
+
+        const types = selectNodeTypes(nodeItem.node);
+        if (types != null) {
+            for (const type of types) {
+                switch (type) {
+                    case "null":
+                        yield* this.makeNodeTypeDescriptorFromNull();
+                        break;
+
+                    case "boolean":
+                        yield* this.makeNodeTypeDescriptorFromBoolean(
+                            nodeItem.node,
+                        );
+                        break;
+
+                    case "integer":
+                        yield* this.makeNodeTypeDescriptorFromNumber(
+                            nodeItem.node,
+                            "integer",
+                        );
+                        break;
+
+                    case "number":
+                        yield* this.makeNodeTypeDescriptorFromNumber(
+                            nodeItem.node,
+                            "float",
+                        );
+                        break;
+
+                    case "string":
+                        yield* this.makeNodeTypeDescriptorFromString(
+                            nodeItem.node,
+                        );
+                        break;
+
+                    case "array":
+                        yield* this.makeNodeTypeDescriptorFromArray(
+                            nodeItem.node,
+                            nodeItem.nodeRootUrl,
+                            nodeItem.nodePointer,
+                        );
+                        break;
+
+                    case "object":
+                        yield* this.makeNodeTypeDescriptorFromObject(
+                            nodeItem.node,
+                            nodeItem.nodeRootUrl,
+                            nodeItem.nodePointer,
+                        );
+                        break;
+
+                }
+            }
+        }
+    }
+
+    private * makeNodeTypeDescriptorFromNull(): Iterable<TypeDescriptorUnion> {
+        yield {
+            type: "null",
+        };
+    }
+
+    private * makeNodeTypeDescriptorFromBoolean(
+        node: Schema,
+    ): Iterable<TypeDescriptorUnion> {
+        const enumValues = selectNodeEnum(node);
+        const constValue = selectNodeConst(node);
+
+        let options: Array<boolean> | undefined;
+
+        if (constValue != null) {
+            options = [constValue];
+        }
+        else if (enumValues != null) {
+            options = [...enumValues];
+        }
+
+        yield {
+            type: "boolean",
+            options,
+        };
+    }
+
+    private * makeNodeTypeDescriptorFromNumber(
+        node: Schema,
+        numberType: "integer" | "float",
+    ): Iterable<TypeDescriptorUnion> {
+        const enumValues = selectNodeEnum(node);
+        const constValue = selectNodeConst(node);
+
+        let options: Array<number> | undefined;
+
+        if (constValue != null) {
+            options = [constValue];
+        }
+        else if (enumValues != null) {
+            options = [...enumValues];
+        }
+
+        const minimumInclusive = selectValidationMinimumInclusive(node);
+        const minimumExclusive = selectValidationMinimumExclusive(node);
+        const maximumInclusive = selectValidationMaximumInclusive(node);
+        const maximumExclusive = selectValidationMaximumExclusive(node);
+        const multipleOf = selectValidationMultipleOf(node);
+
+        yield {
+            type: "number",
+            numberType,
+            options,
+            minimumInclusive,
+            minimumExclusive,
+            maximumInclusive,
+            maximumExclusive,
+            multipleOf,
+        };
+    }
+
+    private * makeNodeTypeDescriptorFromString(
+        node: Schema,
+    ): Iterable<TypeDescriptorUnion> {
+        const enumValues = selectNodeEnum(node);
+        const constValue = selectNodeConst(node);
+
+        let options: Array<string> | undefined;
+
+        if (constValue != null) {
+            options = [constValue];
+        }
+        else if (enumValues != null) {
+            options = [...enumValues];
+        }
+
+        const minimumLength = selectValidationMinimumLength(node);
+        const maximumLength = selectValidationMaximumLength(node);
+        const valuePattern = selectValidationValuePattern(node);
+
+        yield {
+            type: "string",
+            options,
+            minimumLength,
+            maximumLength,
+            valuePattern,
+        };
+    }
+
+    private * makeNodeTypeDescriptorFromArray(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): Iterable<TypeDescriptorUnion> {
+        const items = [...selectSubNodeItemsEntries(nodePointer, node)];
+        const prefixItems = [...selectSubNodePrefixItemsEntries(nodePointer, node)];
+        const minimumItems = selectValidationMinimumItems(node);
+        const maximumItems = selectValidationMaximumItems(node);
+
+        const uniqueItems = selectValidationUniqueItems(node) ?? false;
+
+        if (items.length > 0) {
+            const itemTypeNodeIds = items.map(([itemNodePointer]) => {
+                const itemNodeUrl = new URL(
+                    `#${itemNodePointer}`,
+                    nodeRootUrl,
+                );
+                const itemNodeId = String(itemNodeUrl);
+                return itemNodeId;
+            });
+
+            yield {
+                type: "tuple",
+                uniqueItems,
+                itemTypeNodeIds: itemTypeNodeIds,
+            };
+        }
+
+        if (prefixItems.length > 0) {
+            const itemTypeNodeIds = prefixItems.map(([itemNodePointer]) => {
+                const itemNodeUrl = new URL(
+                    `#${itemNodePointer}`,
+                    nodeRootUrl,
+                );
+                const itemNodeId = String(itemNodeUrl);
+                return itemNodeId;
+            });
+
+            for (const itemTypeNodeId of itemTypeNodeIds) {
+                yield {
+                    type: "array",
+                    minimumItems,
+                    maximumItems,
+                    uniqueItems,
+                    itemTypeNodeId,
+                };
+            }
+        }
+    }
+
+    private * makeNodeTypeDescriptorFromObject(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): Iterable<TypeDescriptorUnion> {
+        const propertyNames = [...selectNodePropertyNamesEntries(nodePointer, node)];
+        const additionalProperties =
+            [...selectSubNodeAdditionalPropertiesEntries(nodePointer, node)];
+        const minimumProperties = selectValidationMinimumProperties(node);
+        const maximumProperties = selectValidationMaximumProperties(node);
+
+        const requiredProperties = selectValidationRequired(node) ?? [];
+
+        if (propertyNames.length > 0) {
+            const propertyTypeNodeIds = Object.fromEntries(
+                propertyNames.map((propertyName, propertyNodePointer) => {
+                    const propertyNodeUrl = new URL(
+                        `#${propertyNodePointer}`,
+                        nodeRootUrl,
+                    );
+                    const propertyNodeId = String(propertyNodeUrl);
+                    return [propertyName, propertyNodeId];
+                }),
+            );
+
+            yield {
+                type: "interface",
+                requiredProperties,
+                propertyTypeNodeIds,
+            };
+        }
+
+        if (additionalProperties.length > 0) {
+            const propertyTypeNodeIds = additionalProperties.map(([propertyNodePointer]) => {
+                const propertyNodeUrl = new URL(
+                    `#${propertyNodePointer}`,
+                    nodeRootUrl,
+                );
+                const propertyNodeId = String(propertyNodeUrl);
+                return propertyNodeId;
+            });
+
+            for (const propertyTypeNodeId of propertyTypeNodeIds) {
+                yield {
+                    type: "record",
+                    minimumProperties,
+                    maximumProperties,
+                    requiredProperties,
+                    propertyTypeNodeId,
+                };
+            }
+        }
     }
 
 }

@@ -1,4 +1,5 @@
 import { SchemaLoaderBase } from "../loader.js";
+import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeDeprecated, selectNodeDescription, selectNodeId, selectNodeRecursiveAnchor, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
@@ -240,6 +241,10 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             join("");
 
         return lines;
+    }
+
+    public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> | undefined {
+        throw new Error("not implemented");
     }
 
 }
