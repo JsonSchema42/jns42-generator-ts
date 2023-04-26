@@ -26,29 +26,6 @@ export class SchemaManager implements LoaderStrategy {
         [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
     };
 
-    private readonly typeCodeGenerators = {
-        [schema202012.metaSchemaId]: new schema202012.SchemaTypeCodeGenerator(
-            this,
-            this.loaders[schema202012.metaSchemaId],
-        ),
-        [schema201909.metaSchemaId]: new schema201909.SchemaTypeCodeGenerator(
-            this,
-            this.loaders[schema201909.metaSchemaId],
-        ),
-        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaTypeCodeGenerator(
-            this,
-            this.loaders[schemaDraft07.metaSchemaId],
-        ),
-        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaTypeCodeGenerator(
-            this,
-            this.loaders[schemaDraft06.metaSchemaId],
-        ),
-        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaTypeCodeGenerator(
-            this,
-            this.loaders[schemaDraft04.metaSchemaId],
-        ),
-    };
-
     private readonly validatorCodeGenerators = {
         [schema202012.metaSchemaId]: new schema202012.SchemaValidatorCodeGenerator(
             this,
@@ -226,24 +203,6 @@ export class SchemaManager implements LoaderStrategy {
 
     public getNodeRootUrl(nodeRetrievalId: string) {
         return this.retrievalRootNodeMap.get(nodeRetrievalId);
-    }
-
-    /**
-     * @deprecated
-     */
-    public *generateTypeStatements(
-        factory: ts.NodeFactory,
-        namer: Namer,
-    ) {
-        for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
-
-            const codeGenerator = this.typeCodeGenerators[metaSchemaId];
-            yield* codeGenerator.generateStatements(
-                factory,
-                namer,
-                nodeId,
-            );
-        }
     }
 
     /**
