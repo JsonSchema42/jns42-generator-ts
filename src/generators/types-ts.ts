@@ -171,7 +171,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         const typeNodes = [...this.generateTypeNodes(nodeId)];
         const node = typeNodes.length === 0 ?
             this.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword) :
-            this.factory.createParenthesizedType(this.factory.createIntersectionTypeNode(
+            this.factory.createParenthesizedType(this.factory.createUnionTypeNode(
                 typeNodes,
             ));
         return node;
