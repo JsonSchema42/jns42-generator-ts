@@ -8,7 +8,9 @@ export type TypeDescriptorUnion =
     TupleTypeDescriptor |
     ArrayTypeDescriptor |
     InterfaceTypeDescriptor |
-    RecordTypeDescriptor;
+    RecordTypeDescriptor |
+    UnionTypeDescriptor |
+    IntersectionTypeDescriptor;
 
 export interface NullTypeDescriptor {
     type: "null"
@@ -72,5 +74,15 @@ export interface RecordTypeDescriptor {
     minimumProperties?: number
     maximumProperties?: number
     propertyTypeNodeId: string | boolean
+}
+
+export interface UnionTypeDescriptor {
+    type: "union"
+    typeNodeIds: string[]
+}
+
+export interface IntersectionTypeDescriptor {
+    type: "intersection"
+    typeNodeIds: string[]
 }
 

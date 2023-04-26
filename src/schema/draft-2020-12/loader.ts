@@ -1,7 +1,7 @@
 import { SchemaLoaderBase } from "../loader.js";
 import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeItemsEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -261,6 +261,22 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             };
         }
 
+        yield* this.makeNodeTypeDescriptorFromAllOf(
+            nodeItem.node,
+            nodeItem.nodeRootUrl,
+            nodeItem.nodePointer,
+        );
+        yield* this.makeNodeTypeDescriptorFromAnyOf(
+            nodeItem.node,
+            nodeItem.nodeRootUrl,
+            nodeItem.nodePointer,
+        );
+        yield* this.makeNodeTypeDescriptorFromOneOf(
+            nodeItem.node,
+            nodeItem.nodeRootUrl,
+            nodeItem.nodePointer,
+        );
+
         const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             for (const type of types) {
@@ -507,6 +523,75 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
                     propertyTypeNodeId,
                 };
             }
+        }
+    }
+
+    private * makeNodeTypeDescriptorFromAllOf(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): Iterable<TypeDescriptorUnion> {
+        const allOf = [...selectSubNodeAllOfEntries(nodePointer, node)];
+        if (allOf.length > 0) {
+            const typeNodeIds = allOf.map(([typeNodePointer]) => {
+                const typeNodeUrl = new URL(
+                    `#${typeNodePointer}`,
+                    nodeRootUrl,
+                );
+                const typeNodeId = String(typeNodeUrl);
+                return typeNodeId;
+            });
+
+            yield {
+                type: "intersection",
+                typeNodeIds,
+            };
+        }
+    }
+
+    private * makeNodeTypeDescriptorFromAnyOf(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): Iterable<TypeDescriptorUnion> {
+        const allOf = [...selectSubNodeAnyOfEntries(nodePointer, node)];
+        if (allOf.length > 0) {
+            const typeNodeIds = allOf.map(([typeNodePointer]) => {
+                const typeNodeUrl = new URL(
+                    `#${typeNodePointer}`,
+                    nodeRootUrl,
+                );
+                const typeNodeId = String(typeNodeUrl);
+                return typeNodeId;
+            });
+
+            yield {
+                type: "intersection",
+                typeNodeIds,
+            };
+        }
+    }
+
+    private * makeNodeTypeDescriptorFromOneOf(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ): Iterable<TypeDescriptorUnion> {
+        const allOf = [...selectSubNodeOneOfEntries(nodePointer, node)];
+        if (allOf.length > 0) {
+            const typeNodeIds = allOf.map(([typeNodePointer]) => {
+                const typeNodeUrl = new URL(
+                    `#${typeNodePointer}`,
+                    nodeRootUrl,
+                );
+                const typeNodeId = String(typeNodeUrl);
+                return typeNodeId;
+            });
+
+            yield {
+                type: "union",
+                typeNodeIds,
+            };
         }
     }
 
