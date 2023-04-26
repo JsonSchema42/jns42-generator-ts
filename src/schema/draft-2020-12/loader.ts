@@ -489,7 +489,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
 
         if (propertyNames.length > 0) {
             const propertyTypeNodeIds = Object.fromEntries(
-                propertyNames.map(([propertyName, propertyNodePointer]) => {
+                propertyNames.map(([propertyNodePointer, propertyName]) => {
                     const propertyNodeUrl = new URL(
                         `#${propertyNodePointer}`,
                         nodeRootUrl,
