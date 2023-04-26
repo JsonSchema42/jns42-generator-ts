@@ -483,7 +483,7 @@ export class SchemaManager implements LoaderStrategy {
         return loader.getComments(nodeId);
     }
 
-    public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> | undefined {
+    public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> {
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
             throw new Error("meta schema id not found");

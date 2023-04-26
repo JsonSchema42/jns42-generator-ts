@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { TypeDescriptorUnion } from "../schema/type-descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
@@ -21,50 +22,111 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     }
 
-    protected generateNullTypeDefinition(
-        nodeId: string,
-    ): ts.TypeNode {
+    protected generateNeverTypeDefinition(): ts.TypeNode {
+        return this.factory.createKeywordTypeNode(
+            ts.SyntaxKind.NeverKeyword,
+        );
+    }
+    protected generateAnyTypeDefinition(): ts.TypeNode {
+        return this.factory.createKeywordTypeNode(
+            ts.SyntaxKind.AnyKeyword,
+        );
+    }
+    protected generateNullTypeDefinition(): ts.TypeNode {
         return this.factory.createLiteralTypeNode(
             this.factory.createNull(),
         );
     }
-    protected generateArrayTypeDefinition(
-        nodeId: string,
-    ): ts.TypeNode {
-        throw new Error("todo");
-    }
-    protected generateObjectTypeDefinition(
-        nodeId: string,
-    ): ts.TypeNode {
-        throw new Error("todo");
-    }
-    protected generateStringTypeDefinition(
-        nodeId: string,
-    ): ts.TypeNode {
+    protected generateBooleanTypeDefinition(): ts.TypeNode {
         return this.factory.createKeywordTypeNode(
-            ts.SyntaxKind.StringKeyword,
+            ts.SyntaxKind.BooleanKeyword,
         );
     }
-    protected generateNumberTypeDefinition(
-        nodeId: string,
-    ): ts.TypeNode {
+    protected generateNumberTypeDefinition(): ts.TypeNode {
         return this.factory.createKeywordTypeNode(
             ts.SyntaxKind.NumberKeyword,
         );
     }
-    protected generateIntegerTypeDefinition(
-        nodeId: string,
-    ): ts.TypeNode {
-        return this.generateNumberTypeDefinition(
-            nodeId,
+    protected generateStringTypeDefinition(): ts.TypeNode {
+        return this.factory.createKeywordTypeNode(
+            ts.SyntaxKind.StringKeyword,
         );
     }
-    protected generateBooleanTypeDefinition(
-        nodeId: string,
+    protected generateTupleTypeDefinition(
+        nodeIds: Array<string | boolean>,
     ): ts.TypeNode {
-        return this.factory.createKeywordTypeNode(
-            ts.SyntaxKind.BooleanKeyword,
+        const elements = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+        return this.factory.createTupleTypeNode(elements);
+    }
+    protected generateArrayTypeDefinition(
+        nodeId: string | boolean,
+    ): ts.TypeNode {
+        const element = this.generateTypeReferenceOrAnyOrNever(nodeId);
+        return this.factory.createArrayTypeNode(element);
+    }
+    protected generateInterfaceTypeDefinition(
+        nodeIds: Record<string, string | boolean>,
+        required: Set<string>,
+    ): ts.TypeNode {
+        const members = Object.entries(nodeIds).
+            map(([name, nodeId]) => this.factory.createPropertySignature(
+                undefined,
+                this.factory.createIdentifier(name),
+                required.has(name) ?
+                    undefined :
+                    this.factory.createToken(ts.SyntaxKind.QuestionToken),
+                this.generateTypeReferenceOrAnyOrNever(nodeId),
+            ));
+        return this.factory.createTypeLiteralNode(members);
+    }
+    protected generateRecordTypeDefinition(
+        nodeId: string | boolean,
+    ): ts.TypeNode {
+        const element = this.generateTypeReferenceOrAnyOrNever(nodeId);
+        return this.factory.createTypeReferenceNode(
+            this.factory.createIdentifier("Record"),
+            [
+                this.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                element,
+            ],
         );
+    }
+
+    protected generateUnionTypeDefinition(
+        nodeIds: Array<string | boolean>,
+    ) {
+        const types = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+        return this.factory.createUnionTypeNode(types);
+    }
+
+    protected generateIntersectionTypeDefinition(
+        nodeIds: Array<string | boolean>,
+    ) {
+        const types = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+        return this.factory.createIntersectionTypeNode(types);
+    }
+
+    protected generateTypeReference(
+        nodeId: string,
+    ) {
+        const typeName = this.namer.getName(nodeId).join("_");
+        return this.factory.createTypeReferenceNode(
+            this.factory.createIdentifier(typeName),
+        );
+    }
+
+    protected generateTypeReferenceOrAnyOrNever(
+        nodeId: string | boolean,
+    ) {
+        if (nodeId === true) {
+            return this.generateAnyTypeDefinition();
+
+        }
+        if (nodeId === false) {
+            return this.generateNeverTypeDefinition();
+        }
+
+        return this.generateTypeReference(nodeId);
     }
 
     protected generateSchemaTypeDeclarationStatement(
@@ -95,38 +157,12 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         return declaration;
     }
 
-    protected generateTypeNodes(
+    protected *generateTypeNodes(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        const type = "" as string;
-        switch (type) {
-            case "null":
-                break;
-
-            case "boolean":
-                break;
-
-            case "number":
-                break;
-
-            case "string":
-                break;
-
-            case "interface":
-                break;
-
-            case "record":
-                break;
-
-            case "tuple":
-                break;
-
-            case "array":
-                break;
-
+        for (const typeDescriptor of this.manager.selectNodeTypeDescriptors(nodeId)) {
+            yield this.generateTypeDefinition(nodeId, typeDescriptor);
         }
-
-        throw new Error("todo");
     }
 
     protected generateComposedTypeNode(
@@ -143,56 +179,61 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     protected generateTypeDefinition(
         nodeId: string,
-        type: string,
+        typeDescriptor: TypeDescriptorUnion,
     ): ts.TypeNode {
-        switch (type) {
+        switch (typeDescriptor.type) {
+            case "never":
+                return this.generateNeverTypeDefinition();
+
+            case "any":
+                return this.generateAnyTypeDefinition();
+
             case "null":
-                return this.generateNullTypeDefinition(
-                    nodeId,
+                return this.generateNullTypeDefinition();
+
+            case "boolean":
+                return this.generateBooleanTypeDefinition();
+
+            case "number":
+                return this.generateNumberTypeDefinition();
+
+            case "string":
+                return this.generateStringTypeDefinition();
+
+            case "tuple":
+                return this.generateTupleTypeDefinition(
+                    typeDescriptor.itemTypeNodeIds,
                 );
 
             case "array":
                 return this.generateArrayTypeDefinition(
-                    nodeId,
+                    typeDescriptor.itemTypeNodeId,
                 );
 
-            case "object":
-                return this.generateObjectTypeDefinition(
-                    nodeId,
+            case "interface":
+                return this.generateInterfaceTypeDefinition(
+                    typeDescriptor.propertyTypeNodeIds,
+                    new Set(typeDescriptor.requiredProperties),
                 );
 
-            case "string":
-                return this.generateStringTypeDefinition(
-                    nodeId,
+            case "record":
+                return this.generateRecordTypeDefinition(
+                    typeDescriptor.propertyTypeNodeId,
                 );
 
-            case "number":
-                return this.generateNumberTypeDefinition(
-                    nodeId,
+            case "union":
+                return this.generateUnionTypeDefinition(
+                    typeDescriptor.typeNodeIds,
                 );
 
-            case "integer":
-                return this.generateIntegerTypeDefinition(
-                    nodeId,
-                );
-
-            case "boolean":
-                return this.generateBooleanTypeDefinition(
-                    nodeId,
+            case "intersection":
+                return this.generateIntersectionTypeDefinition(
+                    typeDescriptor.typeNodeIds,
                 );
 
             default:
                 throw new Error("type not supported");
         }
-    }
-
-    protected generateTypeReference(
-        nodeId: string,
-    ) {
-        const typeName = this.namer.getName(nodeId).join("_");
-        return this.factory.createTypeReferenceNode(
-            this.factory.createIdentifier(typeName),
-        );
     }
 
 }

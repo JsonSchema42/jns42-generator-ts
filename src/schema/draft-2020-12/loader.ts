@@ -246,7 +246,9 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         return lines;
     }
 
-    public *selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> | undefined {
+    public *selectNodeTypeDescriptors(
+        nodeId: string,
+    ): Iterable<TypeDescriptorUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         if (nodeItem.node === true) {

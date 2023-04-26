@@ -16,7 +16,7 @@ export interface SchemaLoaderNodeItem<N> {
 
 export interface LoaderStrategy {
     getComments(nodeId: string): string
-    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> | undefined;
+    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>;
 }
 
 export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
@@ -27,7 +27,7 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
 
     public abstract selectNodeTypeDescriptors(
         nodeId: string
-    ): Iterable<TypeDescriptorUnion> | undefined;
+    ): Iterable<TypeDescriptorUnion>;
 
     protected abstract readonly metaSchemaId: MetaSchemaId
 
