@@ -6,19 +6,11 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
         for (const [nodeId, typeName] of this.manager.getTypeNames()) {
-            yield* this.generateNodeStatements(nodeId);
+            yield this.generateTypeDeclarationStatement(
+                nodeId,
+                typeName,
+            );
         }
-    }
-
-    protected * generateNodeStatements(
-        nodeId: string,
-    ) {
-        const typeName = this.namer.getName(nodeId).join("_");
-
-        yield this.generateTypeDeclarationStatement(
-            nodeId,
-            typeName,
-        );
     }
 
     protected generateTypeDeclarationStatement(
