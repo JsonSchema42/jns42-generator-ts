@@ -22,13 +22,13 @@ export function isValidArrayType(
 
 export function isValidObjectType(
     value: unknown,
-): value is object {
+): value is Record<string, unknown> {
     return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 export function isValidStringType(
     value: unknown,
-): value is object {
+): value is string {
     return typeof value === "string";
 }
 
