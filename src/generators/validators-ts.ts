@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { TypeDescriptorUnion } from "../schema/type-descriptors.js";
+import { ArrayTypeDescriptor, BooleanTypeDescriptor, InterfaceTypeDescriptor, IntersectionTypeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion, UnionTypeDescriptor } from "../schema/type-descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -88,43 +88,48 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 return this.generateNullTypeValidationStatements();
 
             case "boolean":
-                return this.generateBooleanTypeValidationStatements();
+                return this.generateBooleanTypeValidationStatements(
+                    typeDescriptor,
+                );
 
             case "number":
-                return this.generateNumberTypeValidationStatements();
+                return this.generateNumberTypeValidationStatements(
+                    typeDescriptor,
+                );
 
             case "string":
-                return this.generateStringTypeValidationStatements();
+                return this.generateStringTypeValidationStatements(
+                    typeDescriptor,
+                );
 
             case "tuple":
                 return this.generateTupleTypeValidationStatements(
-                    typeDescriptor.itemTypeNodeIds,
+                    typeDescriptor,
                 );
 
             case "array":
                 return this.generateArrayTypeValidationStatements(
-                    typeDescriptor.itemTypeNodeId,
+                    typeDescriptor,
                 );
 
             case "interface":
                 return this.generateInterfaceTypeValidationStatements(
-                    typeDescriptor.propertyTypeNodeIds,
-                    new Set(typeDescriptor.requiredProperties),
+                    typeDescriptor,
                 );
 
             case "record":
                 return this.generateRecordTypeValidationStatements(
-                    typeDescriptor.propertyTypeNodeId,
+                    typeDescriptor,
                 );
 
             case "union":
                 return this.generateUnionTypeValidationStatements(
-                    typeDescriptor.typeNodeIds,
+                    typeDescriptor,
                 );
 
             case "intersection":
                 return this.generateIntersectionTypeValidationStatements(
-                    typeDescriptor.typeNodeIds,
+                    typeDescriptor,
                 );
 
             default:
@@ -171,6 +176,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateBooleanTypeValidationStatements(
+        typeDescriptor: BooleanTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -181,19 +187,43 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createStringLiteral("boolean"),
             ),
             f.createBlock([
-                ...this.generateBooleanTypeInnerValidationStatements(),
+                ...this.generateBooleanTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateBooleanTypeInnerValidationStatements(
+        typeDescriptor: BooleanTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+
+        if (typeDescriptor.options != null) {
+            yield f.createIfStatement(
+                typeDescriptor.options
+                    .map(option => f.createBinaryExpression(
+                        f.createIdentifier("value"),
+                        f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                        option ? f.createTrue() : f.createFalse(),
+                    ),
+                    )
+                    .reduce((a, b) => f.createBinaryExpression(
+                        a, f.createToken(ts.SyntaxKind.AmpersandAmpersandToken), b,
+                    )),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
 
         yield f.createReturnStatement(
             f.createTrue(),
         );
     }
     protected *generateNumberTypeValidationStatements(
+        typeDescriptor: NumberTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -215,19 +245,43 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
             ),
             f.createBlock([
-                ...this.generateNumberTypeInnerValidationStatements(),
+                ...this.generateNumberTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateNumberTypeInnerValidationStatements(
+        typeDescriptor: NumberTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+
+        if (typeDescriptor.options != null) {
+            yield f.createIfStatement(
+                typeDescriptor.options.map(option => f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                    f.createNumericLiteral(option),
+                ),
+                ).reduce((a, b) => f.createBinaryExpression(
+                    a,
+                    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                    b),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
 
         yield f.createReturnStatement(
             f.createTrue(),
         );
     }
     protected *generateStringTypeValidationStatements(
+        typeDescriptor: StringTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -238,20 +292,43 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createStringLiteral("string"),
             ),
             f.createBlock([
-                ...this.generateStringTypeInnerValidationStatements(),
+                ...this.generateStringTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateStringTypeInnerValidationStatements(
+        typeDescriptor: StringTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+
+        if (typeDescriptor.options != null) {
+            yield f.createIfStatement(
+                typeDescriptor.options.map(option => f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                    f.createStringLiteral(option),
+                ),
+                ).reduce((a, b) => f.createBinaryExpression(
+                    a,
+                    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                    b),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
 
         yield f.createReturnStatement(
             f.createTrue(),
         );
     }
     protected *generateTupleTypeValidationStatements(
-        nodeIds: Array<string | boolean>,
+        typeDescriptor: TupleTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -273,11 +350,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
             ),
             f.createBlock([
-                ...this.generateTupleTypeInnerValidationStatements(),
+                ...this.generateTupleTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateTupleTypeInnerValidationStatements(
+        typeDescriptor: TupleTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -286,7 +366,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateArrayTypeValidationStatements(
-        nodeId: string | boolean,
+        typeDescriptor: ArrayTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -308,11 +388,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
             ),
             f.createBlock([
-                ...this.generateArrayTypeInnerValidationStatements(),
+                ...this.generateArrayTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateArrayTypeInnerValidationStatements(
+        typeDescriptor: ArrayTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -321,8 +404,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateInterfaceTypeValidationStatements(
-        nodeIds: Record<string, string | boolean>,
-        required: Set<string>,
+        typeDescriptor: InterfaceTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -355,11 +437,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
             ),
             f.createBlock([
-                ...this.generateInterfaceTypeInnerValidationStatements(),
+                ...this.generateInterfaceTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateInterfaceTypeInnerValidationStatements(
+        typeDescriptor: InterfaceTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -368,7 +453,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateRecordTypeValidationStatements(
-        nodeId: string | boolean,
+        typeDescriptor: RecordTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -401,11 +486,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
             ),
             f.createBlock([
-                ...this.generateRecordTypeInnerValidationStatements(),
+                ...this.generateRecordTypeInnerValidationStatements(
+                    typeDescriptor,
+                ),
             ], true),
         );
     }
     private *generateRecordTypeInnerValidationStatements(
+        typeDescriptor: RecordTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -414,12 +502,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateUnionTypeValidationStatements(
-        nodeIds: Array<string | boolean>,
+        typeDescriptor: UnionTypeDescriptor,
     ): Iterable<ts.Statement> {
         yield* [];
     }
     protected *generateIntersectionTypeValidationStatements(
-        nodeIds: Array<string | boolean>,
+        typeDescriptor: IntersectionTypeDescriptor,
     ): Iterable<ts.Statement> {
         yield* [];
     }
