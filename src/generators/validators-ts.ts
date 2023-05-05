@@ -5,6 +5,18 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
+        const { factory: f } = this;
+
+        yield f.createImportDeclaration(
+            undefined,
+            f.createImportClause(
+                false,
+                undefined,
+                f.createNamespaceImport(f.createIdentifier("types")),
+            ),
+            f.createStringLiteral("./types.js"),
+        );
+
         for (const [nodeId, typeName] of this.manager.getTypeNames()) {
             yield this.generateValidatorFunctionDeclarationStatement(
                 nodeId,
@@ -173,7 +185,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
     }
-    protected *generateBooleanTypeInnerValidationStatements(
+    private *generateBooleanTypeInnerValidationStatements(
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -183,32 +195,223 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
     protected *generateNumberTypeValidationStatements(
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createBinaryExpression(
+                    f.createTypeOfExpression(f.createIdentifier("value")),
+                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                    f.createStringLiteral("number"),
+                ),
+                f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                f.createPrefixUnaryExpression(
+                    ts.SyntaxKind.ExclamationToken,
+                    f.createCallExpression(
+                        f.createIdentifier("isNaN"),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+            ),
+            f.createBlock([
+                ...this.generateNumberTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    private *generateNumberTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
     }
     protected *generateStringTypeValidationStatements(
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createTypeOfExpression(f.createIdentifier("value")),
+                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createStringLiteral("string"),
+            ),
+            f.createBlock([
+                ...this.generateStringTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    private *generateStringTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
     }
     protected *generateTupleTypeValidationStatements(
         nodeIds: Array<string | boolean>,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createBinaryExpression(
+                    f.createTypeOfExpression(f.createIdentifier("value")),
+                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                    f.createStringLiteral("object"),
+                ),
+                f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                f.createCallExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("Array"),
+                        f.createIdentifier("isArray"),
+                    ),
+                    undefined,
+                    [f.createIdentifier("value")],
+                ),
+            ),
+            f.createBlock([
+                ...this.generateTupleTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    private *generateTupleTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
     }
     protected *generateArrayTypeValidationStatements(
         nodeId: string | boolean,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createBinaryExpression(
+                    f.createTypeOfExpression(f.createIdentifier("value")),
+                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                    f.createStringLiteral("object"),
+                ),
+                f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                f.createCallExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("Array"),
+                        f.createIdentifier("isArray"),
+                    ),
+                    undefined,
+                    [f.createIdentifier("value")],
+                ),
+            ),
+            f.createBlock([
+                ...this.generateArrayTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    private *generateArrayTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
     }
     protected *generateInterfaceTypeValidationStatements(
         nodeIds: Record<string, string | boolean>,
         required: Set<string>,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createBinaryExpression(
+                    f.createBinaryExpression(
+                        f.createTypeOfExpression(f.createIdentifier("value")),
+                        f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                        f.createStringLiteral("object"),
+                    ),
+                    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                    f.createBinaryExpression(
+                        f.createIdentifier("value"),
+                        f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                        f.createNull(),
+                    ),
+                ),
+                f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                f.createPrefixUnaryExpression(
+                    ts.SyntaxKind.ExclamationToken,
+                    f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createIdentifier("Array"),
+                            f.createIdentifier("isArray"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+            ),
+            f.createBlock([
+                ...this.generateInterfaceTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    private *generateInterfaceTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
     }
     protected *generateRecordTypeValidationStatements(
         nodeId: string | boolean,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createBinaryExpression(
+                    f.createBinaryExpression(
+                        f.createTypeOfExpression(f.createIdentifier("value")),
+                        f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                        f.createStringLiteral("object"),
+                    ),
+                    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                    f.createBinaryExpression(
+                        f.createIdentifier("value"),
+                        f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                        f.createNull(),
+                    ),
+                ),
+                f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                f.createPrefixUnaryExpression(
+                    ts.SyntaxKind.ExclamationToken,
+                    f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createIdentifier("Array"),
+                            f.createIdentifier("isArray"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+            ),
+            f.createBlock([
+                ...this.generateRecordTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    private *generateRecordTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
     }
     protected *generateUnionTypeValidationStatements(
         nodeIds: Array<string | boolean>,
