@@ -7,6 +7,7 @@ import { MainTsCodeGenerator } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
 import { TypesTsCodeGenerator } from "./types-ts.js";
+import { ValidatorsTsCodeGenerator } from "./validators-ts.js";
 
 export interface PackageOptions {
     name: string
@@ -61,17 +62,17 @@ export function generatePackage(
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
-    // {
-    //     const codeGenerator = new ValidatorsTsCodeGenerator(
-    //         factory,
-    //         namer,
-    //         manager,
-    //     );
-    //     const statements = codeGenerator.getStatements();
-    //     const filePath = path.join(options.directoryPath, "validators.ts");
-    //     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    //     fs.writeFileSync(filePath, formatStatements(factory, statements));
-    // }
+    {
+        const codeGenerator = new ValidatorsTsCodeGenerator(
+            factory,
+            namer,
+            manager,
+        );
+        const statements = codeGenerator.getStatements();
+        const filePath = path.join(options.directoryPath, "validators.ts");
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.writeFileSync(filePath, formatStatements(factory, statements));
+    }
 
     // {
     //     const content = path.join(projectRoot, "src", "includes", "validation.ts");

@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { generateLiteral } from "../utils/index.js";
+import { TypeDescriptorUnion } from "../schema/type-descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -13,300 +13,224 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         }
     }
 
-    protected generateValidatorFunctionBodyStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        throw new Error("todo");
-    }
-
-    protected generateNullTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        return [];
-    }
-    protected generateArrayTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        throw new Error("todo");
-    }
-    protected generateObjectTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        throw new Error("todo");
-    }
-    protected generateStringTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        throw new Error("todo");
-    }
-    protected generateNumberTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        throw new Error("todo");
-    }
-    protected generateIntegerTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        return this.generateNumberTypeValidationStatements(
-            nodeId,
-        );
-    }
-    protected generateBooleanTypeValidationStatements(
-        nodeId: string,
-    ): Iterable<ts.Statement> {
-        return [];
-    }
-
     protected generateValidatorFunctionDeclarationStatement(
         nodeId: string,
         typeName: string,
     ): ts.FunctionDeclaration {
-        return this.factory.createFunctionDeclaration(
+        const { factory: f } = this;
+
+        return f.createFunctionDeclaration(
             [
-                this.factory.createToken(ts.SyntaxKind.ExportKeyword),
+                f.createToken(ts.SyntaxKind.ExportKeyword),
             ],
-            this.factory.createToken(ts.SyntaxKind.AsteriskToken),
-            `validate${typeName}`,
+            undefined,
+            `isValid${typeName}`,
             undefined,
             [
-                this.factory.createParameterDeclaration(
+                f.createParameterDeclaration(
                     undefined,
                     undefined,
                     "value",
                     undefined,
-                    this.generateTypeReference(nodeId),
-                ),
-                this.factory.createParameterDeclaration(
-                    undefined,
-                    undefined,
-                    "path",
-                    undefined,
-                    this.factory.createArrayTypeNode(
-                        this.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                    ),
-                    this.factory.createArrayLiteralExpression([]),
+                    f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
             ],
-            this.factory.createTypeReferenceNode(
-                this.factory.createIdentifier("Iterable"),
-                [
-                    this.factory.createTypeReferenceNode(this.factory.createQualifiedName(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("PathError"),
-                    ),
-                    ),
-                ],
+            f.createTypePredicateNode(
+                undefined,
+                f.createIdentifier("value"),
+                this.generateTypeReference(nodeId),
             ),
-            this.factory.createBlock(
+            f.createBlock(
                 [...this.generateValidatorFunctionBodyStatements(nodeId)],
                 true,
             ),
         );
     }
 
-    protected generateTypeValidationIfStatement(
+    protected *generateValidatorFunctionBodyStatements(
         nodeId: string,
-        type: string,
-        elseStatement: ts.Statement,
-    ) {
-        const thenBlock = this.factory.createBlock(
-            [...this.generateTypeValidationStatements(nodeId, type)],
-            true,
-        );
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
 
-        const testExpression = this.generateCallValidateTypeExpression(
-            type,
-        );
+        for (const typeDescriptor of this.manager.selectNodeTypeDescriptors(nodeId)) {
+            yield* this.generateTypeValidationStatements(nodeId, typeDescriptor);
+        }
 
-        return this.factory.createIfStatement(
-            testExpression,
-            thenBlock,
-            elseStatement,
+        yield f.createReturnStatement(
+            f.createFalse(),
         );
     }
 
-    protected *generateTypeValidationStatements(
+    protected generateTypeValidationStatements(
         nodeId: string,
-        type: string,
+        typeDescriptor: TypeDescriptorUnion,
     ) {
-        switch (type) {
+        switch (typeDescriptor.type) {
+            case "never":
+                return this.generateNeverTypeValidationStatements();
+
+            case "any":
+                return this.generateAnyTypeValidationStatements();
+
             case "null":
-                yield* this.generateNullTypeValidationStatements(nodeId);
-                break;
-
-            case "array":
-                yield* this.generateArrayTypeValidationStatements(nodeId);
-                break;
-
-            case "object":
-                yield* this.generateObjectTypeValidationStatements(nodeId);
-                break;
-
-            case "string":
-                yield* this.generateStringTypeValidationStatements(nodeId);
-                break;
-
-            case "number":
-                yield* this.generateNumberTypeValidationStatements(nodeId);
-                break;
-
-            case "integer":
-                yield* this.generateIntegerTypeValidationStatements(nodeId);
-                break;
+                return this.generateNullTypeValidationStatements();
 
             case "boolean":
-                yield* this.generateBooleanTypeValidationStatements(nodeId);
-                break;
+                return this.generateBooleanTypeValidationStatements();
+
+            case "number":
+                return this.generateNumberTypeValidationStatements();
+
+            case "string":
+                return this.generateStringTypeValidationStatements();
+
+            case "tuple":
+                return this.generateTupleTypeValidationStatements(
+                    typeDescriptor.itemTypeNodeIds,
+                );
+
+            case "array":
+                return this.generateArrayTypeValidationStatements(
+                    typeDescriptor.itemTypeNodeId,
+                );
+
+            case "interface":
+                return this.generateInterfaceTypeValidationStatements(
+                    typeDescriptor.propertyTypeNodeIds,
+                    new Set(typeDescriptor.requiredProperties),
+                );
+
+            case "record":
+                return this.generateRecordTypeValidationStatements(
+                    typeDescriptor.propertyTypeNodeId,
+                );
+
+            case "union":
+                return this.generateUnionTypeValidationStatements(
+                    typeDescriptor.typeNodeIds,
+                );
+
+            case "intersection":
+                return this.generateIntersectionTypeValidationStatements(
+                    typeDescriptor.typeNodeIds,
+                );
 
             default:
                 throw new Error("type not supported");
         }
     }
 
-    protected wrapValidationExpression(
-        testExpression: ts.Expression,
-        error: string,
-    ) {
-        return this.factory.createIfStatement(
-            this.factory.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                testExpression,
-            ),
-            this.factory.createBlock([
-                this.factory.createExpressionStatement(this.factory.createYieldExpression(
-                    undefined,
-                    this.factory.createObjectLiteralExpression([
-                        this.factory.createShorthandPropertyAssignment(this.factory.createIdentifier("path")),
-                        this.factory.createPropertyAssignment(
-                            "error",
-                            this.factory.createStringLiteral(error),
-                        ),
-                    ]),
-                )),
-            ]),
+    protected * generateNeverTypeValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
+        /*
+        never never validates
+        */
+        yield f.createReturnStatement(
+            f.createFalse(),
         );
     }
+    protected *generateAnyTypeValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
 
-    protected generateCallValidatorExpression(
-        validatorName: string,
-        validateArgument: unknown,
-    ) {
-
-        return this.factory.createCallExpression(
-            this.factory.createPropertyAccessExpression(
-                this.factory.createIdentifier("validation"),
-                validatorName,
-            ),
-            undefined,
-            [
-                this.factory.createIdentifier("value"),
-                generateLiteral(this.factory, validateArgument),
-            ],
+        /*
+        any is always valid
+        */
+        yield f.createReturnStatement(
+            f.createTrue(),
         );
     }
+    protected *generateNullTypeValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
 
-    protected generateCallValidateTypeExpression(
-        type: unknown,
-    ) {
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createIdentifier("value"),
+                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createNull(),
+            ),
+            f.createBlock([
+                f.createReturnStatement(
+                    f.createTrue(),
+                ),
+            ], true),
+        );
+    }
+    protected *generateBooleanTypeValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
 
-        switch (type) {
-            case "null":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidNullType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createTypeOfExpression(f.createIdentifier("value")),
+                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createStringLiteral("boolean"),
+            ),
+            f.createBlock([
+                ...this.generateBooleanTypeInnerValidationStatements(),
+            ], true),
+        );
+    }
+    protected *generateBooleanTypeInnerValidationStatements(
+    ): Iterable<ts.Statement> {
+        const { factory: f } = this;
 
-            case "array":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidArrayType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "object":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidObjectType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "string":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidStringType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "number":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidNumberType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "integer":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidIntegerType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
-
-            case "boolean":
-                return this.factory.createCallExpression(
-                    this.factory.createPropertyAccessExpression(
-                        this.factory.createIdentifier("validation"),
-                        this.factory.createIdentifier("isValidBooleanType"),
-                    ),
-                    undefined,
-                    [
-                        this.factory.createIdentifier("value"),
-                    ],
-                );
-
-            default:
-                throw new Error("type not supported");
-        }
+        yield f.createReturnStatement(
+            f.createTrue(),
+        );
+    }
+    protected *generateNumberTypeValidationStatements(
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateStringTypeValidationStatements(
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateTupleTypeValidationStatements(
+        nodeIds: Array<string | boolean>,
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateArrayTypeValidationStatements(
+        nodeId: string | boolean,
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateInterfaceTypeValidationStatements(
+        nodeIds: Record<string, string | boolean>,
+        required: Set<string>,
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateRecordTypeValidationStatements(
+        nodeId: string | boolean,
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateUnionTypeValidationStatements(
+        nodeIds: Array<string | boolean>,
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateIntersectionTypeValidationStatements(
+        nodeIds: Array<string | boolean>,
+    ): Iterable<ts.Statement> {
+        yield* [];
     }
 
     protected generateTypeReference(
         nodeId: string,
     ) {
+        const { factory: f } = this;
+
         const typeName = this.namer.getName(nodeId).join("_");
-        return this.factory.createTypeReferenceNode(
-            this.factory.createQualifiedName(
-                this.factory.createIdentifier("types"),
-                this.factory.createIdentifier(typeName),
+        return f.createTypeReferenceNode(
+            f.createQualifiedName(
+                f.createIdentifier("types"),
+                f.createIdentifier(typeName),
             ),
         );
     }
