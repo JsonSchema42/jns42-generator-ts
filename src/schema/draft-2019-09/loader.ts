@@ -256,4 +256,10 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         throw new Error("not implemented");
     }
 
+    public resolveNodeId(
+        nodeId: string,
+    ): string {
+        throw new Error("not implemented");
+    }
+
 }

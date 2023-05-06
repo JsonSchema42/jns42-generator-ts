@@ -135,4 +135,10 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
     ): Iterable<CompoundDescriptorUnion> {
         throw new Error("not implemented");
     }
+
+    public resolveNodeId(
+        nodeId: string,
+    ): string {
+        throw new Error("not implemented");
+    }
 }

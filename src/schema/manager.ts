@@ -27,29 +27,6 @@ export class SchemaManager implements LoaderStrategy {
         [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
     };
 
-    private readonly validatorCodeGenerators = {
-        [schema202012.metaSchemaId]: new schema202012.SchemaValidatorCodeGenerator(
-            this,
-            this.loaders[schema202012.metaSchemaId],
-        ),
-        [schema201909.metaSchemaId]: new schema201909.SchemaValidatorCodeGenerator(
-            this,
-            this.loaders[schema201909.metaSchemaId],
-        ),
-        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaValidatorCodeGenerator(
-            this,
-            this.loaders[schemaDraft07.metaSchemaId],
-        ),
-        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaValidatorCodeGenerator(
-            this,
-            this.loaders[schemaDraft06.metaSchemaId],
-        ),
-        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaValidatorCodeGenerator(
-            this,
-            this.loaders[schemaDraft04.metaSchemaId],
-        ),
-    };
-
     private readonly specCodeGenerators = {
         [schema202012.metaSchemaId]: new schema202012.SchemaSpecCodeGenerator(
             this,
@@ -204,44 +181,6 @@ export class SchemaManager implements LoaderStrategy {
 
     public getNodeRootUrl(nodeRetrievalId: string) {
         return this.retrievalRootNodeMap.get(nodeRetrievalId);
-    }
-
-    /**
-     * @deprecated
-     */
-    public *generateValidatorStatements(
-        factory: ts.NodeFactory,
-        namer: Namer,
-    ) {
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("validation")),
-            ),
-            factory.createStringLiteral("./validation.js"),
-        );
-
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("types")),
-            ),
-            factory.createStringLiteral("./types.js"),
-        );
-
-        for (const [nodeId, metaSchemaId] of this.nodeMetaMap) {
-
-            const codeGenerator = this.validatorCodeGenerators[metaSchemaId];
-            yield* codeGenerator.generateStatements(
-                factory,
-                namer,
-                nodeId,
-            );
-        }
     }
 
     /**
@@ -441,6 +380,16 @@ export class SchemaManager implements LoaderStrategy {
 
         const loader = this.loaders[metaSchemaId];
         return loader.getComments(nodeId);
+    }
+
+    public resolveNodeId(nodeId: string): string {
+        const metaSchemaId = this.nodeMetaMap.get(nodeId);
+        if (metaSchemaId == null) {
+            throw new Error("meta schema id not found");
+        }
+
+        const loader = this.loaders[metaSchemaId];
+        return loader.resolveNodeId(nodeId);
     }
 
     public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> {

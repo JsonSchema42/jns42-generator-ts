@@ -603,4 +603,8 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         }
     }
 
+    public resolveNodeId(nodeId: string): string {
+        throw new Error("Method not implemented.");
+    }
+
 }
