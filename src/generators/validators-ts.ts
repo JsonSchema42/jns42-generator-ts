@@ -1094,15 +1094,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         yield f.createIfStatement(
             f.createBinaryExpression(
                 f.createIdentifier("validCounter"),
-                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                 f.createNumericLiteral(1),
             ),
             f.createBlock([
-                f.createReturnStatement(f.createTrue()),
+                f.createReturnStatement(f.createFalse()),
             ], true),
         );
-
-        yield f.createReturnStatement(f.createFalse());
     }
     protected *generateAnyOfTypeValidationStatements(
         typeDescriptor: AnyOfTypeDescriptor,
@@ -1144,15 +1142,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         yield f.createIfStatement(
             f.createBinaryExpression(
                 f.createIdentifier("validCounter"),
-                f.createToken(ts.SyntaxKind.GreaterThanToken),
+                f.createToken(ts.SyntaxKind.LessThanEqualsToken),
                 f.createNumericLiteral(0),
             ),
             f.createBlock([
-                f.createReturnStatement(f.createTrue()),
+                f.createReturnStatement(f.createFalse()),
             ], true),
         );
-
-        yield f.createReturnStatement(f.createFalse());
     }
     protected *generateAllOfTypeValidationStatements(
         typeDescriptor: AllOfTypeDescriptor,
@@ -1194,15 +1190,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         yield f.createIfStatement(
             f.createBinaryExpression(
                 f.createIdentifier("validCounter"),
-                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                 f.createNumericLiteral(typeDescriptor.typeNodeIds.length),
             ),
             f.createBlock([
-                f.createReturnStatement(f.createTrue()),
+                f.createReturnStatement(f.createFalse()),
             ], true),
         );
-
-        yield f.createReturnStatement(f.createFalse());
     }
 
     protected getTypeName(
