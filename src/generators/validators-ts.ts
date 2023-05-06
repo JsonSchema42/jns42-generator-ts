@@ -256,6 +256,117 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
+        switch (typeDescriptor.numberType) {
+            case "integer": {
+                yield f.createIfStatement(
+                    f.createBinaryExpression(
+                        f.createBinaryExpression(
+                            f.createIdentifier("value"),
+                            f.createToken(ts.SyntaxKind.PercentToken),
+                            f.createNumericLiteral(1),
+                        ),
+                        f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                        f.createNumericLiteral(0),
+                    ),
+                    f.createBlock(
+                        [f.createReturnStatement(f.createFalse())],
+                        true,
+                    ),
+                    undefined,
+                );
+                break;
+            }
+
+            case "float": {
+                break;
+            }
+
+            default:
+                throw new TypeError(
+                    `unexpected numberType (${typeDescriptor.numberType})`,
+                );
+
+        }
+
+        if (typeDescriptor.minimumInclusive != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createNumericLiteral(typeDescriptor.minimumInclusive),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.minimumExclusive != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.LessThanEqualsToken),
+                    f.createNumericLiteral(typeDescriptor.minimumExclusive),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.maximumInclusive != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.GreaterThanToken),
+                    f.createNumericLiteral(typeDescriptor.maximumInclusive),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.maximumExclusive != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.GreaterThanEqualsToken),
+                    f.createNumericLiteral(typeDescriptor.maximumExclusive),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.multipleOf != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createBinaryExpression(
+                        f.createIdentifier("value"),
+                        f.createToken(ts.SyntaxKind.PercentToken),
+                        f.createNumericLiteral(typeDescriptor.multipleOf),
+                    ),
+                    f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+                    f.createNumericLiteral(0),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
         if (typeDescriptor.options != null) {
             yield f.createIfStatement(
                 typeDescriptor.options.map(option => f.createBinaryExpression(
