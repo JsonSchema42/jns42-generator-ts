@@ -441,16 +441,28 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const { factory: f } = this;
         const typeName = this.getTypeName(typeDescriptor.itemTypeNodeId);
 
-        yield f.createForOfStatement(
-            undefined,
+        yield f.createForInStatement(
             f.createVariableDeclarationList([
                 f.createVariableDeclaration(
-                    f.createIdentifier("elementValue"),
+                    f.createIdentifier("elementIndex"),
                 ),
             ], ts.NodeFlags.Const),
             f.createIdentifier("value"),
             f.createBlock([
-                f.createIfStatement(
+                f.createVariableStatement(
+                    undefined,
+                    f.createVariableDeclarationList([
+                        f.createVariableDeclaration(
+                            f.createIdentifier("elementValue"),
+                            undefined,
+                            undefined,
+                            f.createElementAccessExpression(
+                                f.createIdentifier("value"),
+                                f.createIdentifier("elementIndex"),
+                            ),
+                        ),
+                    ], ts.NodeFlags.Const),
+                ), f.createIfStatement(
                     f.createPrefixUnaryExpression(
                         ts.SyntaxKind.ExclamationToken,
                         f.createCallExpression(
@@ -517,11 +529,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const propertyName in typeDescriptor.propertyTypeNodeIds) {
-            const propertyTypeNodeId = typeDescriptor.propertyTypeNodeIds[propertyName];
-            const typeName = this.getTypeName(propertyTypeNodeId);
-
-            yield f.createBlock([
+        yield f.createForInStatement(
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("propertyName"),
+                ),
+            ], ts.NodeFlags.Const),
+            f.createIdentifier("value"),
+            f.createBlock([
                 f.createVariableStatement(
                     undefined,
                     f.createVariableDeclarationList([
@@ -532,7 +547,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                             f.createElementAccessExpression(
                                 f.createIdentifier("value"),
                                 f.createAsExpression(
-                                    f.createStringLiteral(propertyName),
+                                    f.createIdentifier("propertyName"),
                                     f.createTypeOperatorNode(
                                         ts.SyntaxKind.KeyOfKeyword,
                                         f.createTypeQueryNode(
@@ -544,28 +559,61 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         ),
                     ], ts.NodeFlags.Const),
                 ),
-                f.createIfStatement(
-                    f.createPrefixUnaryExpression(
-                        ts.SyntaxKind.ExclamationToken,
-                        f.createCallExpression(
-                            f.createIdentifier(`isValid${typeName}`),
-                            undefined,
-                            [
-                                f.createIdentifier("propertyValue"),
-                            ],
+                f.createSwitchStatement(
+                    f.createIdentifier("propertyName"),
+                    f.createCaseBlock([
+                        ...this.generateInterfaceTypeCaseBlockValidationStatements(
+                            typeDescriptor,
                         ),
-                    ),
-                    f.createBlock([
-                        f.createReturnStatement(f.createFalse()),
-                    ], true),
+                    ]),
                 ),
-            ], true);
-        }
+            ], true),
+        );
 
         yield f.createReturnStatement(
             f.createTrue(),
         );
     }
+    private * generateInterfaceTypeCaseBlockValidationStatements(
+        typeDescriptor: InterfaceTypeDescriptor,
+    ) {
+        const { factory: f } = this;
+
+        for (const propertyName in typeDescriptor.propertyTypeNodeIds) {
+            const propertyTypeNodeId = typeDescriptor.propertyTypeNodeIds[propertyName];
+            const typeName = this.getTypeName(propertyTypeNodeId);
+
+            yield f.createCaseClause(
+                f.createStringLiteral(propertyName),
+                [
+                    f.createIfStatement(
+                        f.createPrefixUnaryExpression(
+                            ts.SyntaxKind.ExclamationToken,
+                            f.createCallExpression(
+                                f.createIdentifier(`isValid${typeName}`),
+                                undefined,
+                                [
+                                    f.createIdentifier("propertyValue"),
+                                ],
+                            ),
+                        ),
+                        f.createBlock([
+                            f.createReturnStatement(f.createFalse()),
+                        ], true),
+                    ),
+                    f.createBreakStatement(),
+                ],
+            );
+        }
+
+        yield f.createDefaultClause([
+            f.createReturnStatement(
+                f.createFalse(),
+            ),
+        ]);
+
+    }
+
     protected *generateRecordTypeValidationStatements(
         typeDescriptor: RecordTypeDescriptor,
     ): Iterable<ts.Statement> {
