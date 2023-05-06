@@ -862,6 +862,23 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
+        for (const propertyName of typeDescriptor.requiredProperties) {
+            yield f.createIfStatement(
+                f.createPrefixUnaryExpression(
+                    ts.SyntaxKind.ExclamationToken,
+                    f.createParenthesizedExpression(f.createBinaryExpression(
+                        f.createStringLiteral(propertyName),
+                        f.createToken(ts.SyntaxKind.InKeyword),
+                        f.createIdentifier("value"),
+                    )),
+                ),
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
+            );
+
+        }
+
         yield f.createForInStatement(
             f.createVariableDeclarationList([
                 f.createVariableDeclaration(
