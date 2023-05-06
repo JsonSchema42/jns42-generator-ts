@@ -52,10 +52,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createIdentifier("value"),
                 this.generateTypeReference(nodeId),
             ),
-            f.createBlock(
-                [...this.generateValidatorFunctionBodyStatements(nodeId)],
-                true,
-            ),
+            f.createBlock([
+                ...this.generateValidatorFunctionBodyStatements(nodeId),
+            ], true),
         );
     }
 
@@ -219,7 +218,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     [f.createReturnStatement(f.createFalse())],
                     true,
                 ),
-                undefined,
             );
         }
 
@@ -273,11 +271,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                         f.createNumericLiteral(0),
                     ),
-                    f.createBlock(
-                        [f.createReturnStatement(f.createFalse())],
-                        true,
-                    ),
-                    undefined,
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
                 );
                 break;
             }
@@ -304,7 +300,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     [f.createReturnStatement(f.createFalse())],
                     true,
                 ),
-                undefined,
             );
         }
 
@@ -315,11 +310,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.LessThanEqualsToken),
                     f.createNumericLiteral(typeDescriptor.minimumExclusive),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -330,11 +323,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.GreaterThanToken),
                     f.createNumericLiteral(typeDescriptor.maximumInclusive),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -345,11 +336,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.GreaterThanEqualsToken),
                     f.createNumericLiteral(typeDescriptor.maximumExclusive),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -364,11 +353,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                     f.createNumericLiteral(0),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -384,11 +371,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
                     b),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -429,11 +414,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.LessThanToken),
                     f.createNumericLiteral(typeDescriptor.minimumLength),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -447,11 +430,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.GreaterThanToken),
                     f.createNumericLiteral(typeDescriptor.maximumLength),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -468,11 +449,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         [f.createIdentifier("value")],
                     ),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -488,11 +467,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
                     b),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -671,11 +648,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.LessThanToken),
                     f.createNumericLiteral(typeDescriptor.minimumItems),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -689,11 +664,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createToken(ts.SyntaxKind.GreaterThanToken),
                     f.createNumericLiteral(typeDescriptor.maximumItems),
                 ),
-                f.createBlock(
-                    [f.createReturnStatement(f.createFalse())],
-                    true,
-                ),
-                undefined,
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
             );
         }
 
@@ -1057,11 +1030,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createToken(ts.SyntaxKind.LessThanToken),
                         f.createNumericLiteral(typeDescriptor.minimumProperties),
                     ),
-                    f.createBlock(
-                        [f.createReturnStatement(f.createFalse())],
-                        true,
-                    ),
-                    undefined,
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
                 );
             }
 
@@ -1072,11 +1043,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createToken(ts.SyntaxKind.GreaterThanToken),
                         f.createNumericLiteral(typeDescriptor.maximumProperties),
                     ),
-                    f.createBlock(
-                        [f.createReturnStatement(f.createFalse())],
-                        true,
-                    ),
-                    undefined,
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
                 );
             }
         }
@@ -1088,17 +1057,152 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     protected *generateOneOfTypeValidationStatements(
         typeDescriptor: OneOfTypeDescriptor,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("validCounter"),
+                    undefined,
+                    undefined,
+                    f.createNumericLiteral(0),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+
+        for (const typeNodeId of typeDescriptor.typeNodeIds) {
+            const typeName = this.getTypeName(typeNodeId);
+
+            yield f.createIfStatement(
+                f.createCallExpression(
+                    f.createIdentifier(`isValid${typeName}`),
+                    undefined,
+                    [
+                        f.createIdentifier("value"),
+                    ],
+                ),
+                f.createBlock([
+                    f.createExpressionStatement(f.createPostfixUnaryExpression(
+                        f.createIdentifier("validCounter"),
+                        ts.SyntaxKind.PlusPlusToken,
+                    )),
+                ], true),
+            );
+        }
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createIdentifier("validCounter"),
+                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createNumericLiteral(1),
+            ),
+            f.createBlock([
+                f.createReturnStatement(f.createTrue()),
+            ], true),
+        );
+
+        yield f.createReturnStatement(f.createFalse());
     }
     protected *generateAnyOfTypeValidationStatements(
         typeDescriptor: AnyOfTypeDescriptor,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("validCounter"),
+                    undefined,
+                    undefined,
+                    f.createNumericLiteral(0),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+
+        for (const typeNodeId of typeDescriptor.typeNodeIds) {
+            const typeName = this.getTypeName(typeNodeId);
+
+            yield f.createIfStatement(
+                f.createCallExpression(
+                    f.createIdentifier(`isValid${typeName}`),
+                    undefined,
+                    [
+                        f.createIdentifier("value"),
+                    ],
+                ),
+                f.createBlock([
+                    f.createExpressionStatement(f.createPostfixUnaryExpression(
+                        f.createIdentifier("validCounter"),
+                        ts.SyntaxKind.PlusPlusToken,
+                    )),
+                ], true),
+            );
+        }
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createIdentifier("validCounter"),
+                f.createToken(ts.SyntaxKind.GreaterThanToken),
+                f.createNumericLiteral(0),
+            ),
+            f.createBlock([
+                f.createReturnStatement(f.createTrue()),
+            ], true),
+        );
+
+        yield f.createReturnStatement(f.createFalse());
     }
     protected *generateAllOfTypeValidationStatements(
         typeDescriptor: AllOfTypeDescriptor,
     ): Iterable<ts.Statement> {
-        yield* [];
+        const { factory: f } = this;
+
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("validCounter"),
+                    undefined,
+                    undefined,
+                    f.createNumericLiteral(0),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+
+        for (const typeNodeId of typeDescriptor.typeNodeIds) {
+            const typeName = this.getTypeName(typeNodeId);
+
+            yield f.createIfStatement(
+                f.createCallExpression(
+                    f.createIdentifier(`isValid${typeName}`),
+                    undefined,
+                    [
+                        f.createIdentifier("value"),
+                    ],
+                ),
+                f.createBlock([
+                    f.createExpressionStatement(f.createPostfixUnaryExpression(
+                        f.createIdentifier("validCounter"),
+                        ts.SyntaxKind.PlusPlusToken,
+                    )),
+                ], true),
+            );
+        }
+
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createIdentifier("validCounter"),
+                f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                f.createNumericLiteral(typeDescriptor.typeNodeIds.length),
+            ),
+            f.createBlock([
+                f.createReturnStatement(f.createTrue()),
+            ], true),
+        );
+
+        yield f.createReturnStatement(f.createFalse());
     }
 
     protected getTypeName(
