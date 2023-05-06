@@ -655,44 +655,163 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const { factory: f } = this;
         const typeName = this.getTypeName(typeDescriptor.itemTypeNodeId);
 
-        yield f.createForInStatement(
-            f.createVariableDeclarationList([
-                f.createVariableDeclaration(
-                    f.createIdentifier("elementIndex"),
+        if (typeDescriptor.minimumItems != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("value"),
+                        f.createIdentifier("length"),
+                    ),
+                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createNumericLiteral(typeDescriptor.minimumItems),
                 ),
-            ], ts.NodeFlags.Const),
-            f.createIdentifier("value"),
-            f.createBlock([
-                f.createVariableStatement(
-                    undefined,
-                    f.createVariableDeclarationList([
-                        f.createVariableDeclaration(
-                            f.createIdentifier("elementValue"),
-                            undefined,
-                            undefined,
-                            f.createElementAccessExpression(
-                                f.createIdentifier("value"),
-                                f.createIdentifier("elementIndex"),
-                            ),
-                        ),
-                    ], ts.NodeFlags.Const),
-                ), f.createIfStatement(
-                    f.createPrefixUnaryExpression(
-                        ts.SyntaxKind.ExclamationToken,
-                        f.createCallExpression(
-                            f.createIdentifier(`isValid${typeName}`),
-                            undefined,
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.maximumItems != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("value"),
+                        f.createIdentifier("length"),
+                    ),
+                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createNumericLiteral(typeDescriptor.maximumItems),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.uniqueItems ?? false) {
+            yield f.createVariableStatement(
+                undefined,
+                f.createVariableDeclarationList([
+                    f.createVariableDeclaration(
+                        f.createIdentifier("elementValueSeen"),
+                        undefined,
+                        undefined,
+                        f.createNewExpression(
+                            f.createIdentifier("Set"),
                             [
-                                f.createIdentifier("elementValue"),
+                                this.generateTypeReference(typeDescriptor.itemTypeNodeId),
                             ],
+                            [],
                         ),
                     ),
-                    f.createBlock([
-                        f.createReturnStatement(f.createFalse()),
-                    ], true),
-                ),
-            ], true),
-        );
+                ], ts.NodeFlags.Const),
+            );
+
+            yield f.createForInStatement(
+                f.createVariableDeclarationList([
+                    f.createVariableDeclaration(
+                        f.createIdentifier("elementIndex"),
+                    ),
+                ], ts.NodeFlags.Const),
+                f.createIdentifier("value"),
+                f.createBlock([
+                    f.createVariableStatement(
+                        undefined,
+                        f.createVariableDeclarationList([
+                            f.createVariableDeclaration(
+                                f.createIdentifier("elementValue"),
+                                undefined,
+                                undefined,
+                                f.createElementAccessExpression(
+                                    f.createIdentifier("value"),
+                                    f.createIdentifier("elementIndex"),
+                                ),
+                            ),
+                        ], ts.NodeFlags.Const),
+                    ),
+                    f.createIfStatement(
+                        f.createCallExpression(
+                            f.createPropertyAccessExpression(
+                                f.createIdentifier("elementValueSeen"),
+                                f.createIdentifier("has"),
+                            ),
+                            undefined,
+                            [f.createIdentifier("elementValue")],
+                        ),
+                        f.createBlock([
+                            f.createReturnStatement(f.createFalse()),
+                        ], true),
+                    ),
+                    f.createExpressionStatement(f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createIdentifier("elementValueSeen"),
+                            f.createIdentifier("add"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("elementValue")],
+                    )),
+                    f.createIfStatement(
+                        f.createPrefixUnaryExpression(
+                            ts.SyntaxKind.ExclamationToken,
+                            f.createCallExpression(
+                                f.createIdentifier(`isValid${typeName}`),
+                                undefined,
+                                [
+                                    f.createIdentifier("elementValue"),
+                                ],
+                            ),
+                        ),
+                        f.createBlock([
+                            f.createReturnStatement(f.createFalse()),
+                        ], true),
+                    ),
+                ], true),
+            );
+        }
+        else {
+            yield f.createForInStatement(
+                f.createVariableDeclarationList([
+                    f.createVariableDeclaration(
+                        f.createIdentifier("elementIndex"),
+                    ),
+                ], ts.NodeFlags.Const),
+                f.createIdentifier("value"),
+                f.createBlock([
+                    f.createVariableStatement(
+                        undefined,
+                        f.createVariableDeclarationList([
+                            f.createVariableDeclaration(
+                                f.createIdentifier("elementValue"),
+                                undefined,
+                                undefined,
+                                f.createElementAccessExpression(
+                                    f.createIdentifier("value"),
+                                    f.createIdentifier("elementIndex"),
+                                ),
+                            ),
+                        ], ts.NodeFlags.Const),
+                    ),
+                    f.createIfStatement(
+                        f.createPrefixUnaryExpression(
+                            ts.SyntaxKind.ExclamationToken,
+                            f.createCallExpression(
+                                f.createIdentifier(`isValid${typeName}`),
+                                undefined,
+                                [
+                                    f.createIdentifier("elementValue"),
+                                ],
+                            ),
+                        ),
+                        f.createBlock([
+                            f.createReturnStatement(f.createFalse()),
+                        ], true),
+                    ),
+                ], true),
+            );
+        }
 
         yield f.createReturnStatement(
             f.createTrue(),
