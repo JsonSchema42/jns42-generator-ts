@@ -654,6 +654,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
         const typeName = this.getTypeName(typeDescriptor.itemTypeNodeId);
+        const hasSeenSet = typeDescriptor.uniqueItems ?? false;
 
         if (typeDescriptor.minimumItems != null) {
             yield f.createIfStatement(
@@ -680,7 +681,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createIdentifier("value"),
                         f.createIdentifier("length"),
                     ),
-                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createToken(ts.SyntaxKind.GreaterThanToken),
                     f.createNumericLiteral(typeDescriptor.maximumItems),
                 ),
                 f.createBlock(
@@ -691,7 +692,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.uniqueItems ?? false) {
+        if (hasSeenSet) {
             yield f.createVariableStatement(
                 undefined,
                 f.createVariableDeclarationList([
@@ -709,29 +710,31 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     ),
                 ], ts.NodeFlags.Const),
             );
+        }
 
-            yield f.createForInStatement(
-                f.createVariableDeclarationList([
-                    f.createVariableDeclaration(
-                        f.createIdentifier("elementIndex"),
-                    ),
-                ], ts.NodeFlags.Const),
-                f.createIdentifier("value"),
-                f.createBlock([
-                    f.createVariableStatement(
-                        undefined,
-                        f.createVariableDeclarationList([
-                            f.createVariableDeclaration(
-                                f.createIdentifier("elementValue"),
-                                undefined,
-                                undefined,
-                                f.createElementAccessExpression(
-                                    f.createIdentifier("value"),
-                                    f.createIdentifier("elementIndex"),
-                                ),
+        yield f.createForInStatement(
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("elementIndex"),
+                ),
+            ], ts.NodeFlags.Const),
+            f.createIdentifier("value"),
+            f.createBlock([
+                f.createVariableStatement(
+                    undefined,
+                    f.createVariableDeclarationList([
+                        f.createVariableDeclaration(
+                            f.createIdentifier("elementValue"),
+                            undefined,
+                            undefined,
+                            f.createElementAccessExpression(
+                                f.createIdentifier("value"),
+                                f.createIdentifier("elementIndex"),
                             ),
-                        ], ts.NodeFlags.Const),
-                    ),
+                        ),
+                    ], ts.NodeFlags.Const),
+                ),
+                hasSeenSet ?
                     f.createIfStatement(
                         f.createCallExpression(
                             f.createPropertyAccessExpression(
@@ -744,7 +747,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createBlock([
                             f.createReturnStatement(f.createFalse()),
                         ], true),
-                    ),
+                    ) :
+                    f.createEmptyStatement(),
+                hasSeenSet ?
                     f.createExpressionStatement(f.createCallExpression(
                         f.createPropertyAccessExpression(
                             f.createIdentifier("elementValueSeen"),
@@ -752,66 +757,25 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         ),
                         undefined,
                         [f.createIdentifier("elementValue")],
-                    )),
-                    f.createIfStatement(
-                        f.createPrefixUnaryExpression(
-                            ts.SyntaxKind.ExclamationToken,
-                            f.createCallExpression(
-                                f.createIdentifier(`isValid${typeName}`),
-                                undefined,
-                                [
-                                    f.createIdentifier("elementValue"),
-                                ],
-                            ),
-                        ),
-                        f.createBlock([
-                            f.createReturnStatement(f.createFalse()),
-                        ], true),
-                    ),
-                ], true),
-            );
-        }
-        else {
-            yield f.createForInStatement(
-                f.createVariableDeclarationList([
-                    f.createVariableDeclaration(
-                        f.createIdentifier("elementIndex"),
-                    ),
-                ], ts.NodeFlags.Const),
-                f.createIdentifier("value"),
-                f.createBlock([
-                    f.createVariableStatement(
-                        undefined,
-                        f.createVariableDeclarationList([
-                            f.createVariableDeclaration(
+                    )) :
+                    f.createEmptyStatement(),
+                f.createIfStatement(
+                    f.createPrefixUnaryExpression(
+                        ts.SyntaxKind.ExclamationToken,
+                        f.createCallExpression(
+                            f.createIdentifier(`isValid${typeName}`),
+                            undefined,
+                            [
                                 f.createIdentifier("elementValue"),
-                                undefined,
-                                undefined,
-                                f.createElementAccessExpression(
-                                    f.createIdentifier("value"),
-                                    f.createIdentifier("elementIndex"),
-                                ),
-                            ),
-                        ], ts.NodeFlags.Const),
-                    ),
-                    f.createIfStatement(
-                        f.createPrefixUnaryExpression(
-                            ts.SyntaxKind.ExclamationToken,
-                            f.createCallExpression(
-                                f.createIdentifier(`isValid${typeName}`),
-                                undefined,
-                                [
-                                    f.createIdentifier("elementValue"),
-                                ],
-                            ),
+                            ],
                         ),
-                        f.createBlock([
-                            f.createReturnStatement(f.createFalse()),
-                        ], true),
                     ),
-                ], true),
-            );
-        }
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
+                ),
+            ].filter(statement => !ts.isEmptyStatement(statement)), true),
+        );
 
         yield f.createReturnStatement(
             f.createTrue(),
@@ -876,7 +840,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createReturnStatement(f.createFalse()),
                 ], true),
             );
-
         }
 
         yield f.createForInStatement(
@@ -1009,6 +972,24 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const { factory: f } = this;
         const typeName = this.getTypeName(typeDescriptor.propertyTypeNodeId);
 
+        const hasPropertyCounter =
+            typeDescriptor.minimumProperties != null ||
+            typeDescriptor.maximumProperties != null;
+
+        if (hasPropertyCounter) {
+            f.createVariableStatement(
+                undefined,
+                f.createVariableDeclarationList([
+                    f.createVariableDeclaration(
+                        f.createIdentifier("propertyCount"),
+                        undefined,
+                        undefined,
+                        f.createNumericLiteral(0),
+                    ),
+                ], ts.NodeFlags.Let),
+            );
+        }
+
         yield f.createForInStatement(
             f.createVariableDeclarationList([
                 f.createVariableDeclaration(
@@ -1017,6 +998,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], ts.NodeFlags.Const),
             f.createIdentifier("value"),
             f.createBlock([
+                hasPropertyCounter ?
+                    f.createExpressionStatement(f.createPostfixUnaryExpression(
+                        f.createIdentifier("propertyCount"),
+                        ts.SyntaxKind.PlusPlusToken,
+                    )) :
+                    f.createEmptyStatement(),
                 f.createVariableStatement(
                     undefined,
                     f.createVariableDeclarationList([
@@ -1037,7 +1024,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                                 ),
                             ),
                         ),
-                    ], ts.NodeFlags.Const),
+                    ].filter(statement => !ts.isEmptyStatement(statement)), ts.NodeFlags.Const),
                 ),
                 f.createIfStatement(
                     f.createPrefixUnaryExpression(
@@ -1056,6 +1043,38 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
             ], true),
         );
+
+        if (hasPropertyCounter) {
+            if (typeDescriptor.minimumProperties != null) {
+                yield f.createIfStatement(
+                    f.createBinaryExpression(
+                        f.createIdentifier("propertyCount"),
+                        f.createToken(ts.SyntaxKind.LessThanToken),
+                        f.createNumericLiteral(typeDescriptor.minimumProperties),
+                    ),
+                    f.createBlock(
+                        [f.createReturnStatement(f.createFalse())],
+                        true,
+                    ),
+                    undefined,
+                );
+            }
+
+            if (typeDescriptor.maximumProperties != null) {
+                yield f.createIfStatement(
+                    f.createBinaryExpression(
+                        f.createIdentifier("propertyCount"),
+                        f.createToken(ts.SyntaxKind.GreaterThanToken),
+                        f.createNumericLiteral(typeDescriptor.maximumProperties),
+                    ),
+                    f.createBlock(
+                        [f.createReturnStatement(f.createFalse())],
+                        true,
+                    ),
+                    undefined,
+                );
+            }
+        }
 
         yield f.createReturnStatement(
             f.createTrue(),
