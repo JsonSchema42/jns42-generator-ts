@@ -17,19 +17,19 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createStringLiteral("./types.js"),
         );
 
-        for (const [nodeId, typeName] of this.manager.getTypeNames()) {
+        for (const [nodeId] of this.manager.getTypeNames()) {
             yield this.generateValidatorFunctionDeclarationStatement(
                 nodeId,
-                typeName,
             );
         }
     }
 
     protected generateValidatorFunctionDeclarationStatement(
         nodeId: string,
-        typeName: string,
     ): ts.FunctionDeclaration {
         const { factory: f } = this;
+
+        const typeName = this.getTypeName(nodeId);
 
         return f.createFunctionDeclaration(
             [

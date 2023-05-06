@@ -5,18 +5,17 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        for (const [nodeId, typeName] of this.manager.getTypeNames()) {
+        for (const [nodeId] of this.manager.getTypeNames()) {
             yield this.generateTypeDeclarationStatement(
                 nodeId,
-                typeName,
             );
         }
     }
 
     protected generateTypeDeclarationStatement(
         nodeId: string,
-        typeName: string,
     ) {
+        const typeName = this.getTypeName(nodeId);
         const declaration = this.factory.createTypeAliasDeclaration(
             [
                 this.factory.createToken(ts.SyntaxKind.ExportKeyword),
@@ -200,10 +199,18 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         const types = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
         return this.factory.createIntersectionTypeNode(types);
     }
-    protected generateTypeReference(
+
+    protected getTypeName(
         nodeId: string,
     ) {
         const typeName = this.namer.getName(nodeId).join("_");
+        return typeName;
+    }
+
+    protected generateTypeReference(
+        nodeId: string,
+    ) {
+        const typeName = this.getTypeName(nodeId);
         return this.factory.createTypeReferenceNode(
             this.factory.createIdentifier(typeName),
         );
