@@ -50,7 +50,6 @@ export interface StringTypeDescriptor {
 
 export interface TupleTypeDescriptor {
     type: "tuple"
-    uniqueItems?: boolean
     itemTypeNodeIds: Array<string>
 }
 

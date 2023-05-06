@@ -432,7 +432,6 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         const prefixItems = [...selectSubNodePrefixItemsEntries(nodePointer, node)];
         const minimumItems = selectValidationMinimumItems(node);
         const maximumItems = selectValidationMaximumItems(node);
-
         const uniqueItems = selectValidationUniqueItems(node) ?? false;
 
         if (prefixItems.length > 0) {
@@ -447,7 +446,6 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
 
             yield {
                 type: "tuple",
-                uniqueItems,
                 itemTypeNodeIds: itemTypeNodeIds,
             };
         }
