@@ -774,7 +774,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createReturnStatement(f.createFalse()),
                     ], true),
                 ),
-            ].filter(statement => !ts.isEmptyStatement(statement)), true),
+            ].filter(node => !ts.isEmptyStatement(node)), true),
         );
 
         yield f.createReturnStatement(
@@ -1024,7 +1024,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                                 ),
                             ),
                         ),
-                    ].filter(statement => !ts.isEmptyStatement(statement)), ts.NodeFlags.Const),
+                    ], ts.NodeFlags.Const),
                 ),
                 f.createIfStatement(
                     f.createPrefixUnaryExpression(
@@ -1041,7 +1041,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createReturnStatement(f.createFalse()),
                     ], true),
                 ),
-            ], true),
+            ].filter(node => !ts.isEmptyStatement(node)), true),
         );
 
         if (hasPropertyCounter) {
