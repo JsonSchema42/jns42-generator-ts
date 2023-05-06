@@ -361,6 +361,47 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
+        for (
+            let itemTypeNodeIndex = 0;
+            itemTypeNodeIndex < typeDescriptor.itemTypeNodeIds.length;
+            itemTypeNodeIndex++
+        ) {
+            const itemTypeNodeId = typeDescriptor.itemTypeNodeIds[itemTypeNodeIndex];
+            const typeName = this.getTypeName(itemTypeNodeId);
+
+            yield f.createBlock([
+                f.createVariableStatement(
+                    undefined,
+                    f.createVariableDeclarationList([
+                        f.createVariableDeclaration(
+                            f.createIdentifier("elementValue"),
+                            undefined,
+                            undefined,
+                            f.createElementAccessExpression(
+                                f.createIdentifier("value"),
+                                f.createNumericLiteral(itemTypeNodeIndex),
+                            ),
+                        ),
+                    ], ts.NodeFlags.Const),
+                ),
+                f.createIfStatement(
+                    f.createPrefixUnaryExpression(
+                        ts.SyntaxKind.ExclamationToken,
+                        f.createCallExpression(
+                            f.createIdentifier(`isValid${typeName}`),
+                            undefined,
+                            [
+                                f.createIdentifier("elementValue"),
+                            ],
+                        ),
+                    ),
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
+                ),
+            ], true);
+        }
+
         yield f.createReturnStatement(
             f.createTrue(),
         );
@@ -398,6 +439,34 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         typeDescriptor: ArrayTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+        const typeName = this.getTypeName(typeDescriptor.itemTypeNodeId);
+
+        yield f.createForOfStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("elementValue"),
+                ),
+            ], ts.NodeFlags.Const),
+            f.createIdentifier("value"),
+            f.createBlock([
+                f.createIfStatement(
+                    f.createPrefixUnaryExpression(
+                        ts.SyntaxKind.ExclamationToken,
+                        f.createCallExpression(
+                            f.createIdentifier(`isValid${typeName}`),
+                            undefined,
+                            [
+                                f.createIdentifier("elementValue"),
+                            ],
+                        ),
+                    ),
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
+                ),
+            ], true),
+        );
 
         yield f.createReturnStatement(
             f.createTrue(),
@@ -448,6 +517,51 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
+        for (const propertyName in typeDescriptor.propertyTypeNodeIds) {
+            const propertyTypeNodeId = typeDescriptor.propertyTypeNodeIds[propertyName];
+            const typeName = this.getTypeName(propertyTypeNodeId);
+
+            yield f.createBlock([
+                f.createVariableStatement(
+                    undefined,
+                    f.createVariableDeclarationList([
+                        f.createVariableDeclaration(
+                            f.createIdentifier("propertyValue"),
+                            undefined,
+                            undefined,
+                            f.createElementAccessExpression(
+                                f.createIdentifier("value"),
+                                f.createAsExpression(
+                                    f.createStringLiteral(propertyName),
+                                    f.createTypeOperatorNode(
+                                        ts.SyntaxKind.KeyOfKeyword,
+                                        f.createTypeQueryNode(
+                                            f.createIdentifier("value"),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ], ts.NodeFlags.Const),
+                ),
+                f.createIfStatement(
+                    f.createPrefixUnaryExpression(
+                        ts.SyntaxKind.ExclamationToken,
+                        f.createCallExpression(
+                            f.createIdentifier(`isValid${typeName}`),
+                            undefined,
+                            [
+                                f.createIdentifier("propertyValue"),
+                            ],
+                        ),
+                    ),
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
+                ),
+            ], true);
+        }
+
         yield f.createReturnStatement(
             f.createTrue(),
         );
@@ -496,6 +610,55 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         typeDescriptor: RecordTypeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+        const typeName = this.getTypeName(typeDescriptor.propertyTypeNodeId);
+
+        yield f.createForInStatement(
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("propertyName"),
+                ),
+            ], ts.NodeFlags.Const),
+            f.createIdentifier("value"),
+            f.createBlock([
+                f.createVariableStatement(
+                    undefined,
+                    f.createVariableDeclarationList([
+                        f.createVariableDeclaration(
+                            f.createIdentifier("propertyValue"),
+                            undefined,
+                            undefined,
+                            f.createElementAccessExpression(
+                                f.createIdentifier("value"),
+                                f.createAsExpression(
+                                    f.createIdentifier("propertyName"),
+                                    f.createTypeOperatorNode(
+                                        ts.SyntaxKind.KeyOfKeyword,
+                                        f.createTypeQueryNode(
+                                            f.createIdentifier("value"),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ], ts.NodeFlags.Const),
+                ),
+                f.createIfStatement(
+                    f.createPrefixUnaryExpression(
+                        ts.SyntaxKind.ExclamationToken,
+                        f.createCallExpression(
+                            f.createIdentifier(`isValid${typeName}`),
+                            undefined,
+                            [
+                                f.createIdentifier("propertyValue"),
+                            ],
+                        ),
+                    ),
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
+                ),
+            ], true),
+        );
 
         yield f.createReturnStatement(
             f.createTrue(),
@@ -512,12 +675,19 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         yield* [];
     }
 
+    protected getTypeName(
+        nodeId: string,
+    ) {
+        const typeName = this.namer.getName(nodeId).join("_");
+        return typeName;
+    }
+
     protected generateTypeReference(
         nodeId: string,
     ) {
         const { factory: f } = this;
 
-        const typeName = this.namer.getName(nodeId).join("_");
+        const typeName = this.getTypeName(nodeId);
         return f.createTypeReferenceNode(
             f.createQualifiedName(
                 f.createIdentifier("types"),

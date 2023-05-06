@@ -435,8 +435,8 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
 
         const uniqueItems = selectValidationUniqueItems(node) ?? false;
 
-        if (items.length > 0) {
-            const itemTypeNodeIds = items.map(([itemNodePointer]) => {
+        if (prefixItems.length > 0) {
+            const itemTypeNodeIds = prefixItems.map(([itemNodePointer]) => {
                 const itemNodeUrl = new URL(
                     `#${itemNodePointer}`,
                     nodeRootUrl,
@@ -452,8 +452,8 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             };
         }
 
-        if (prefixItems.length > 0) {
-            const itemTypeNodeIds = prefixItems.map(([itemNodePointer]) => {
+        if (items.length > 0) {
+            const itemTypeNodeIds = items.map(([itemNodePointer]) => {
                 const itemNodeUrl = new URL(
                     `#${itemNodePointer}`,
                     nodeRootUrl,

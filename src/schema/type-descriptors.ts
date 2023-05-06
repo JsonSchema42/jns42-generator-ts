@@ -51,7 +51,7 @@ export interface StringTypeDescriptor {
 export interface TupleTypeDescriptor {
     type: "tuple"
     uniqueItems?: boolean
-    itemTypeNodeIds: Array<string | boolean>
+    itemTypeNodeIds: Array<string>
 }
 
 export interface ArrayTypeDescriptor {
@@ -59,13 +59,13 @@ export interface ArrayTypeDescriptor {
     minimumItems?: number
     maximumItems?: number
     uniqueItems?: boolean
-    itemTypeNodeId: string | boolean
+    itemTypeNodeId: string
 }
 
 export interface InterfaceTypeDescriptor {
     type: "interface"
     requiredProperties: string[]
-    propertyTypeNodeIds: Record<string, string | boolean>
+    propertyTypeNodeIds: Record<string, string>
 }
 
 export interface RecordTypeDescriptor {
@@ -73,7 +73,7 @@ export interface RecordTypeDescriptor {
     requiredProperties: string[]
     minimumProperties?: number
     maximumProperties?: number
-    propertyTypeNodeId: string | boolean
+    propertyTypeNodeId: string
 }
 
 export interface UnionTypeDescriptor {
