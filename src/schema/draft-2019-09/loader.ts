@@ -256,9 +256,9 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         throw new Error("not implemented");
     }
 
-    public resolveNodeId(
+    public getReferencingNodeId(
         nodeId: string,
-    ): string {
+    ): string | undefined {
         throw new Error("not implemented");
     }
 

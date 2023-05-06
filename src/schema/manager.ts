@@ -382,14 +382,14 @@ export class SchemaManager implements LoaderStrategy {
         return loader.getComments(nodeId);
     }
 
-    public resolveNodeId(nodeId: string): string {
+    public getReferencingNodeId(nodeId: string): string | undefined {
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
             throw new Error("meta schema id not found");
         }
 
         const loader = this.loaders[metaSchemaId];
-        return loader.resolveNodeId(nodeId);
+        return loader.getReferencingNodeId(nodeId);
     }
 
     public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> {

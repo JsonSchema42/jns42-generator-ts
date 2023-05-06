@@ -17,9 +17,9 @@ export interface SchemaLoaderNodeItem<N> {
 
 export interface LoaderStrategy {
     getComments(nodeId: string): string
+    getReferencingNodeId(nodeId: string): string | undefined;
     selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>;
     selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>;
-    resolveNodeId(nodeId: string): string;
 }
 
 export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
@@ -36,9 +36,9 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
         nodeId: string
     ): Iterable<CompoundDescriptorUnion>
 
-    public abstract resolveNodeId(
+    public abstract getReferencingNodeId(
         nodeId: string
-    ): string
+    ): string | undefined
 
     protected abstract readonly metaSchemaId: MetaSchemaId
 

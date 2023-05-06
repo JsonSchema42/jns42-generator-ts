@@ -2,7 +2,7 @@ import { CompoundDescriptorUnion } from "../index.js";
 import { SchemaLoaderBase } from "../loader.js";
 import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -603,8 +603,31 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         }
     }
 
-    public resolveNodeId(nodeId: string): string {
-        throw new Error("Method not implemented.");
+    public getReferencingNodeId(
+        nodeId: string,
+    ): string | undefined {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        const nodeRef = selectNodeRef(nodeItem.node);
+        if (nodeRef != null) {
+            const resolvedNodeId = this.resolveReferenceNodeId(
+                nodeId,
+                nodeRef,
+            );
+
+            return resolvedNodeId;
+        }
+
+        const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
+        if (nodeDynamicRef != null) {
+            const resolvedNodeId = this.resolveDynamicReferenceNodeId(
+                nodeId,
+                nodeDynamicRef,
+            );
+
+            return resolvedNodeId;
+        }
+
     }
 
 }
