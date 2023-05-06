@@ -122,6 +122,25 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const typeDescriptors = [...this.manager.selectNodeTypeDescriptors(nodeId)];
         const compoundDescriptors = [...this.manager.selectNodeCompoundDescriptors(nodeId)];
 
+        const referencingNodeId = this.manager.getReferencingNodeId(nodeId);
+        if (referencingNodeId != null) {
+            const referencingTypeName = this.getTypeName(referencingNodeId);
+
+            yield f.createIfStatement(
+                f.createPrefixUnaryExpression(
+                    ts.SyntaxKind.ExclamationToken,
+                    f.createCallExpression(
+                        f.createIdentifier(`isValid${referencingTypeName}`),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+                f.createBlock([
+                    f.createReturnStatement(f.createFalse()),
+                ], true),
+            );
+        }
+
         if (typeDescriptors.length > 0) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(

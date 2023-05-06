@@ -16,6 +16,18 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected generateTypeDeclarationStatement(
         nodeId: string,
     ) {
+        let typeDefinition = this.generateTypeDefinition(
+            nodeId,
+        );
+
+        const referencingNodeId = this.manager.getReferencingNodeId(nodeId);
+        if (referencingNodeId != null) {
+            typeDefinition = this.factory.createIntersectionTypeNode([
+                typeDefinition,
+                this.generateTypeReference(referencingNodeId),
+            ]);
+        }
+
         const typeName = this.getTypeName(nodeId);
         const declaration = this.factory.createTypeAliasDeclaration(
             [
@@ -23,9 +35,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             ],
             typeName,
             undefined,
-            this.generateTypeDefinition(
-                nodeId,
-            ),
+            typeDefinition,
         );
 
         const comments = this.manager.getComments(nodeId);
