@@ -9,8 +9,9 @@ export type TypeDescriptorUnion =
     ArrayTypeDescriptor |
     InterfaceTypeDescriptor |
     RecordTypeDescriptor |
-    UnionTypeDescriptor |
-    IntersectionTypeDescriptor;
+    OneOfTypeDescriptor |
+    AnyOfTypeDescriptor |
+    AllOfTypeDescriptor;
 
 export interface NullTypeDescriptor {
     type: "null"
@@ -75,13 +76,18 @@ export interface RecordTypeDescriptor {
     propertyTypeNodeId: string
 }
 
-export interface UnionTypeDescriptor {
-    type: "union"
+export interface OneOfTypeDescriptor {
+    type: "one-of"
     typeNodeIds: string[]
 }
 
-export interface IntersectionTypeDescriptor {
-    type: "intersection"
+export interface AnyOfTypeDescriptor {
+    type: "any-of"
+    typeNodeIds: string[]
+}
+
+export interface AllOfTypeDescriptor {
+    type: "all-of"
     typeNodeIds: string[]
 }
 

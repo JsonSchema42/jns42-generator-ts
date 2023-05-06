@@ -543,7 +543,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             });
 
             yield {
-                type: "intersection",
+                type: "all-of",
                 typeNodeIds,
             };
         }
@@ -566,7 +566,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             });
 
             yield {
-                type: "intersection",
+                type: "any-of",
                 typeNodeIds,
             };
         }
@@ -589,7 +589,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             });
 
             yield {
-                type: "union",
+                type: "one-of",
                 typeNodeIds,
             };
         }

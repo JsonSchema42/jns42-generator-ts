@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { ArrayTypeDescriptor, BooleanTypeDescriptor, InterfaceTypeDescriptor, IntersectionTypeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion, UnionTypeDescriptor } from "../schema/type-descriptors.js";
+import { AllOfTypeDescriptor, AnyOfTypeDescriptor, ArrayTypeDescriptor, BooleanTypeDescriptor, InterfaceTypeDescriptor, NumberTypeDescriptor, OneOfTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/type-descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -122,13 +122,18 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     typeDescriptor,
                 );
 
-            case "union":
-                return this.generateUnionTypeValidationStatements(
+            case "one-of":
+                return this.generateOneOfTypeValidationStatements(
                     typeDescriptor,
                 );
 
-            case "intersection":
-                return this.generateIntersectionTypeValidationStatements(
+            case "any-of":
+                return this.generateAnyOfTypeValidationStatements(
+                    typeDescriptor,
+                );
+
+            case "all-of":
+                return this.generateAllOfTypeValidationStatements(
                     typeDescriptor,
                 );
 
@@ -1080,13 +1085,18 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createTrue(),
         );
     }
-    protected *generateUnionTypeValidationStatements(
-        typeDescriptor: UnionTypeDescriptor,
+    protected *generateOneOfTypeValidationStatements(
+        typeDescriptor: OneOfTypeDescriptor,
     ): Iterable<ts.Statement> {
         yield* [];
     }
-    protected *generateIntersectionTypeValidationStatements(
-        typeDescriptor: IntersectionTypeDescriptor,
+    protected *generateAnyOfTypeValidationStatements(
+        typeDescriptor: AnyOfTypeDescriptor,
+    ): Iterable<ts.Statement> {
+        yield* [];
+    }
+    protected *generateAllOfTypeValidationStatements(
+        typeDescriptor: AllOfTypeDescriptor,
     ): Iterable<ts.Statement> {
         yield* [];
     }

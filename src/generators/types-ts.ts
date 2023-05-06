@@ -103,13 +103,18 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
                     typeDescriptor.propertyTypeNodeId,
                 );
 
-            case "union":
-                return this.generateUnionTypeDefinition(
+            case "one-of":
+                return this.generateOneOfTypeDefinition(
                     typeDescriptor.typeNodeIds,
                 );
 
-            case "intersection":
-                return this.generateIntersectionTypeDefinition(
+            case "any-of":
+                return this.generateAnyOfTypeDefinition(
+                    typeDescriptor.typeNodeIds,
+                );
+
+            case "all-of":
+                return this.generateAllOfTypeDefinition(
                     typeDescriptor.typeNodeIds,
                 );
 
@@ -187,16 +192,26 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             ],
         );
     }
-    protected generateUnionTypeDefinition(
+    protected generateOneOfTypeDefinition(
         nodeIds: Array<string | boolean>,
     ) {
-        const types = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+        const types = nodeIds.
+            map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
         return this.factory.createUnionTypeNode(types);
     }
-    protected generateIntersectionTypeDefinition(
+    protected generateAnyOfTypeDefinition(
         nodeIds: Array<string | boolean>,
     ) {
-        const types = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+        const types = nodeIds.
+            map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId)).
+            map(typeNode => this.factory.createTypeReferenceNode("Partial", [typeNode]));
+        return this.factory.createIntersectionTypeNode(types);
+    }
+    protected generateAllOfTypeDefinition(
+        nodeIds: Array<string | boolean>,
+    ) {
+        const types = nodeIds.
+            map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
         return this.factory.createIntersectionTypeNode(types);
     }
 
