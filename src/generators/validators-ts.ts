@@ -74,8 +74,10 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                     ),
                 ],
-                f.createKeywordTypeNode(
-                    ts.SyntaxKind.BooleanKeyword,
+                f.createTypePredicateNode(
+                    undefined,
+                    f.createIdentifier("value"),
+                    f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
                 f.createBlock([
                     ...this.generateTypeValidationStatements(nodeId, typeDescriptor),
@@ -98,8 +100,10 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                     ),
                 ],
-                f.createKeywordTypeNode(
-                    ts.SyntaxKind.BooleanKeyword,
+                f.createTypePredicateNode(
+                    undefined,
+                    f.createIdentifier("value"),
+                    f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
                 f.createBlock([
                     ...this.generateCompoundValidationStatements(nodeId, compoundDescriptor),
