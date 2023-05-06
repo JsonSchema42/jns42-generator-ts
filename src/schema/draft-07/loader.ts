@@ -1,3 +1,4 @@
+import { CompoundDescriptorUnion } from "../compound-descriptors.js";
 import { SchemaLoaderBase } from "../loader.js";
 import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
@@ -129,4 +130,9 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         throw new Error("not implemented");
     }
 
+    public selectNodeCompoundDescriptors(
+        nodeId: string,
+    ): Iterable<CompoundDescriptorUnion> {
+        throw new Error("not implemented");
+    }
 }

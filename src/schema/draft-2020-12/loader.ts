@@ -1,3 +1,4 @@
+import { CompoundDescriptorUnion } from "../index.js";
 import { SchemaLoaderBase } from "../loader.js";
 import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
@@ -263,22 +264,6 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             };
         }
 
-        yield* this.makeNodeTypeDescriptorFromAllOf(
-            nodeItem.node,
-            nodeItem.nodeRootUrl,
-            nodeItem.nodePointer,
-        );
-        yield* this.makeNodeTypeDescriptorFromAnyOf(
-            nodeItem.node,
-            nodeItem.nodeRootUrl,
-            nodeItem.nodePointer,
-        );
-        yield* this.makeNodeTypeDescriptorFromOneOf(
-            nodeItem.node,
-            nodeItem.nodeRootUrl,
-            nodeItem.nodePointer,
-        );
-
         const types = selectNodeTypes(nodeItem.node);
         if (types != null) {
             for (const type of types) {
@@ -332,6 +317,29 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
                 }
             }
         }
+    }
+
+    public *selectNodeCompoundDescriptors(
+        nodeId: string,
+    ): Iterable<CompoundDescriptorUnion> {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        yield* this.makeNodeCompoundDescriptorFromAllOf(
+            nodeItem.node,
+            nodeItem.nodeRootUrl,
+            nodeItem.nodePointer,
+        );
+        yield* this.makeNodeCompoundDescriptorFromAnyOf(
+            nodeItem.node,
+            nodeItem.nodeRootUrl,
+            nodeItem.nodePointer,
+        );
+        yield* this.makeNodeCompoundDescriptorFromOneOf(
+            nodeItem.node,
+            nodeItem.nodeRootUrl,
+            nodeItem.nodePointer,
+        );
+
     }
 
     private * makeNodeTypeDescriptorFromNull(): Iterable<TypeDescriptorUnion> {
@@ -526,11 +534,11 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         }
     }
 
-    private * makeNodeTypeDescriptorFromAllOf(
+    private * makeNodeCompoundDescriptorFromAllOf(
         node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<CompoundDescriptorUnion> {
         const allOf = [...selectSubNodeAllOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
@@ -549,11 +557,11 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         }
     }
 
-    private * makeNodeTypeDescriptorFromAnyOf(
+    private * makeNodeCompoundDescriptorFromAnyOf(
         node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<CompoundDescriptorUnion> {
         const allOf = [...selectSubNodeAnyOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
@@ -572,11 +580,11 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         }
     }
 
-    private * makeNodeTypeDescriptorFromOneOf(
+    private * makeNodeCompoundDescriptorFromOneOf(
         node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<CompoundDescriptorUnion> {
         const allOf = [...selectSubNodeOneOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {

@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { CompoundDescriptorUnion } from "../schema/index.js";
 import { TypeDescriptorUnion } from "../schema/type-descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
@@ -58,6 +59,9 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         for (const typeDescriptor of this.manager.selectNodeTypeDescriptors(nodeId)) {
             yield this.generateTypeDefinitionElement(typeDescriptor);
         }
+        for (const compoundDescriptor of this.manager.selectNodeCompoundDescriptors(nodeId)) {
+            yield this.generateCompoundDefinitionElement(compoundDescriptor);
+        }
     }
 
     protected generateTypeDefinitionElement(
@@ -103,19 +107,28 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
                     typeDescriptor.propertyTypeNodeId,
                 );
 
+            default:
+                throw new Error("type not supported");
+        }
+    }
+
+    protected generateCompoundDefinitionElement(
+        compoundDescriptor: CompoundDescriptorUnion,
+    ): ts.TypeNode {
+        switch (compoundDescriptor.type) {
             case "one-of":
-                return this.generateOneOfTypeDefinition(
-                    typeDescriptor.typeNodeIds,
+                return this.generateOneOfCompoundDefinition(
+                    compoundDescriptor.typeNodeIds,
                 );
 
             case "any-of":
-                return this.generateAnyOfTypeDefinition(
-                    typeDescriptor.typeNodeIds,
+                return this.generateAnyOfCompoundDefinition(
+                    compoundDescriptor.typeNodeIds,
                 );
 
             case "all-of":
-                return this.generateAllOfTypeDefinition(
-                    typeDescriptor.typeNodeIds,
+                return this.generateAllOfCompoundDefinition(
+                    compoundDescriptor.typeNodeIds,
                 );
 
             default:
@@ -192,14 +205,14 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             ],
         );
     }
-    protected generateOneOfTypeDefinition(
+    protected generateOneOfCompoundDefinition(
         nodeIds: Array<string | boolean>,
     ) {
         const types = nodeIds.
             map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
         return this.factory.createUnionTypeNode(types);
     }
-    protected generateAnyOfTypeDefinition(
+    protected generateAnyOfCompoundDefinition(
         nodeIds: Array<string | boolean>,
     ) {
         const types = nodeIds.
@@ -207,7 +220,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             map(typeNode => this.factory.createTypeReferenceNode("Partial", [typeNode]));
         return this.factory.createIntersectionTypeNode(types);
     }
-    protected generateAllOfTypeDefinition(
+    protected generateAllOfCompoundDefinition(
         nodeIds: Array<string | boolean>,
     ) {
         const types = nodeIds.

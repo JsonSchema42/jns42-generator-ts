@@ -8,10 +8,7 @@ export type TypeDescriptorUnion =
     TupleTypeDescriptor |
     ArrayTypeDescriptor |
     InterfaceTypeDescriptor |
-    RecordTypeDescriptor |
-    OneOfTypeDescriptor |
-    AnyOfTypeDescriptor |
-    AllOfTypeDescriptor;
+    RecordTypeDescriptor;
 
 export interface NullTypeDescriptor {
     type: "null"
@@ -74,20 +71,5 @@ export interface RecordTypeDescriptor {
     minimumProperties?: number
     maximumProperties?: number
     propertyTypeNodeId: string
-}
-
-export interface OneOfTypeDescriptor {
-    type: "one-of"
-    typeNodeIds: string[]
-}
-
-export interface AnyOfTypeDescriptor {
-    type: "any-of"
-    typeNodeIds: string[]
-}
-
-export interface AllOfTypeDescriptor {
-    type: "all-of"
-    typeNodeIds: string[]
 }
 

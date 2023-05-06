@@ -7,6 +7,7 @@ import * as schemaDraft06 from "./draft-06/index.js";
 import * as schemaDraft07 from "./draft-07/index.js";
 import * as schema201909 from "./draft-2019-09/index.js";
 import * as schema202012 from "./draft-2020-12/index.js";
+import { CompoundDescriptorUnion } from "./index.js";
 import { LoaderStrategy, SchemaLoaderBase } from "./loader.js";
 import { MetaSchemaId } from "./meta.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
@@ -450,6 +451,16 @@ export class SchemaManager implements LoaderStrategy {
 
         const loader = this.loaders[metaSchemaId];
         return loader.selectNodeTypeDescriptors(nodeId);
+    }
+
+    public selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion> {
+        const metaSchemaId = this.nodeMetaMap.get(nodeId);
+        if (metaSchemaId == null) {
+            throw new Error("meta schema id not found");
+        }
+
+        const loader = this.loaders[metaSchemaId];
+        return loader.selectNodeCompoundDescriptors(nodeId);
     }
 
 }

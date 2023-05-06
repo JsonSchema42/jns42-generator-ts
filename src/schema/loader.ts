@@ -1,3 +1,4 @@
+import { CompoundDescriptorUnion } from "./compound-descriptors.js";
 import { SchemaManager } from "./manager.js";
 import { MetaSchemaId } from "./meta.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
@@ -17,6 +18,7 @@ export interface SchemaLoaderNodeItem<N> {
 export interface LoaderStrategy {
     getComments(nodeId: string): string
     selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>;
+    selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>;
 }
 
 export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
@@ -27,7 +29,11 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
 
     public abstract selectNodeTypeDescriptors(
         nodeId: string
-    ): Iterable<TypeDescriptorUnion>;
+    ): Iterable<TypeDescriptorUnion>
+
+    public abstract selectNodeCompoundDescriptors(
+        nodeId: string
+    ): Iterable<CompoundDescriptorUnion>
 
     protected abstract readonly metaSchemaId: MetaSchemaId
 
@@ -82,7 +88,6 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
     ) {
         //
     }
-
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem<N>>();
     private readonly nodeMap = new Map<string, SchemaLoaderNodeItem<N>>();
 

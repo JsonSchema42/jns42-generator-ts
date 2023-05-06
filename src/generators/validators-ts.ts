@@ -1,5 +1,7 @@
+import camelcase from "camelcase";
 import ts from "typescript";
-import { AllOfTypeDescriptor, AnyOfTypeDescriptor, ArrayTypeDescriptor, BooleanTypeDescriptor, InterfaceTypeDescriptor, NumberTypeDescriptor, OneOfTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/type-descriptors.js";
+import { CompoundDescriptorUnion } from "../schema/compound-descriptors.js";
+import { ArrayTypeDescriptor, BooleanTypeDescriptor, InterfaceTypeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/type-descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -18,20 +20,20 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
 
         for (const [nodeId] of this.manager.getTypeNames()) {
-            yield this.generateValidatorFunctionDeclarationStatement(
+            yield* this.generateValidatorFunctionDeclarationStatements(
                 nodeId,
             );
         }
     }
 
-    protected generateValidatorFunctionDeclarationStatement(
+    protected * generateValidatorFunctionDeclarationStatements(
         nodeId: string,
-    ): ts.FunctionDeclaration {
+    ): Iterable<ts.FunctionDeclaration> {
         const { factory: f } = this;
 
         const typeName = this.getTypeName(nodeId);
 
-        return f.createFunctionDeclaration(
+        yield f.createFunctionDeclaration(
             [
                 f.createToken(ts.SyntaxKind.ExportKeyword),
             ],
@@ -56,6 +58,61 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ...this.generateValidatorFunctionBodyStatements(nodeId),
             ], true),
         );
+
+        for (const typeDescriptor of this.manager.selectNodeTypeDescriptors(nodeId)) {
+            yield f.createFunctionDeclaration(
+                undefined,
+                undefined,
+                `isValid${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`,
+                undefined,
+                [
+                    f.createParameterDeclaration(
+                        undefined,
+                        undefined,
+                        "value",
+                        undefined,
+                        f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+                    ),
+                ],
+                f.createKeywordTypeNode(
+                    ts.SyntaxKind.BooleanKeyword,
+                ),
+                f.createBlock([
+                    ...this.generateTypeValidationStatements(nodeId, typeDescriptor),
+                    f.createReturnStatement(
+                        f.createTrue(),
+                    ),
+                ], true),
+            );
+        }
+
+        for (const compoundDescriptor of this.manager.selectNodeCompoundDescriptors(nodeId)) {
+            yield f.createFunctionDeclaration(
+                undefined,
+                undefined,
+                `isValid${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`,
+                undefined,
+                [
+                    f.createParameterDeclaration(
+                        undefined,
+                        undefined,
+                        "value",
+                        undefined,
+                        f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+                    ),
+                ],
+                f.createKeywordTypeNode(
+                    ts.SyntaxKind.BooleanKeyword,
+                ),
+                f.createBlock([
+                    ...this.generateCompoundValidationStatements(nodeId, compoundDescriptor),
+                    f.createReturnStatement(
+                        f.createTrue(),
+                    ),
+                ], true),
+            );
+        }
+
     }
 
     protected *generateValidatorFunctionBodyStatements(
@@ -121,19 +178,29 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     typeDescriptor,
                 );
 
+            default:
+                throw new Error("type not supported");
+        }
+    }
+
+    protected generateCompoundValidationStatements(
+        nodeId: string,
+        compoundDescriptor: CompoundDescriptorUnion,
+    ) {
+        switch (compoundDescriptor.type) {
             case "one-of":
-                return this.generateOneOfTypeValidationStatements(
-                    typeDescriptor,
+                return this.generateOneOfCompoundValidationStatements(
+                    compoundDescriptor.typeNodeIds,
                 );
 
             case "any-of":
-                return this.generateAnyOfTypeValidationStatements(
-                    typeDescriptor,
+                return this.generateAnyOfCompoundValidationStatements(
+                    compoundDescriptor.typeNodeIds,
                 );
 
             case "all-of":
-                return this.generateAllOfTypeValidationStatements(
-                    typeDescriptor,
+                return this.generateAllOfCompoundValidationStatements(
+                    compoundDescriptor.typeNodeIds,
                 );
 
             default:
@@ -1054,8 +1121,8 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createTrue(),
         );
     }
-    protected *generateOneOfTypeValidationStatements(
-        typeDescriptor: OneOfTypeDescriptor,
+    protected *generateOneOfCompoundValidationStatements(
+        typeNodeIds: string[],
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -1071,7 +1138,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], ts.NodeFlags.Let),
         );
 
-        for (const typeNodeId of typeDescriptor.typeNodeIds) {
+        for (const typeNodeId of typeNodeIds) {
             const typeName = this.getTypeName(typeNodeId);
 
             yield f.createIfStatement(
@@ -1102,8 +1169,8 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
     }
-    protected *generateAnyOfTypeValidationStatements(
-        typeDescriptor: AnyOfTypeDescriptor,
+    protected *generateAnyOfCompoundValidationStatements(
+        typeNodeIds: string[],
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -1119,7 +1186,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], ts.NodeFlags.Let),
         );
 
-        for (const typeNodeId of typeDescriptor.typeNodeIds) {
+        for (const typeNodeId of typeNodeIds) {
             const typeName = this.getTypeName(typeNodeId);
 
             yield f.createIfStatement(
@@ -1150,8 +1217,8 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
     }
-    protected *generateAllOfTypeValidationStatements(
-        typeDescriptor: AllOfTypeDescriptor,
+    protected *generateAllOfCompoundValidationStatements(
+        typeNodeIds: string[],
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -1167,7 +1234,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], ts.NodeFlags.Let),
         );
 
-        for (const typeNodeId of typeDescriptor.typeNodeIds) {
+        for (const typeNodeId of typeNodeIds) {
             const typeName = this.getTypeName(typeNodeId);
 
             yield f.createIfStatement(
@@ -1191,7 +1258,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createBinaryExpression(
                 f.createIdentifier("validCounter"),
                 f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
-                f.createNumericLiteral(typeDescriptor.typeNodeIds.length),
+                f.createNumericLiteral(typeNodeIds.length),
             ),
             f.createBlock([
                 f.createReturnStatement(f.createFalse()),
