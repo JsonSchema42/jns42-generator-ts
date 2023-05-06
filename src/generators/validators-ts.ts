@@ -361,15 +361,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (
-            let itemTypeNodeIndex = 0;
-            itemTypeNodeIndex < typeDescriptor.itemTypeNodeIds.length;
-            itemTypeNodeIndex++
-        ) {
-            const itemTypeNodeId = typeDescriptor.itemTypeNodeIds[itemTypeNodeIndex];
-            const typeName = this.getTypeName(itemTypeNodeId);
-
-            yield f.createBlock([
+        yield f.createForInStatement(
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("elementIndex"),
+                ),
+            ], ts.NodeFlags.Const),
+            f.createIdentifier("value"),
+            f.createBlock([
                 f.createVariableStatement(
                     undefined,
                     f.createVariableDeclarationList([
@@ -379,33 +378,66 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                             undefined,
                             f.createElementAccessExpression(
                                 f.createIdentifier("value"),
-                                f.createNumericLiteral(itemTypeNodeIndex),
+                                f.createIdentifier("elementIndex"),
                             ),
                         ),
                     ], ts.NodeFlags.Const),
                 ),
-                f.createIfStatement(
-                    f.createPrefixUnaryExpression(
-                        ts.SyntaxKind.ExclamationToken,
-                        f.createCallExpression(
-                            f.createIdentifier(`isValid${typeName}`),
-                            undefined,
-                            [
-                                f.createIdentifier("elementValue"),
-                            ],
+                f.createSwitchStatement(
+                    f.createIdentifier("elementIndex"),
+                    f.createCaseBlock([
+                        ...this.generateTupleTypeCaseClausesValidationStatements(
+                            typeDescriptor,
                         ),
-                    ),
-                    f.createBlock([
-                        f.createReturnStatement(f.createFalse()),
-                    ], true),
+                    ]),
                 ),
-            ], true);
-        }
+            ], true),
+        );
 
         yield f.createReturnStatement(
             f.createTrue(),
         );
     }
+    private *generateTupleTypeCaseClausesValidationStatements(
+        typeDescriptor: TupleTypeDescriptor,
+    ): Iterable<ts.CaseOrDefaultClause> {
+        const { factory: f } = this;
+
+        for (const elementIndex in typeDescriptor.itemTypeNodeIds) {
+            const itemTypeNodeId = typeDescriptor.itemTypeNodeIds[elementIndex];
+            const typeName = this.getTypeName(itemTypeNodeId);
+
+            yield f.createCaseClause(
+                f.createNumericLiteral(elementIndex),
+                [
+                    f.createIfStatement(
+                        f.createPrefixUnaryExpression(
+                            ts.SyntaxKind.ExclamationToken,
+                            f.createCallExpression(
+                                f.createIdentifier(`isValid${typeName}`),
+                                undefined,
+                                [
+                                    f.createIdentifier("elementValue"),
+                                ],
+                            ),
+                        ),
+                        f.createBlock([
+                            f.createReturnStatement(f.createFalse()),
+                        ], true),
+                    ),
+                    f.createBreakStatement(),
+                ],
+            );
+        }
+
+        yield f.createDefaultClause([
+            f.createReturnStatement(
+                f.createFalse(),
+            ),
+        ]);
+
+    }
+
     protected *generateArrayTypeValidationStatements(
         typeDescriptor: ArrayTypeDescriptor,
     ): Iterable<ts.Statement> {
@@ -562,7 +594,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createSwitchStatement(
                     f.createIdentifier("propertyName"),
                     f.createCaseBlock([
-                        ...this.generateInterfaceTypeCaseBlockValidationStatements(
+                        ...this.generateInterfaceTypeCaseClausesValidationStatements(
                             typeDescriptor,
                         ),
                     ]),
@@ -574,9 +606,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createTrue(),
         );
     }
-    private * generateInterfaceTypeCaseBlockValidationStatements(
+    private * generateInterfaceTypeCaseClausesValidationStatements(
         typeDescriptor: InterfaceTypeDescriptor,
-    ) {
+    ): Iterable<ts.CaseOrDefaultClause> {
         const { factory: f } = this;
 
         for (const propertyName in typeDescriptor.propertyTypeNodeIds) {
@@ -611,7 +643,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createFalse(),
             ),
         ]);
-
     }
 
     protected *generateRecordTypeValidationStatements(
