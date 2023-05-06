@@ -167,19 +167,19 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected generateTupleTypeDefinition(
-        nodeIds: Array<string | boolean>,
+        nodeIds: Array<string>,
     ): ts.TypeNode {
-        const elements = nodeIds.map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+        const elements = nodeIds.map(nodeId => this.generateTypeReference(nodeId));
         return this.factory.createTupleTypeNode(elements);
     }
     protected generateArrayTypeDefinition(
-        nodeId: string | boolean,
+        nodeId: string,
     ): ts.TypeNode {
-        const element = this.generateTypeReferenceOrAnyOrNever(nodeId);
+        const element = this.generateTypeReference(nodeId);
         return this.factory.createArrayTypeNode(element);
     }
     protected generateInterfaceTypeDefinition(
-        nodeIds: Record<string, string | boolean>,
+        nodeIds: Record<string, string>,
         required: Set<string>,
     ): ts.TypeNode {
         const members = Object.entries(nodeIds).
@@ -189,14 +189,14 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
                 required.has(name) ?
                     undefined :
                     this.factory.createToken(ts.SyntaxKind.QuestionToken),
-                this.generateTypeReferenceOrAnyOrNever(nodeId),
+                this.generateTypeReference(nodeId),
             ));
         return this.factory.createTypeLiteralNode(members);
     }
     protected generateRecordTypeDefinition(
-        nodeId: string | boolean,
+        nodeId: string,
     ): ts.TypeNode {
-        const element = this.generateTypeReferenceOrAnyOrNever(nodeId);
+        const element = this.generateTypeReference(nodeId);
         return this.factory.createTypeReferenceNode(
             this.factory.createIdentifier("Record"),
             [
@@ -206,25 +206,25 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected generateOneOfCompoundDefinition(
-        nodeIds: Array<string | boolean>,
+        nodeIds: Array<string>,
     ) {
         const types = nodeIds.
-            map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+            map(nodeId => this.generateTypeReference(nodeId));
         return this.factory.createUnionTypeNode(types);
     }
     protected generateAnyOfCompoundDefinition(
-        nodeIds: Array<string | boolean>,
+        nodeIds: Array<string>,
     ) {
         const types = nodeIds.
-            map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId)).
+            map(nodeId => this.generateTypeReference(nodeId)).
             map(typeNode => this.factory.createTypeReferenceNode("Partial", [typeNode]));
         return this.factory.createIntersectionTypeNode(types);
     }
     protected generateAllOfCompoundDefinition(
-        nodeIds: Array<string | boolean>,
+        nodeIds: Array<string>,
     ) {
         const types = nodeIds.
-            map(nodeId => this.generateTypeReferenceOrAnyOrNever(nodeId));
+            map(nodeId => this.generateTypeReference(nodeId));
         return this.factory.createIntersectionTypeNode(types);
     }
 
@@ -242,19 +242,6 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         return this.factory.createTypeReferenceNode(
             this.factory.createIdentifier(typeName),
         );
-    }
-    protected generateTypeReferenceOrAnyOrNever(
-        nodeId: string | boolean,
-    ) {
-        if (nodeId === true) {
-            return this.generateAnyTypeDefinition();
-
-        }
-        if (nodeId === false) {
-            return this.generateNeverTypeDefinition();
-        }
-
-        return this.generateTypeReference(nodeId);
     }
 
 }
