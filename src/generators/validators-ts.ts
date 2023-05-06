@@ -439,7 +439,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createIdentifier("value"),
                         f.createIdentifier("length"),
                     ),
-                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createToken(ts.SyntaxKind.GreaterThanToken),
                     f.createNumericLiteral(typeDescriptor.maximumLength),
                 ),
                 f.createBlock(
