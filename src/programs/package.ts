@@ -1,10 +1,9 @@
-import * as fs from "node:fs";
 import * as path from "node:path";
 import ts from "typescript";
 import * as yargs from "yargs";
 import { generatePackage } from "../generators/index.js";
 import { SchemaManager } from "../schema/index.js";
-import { Namer, formatStatements } from "../utils/index.js";
+import { Namer } from "../utils/index.js";
 
 export function configureLabProgram(argv: yargs.Argv) {
     return argv.
@@ -91,50 +90,5 @@ async function main(options: MainOptions) {
         version: packageVersion,
     });
 
-    if (options.generateTest) {
-        const statements = getSpecTsStatements(factory, namer, manager, rootNodeUrl);
-        const filePath = path.join(packageDirectoryPath, "schema.spec.ts");
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.writeFileSync(filePath, formatStatements(factory, statements));
-
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.mkdirSync(path.join(packageDirectoryPath, "examples", "valid"), { recursive: true });
-        {
-            let index = 0;
-            for (const example of manager.generateValidExamples(rootNodeUrl)) {
-                index++;
-                const exampleFileContent = JSON.stringify(example, undefined, 2);
-                const exampleFilePath = path.join(packageDirectoryPath, "examples", "valid", `valid-${packageName}-${index}.json`);
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                fs.writeFileSync(exampleFilePath, exampleFileContent);
-            }
-        }
-
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.mkdirSync(path.join(packageDirectoryPath, "examples", "invalid"), { recursive: true });
-        {
-            let index = 0;
-            for (const example of manager.generateInvalidExamples(rootNodeUrl)) {
-                index++;
-                const exampleFileContent = JSON.stringify(example, undefined, 2);
-                const exampleFilePath = path.join(packageDirectoryPath, "examples", "invalid", `invalid-${packageName}-${index}.json`);
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                fs.writeFileSync(exampleFilePath, exampleFileContent);
-            }
-        }
-    }
-
-}
-
-function getSpecTsStatements(
-    factory: ts.NodeFactory,
-    namer: Namer,
-    manager: SchemaManager,
-    nodeUrl: URL,
-) {
-
-    const statements = manager.generateSpecStatements(factory, namer, nodeUrl);
-
-    return statements;
 }
 

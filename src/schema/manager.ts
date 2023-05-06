@@ -1,7 +1,5 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
-import ts from "typescript";
-import { Namer } from "../utils/index.js";
 import * as schemaDraft04 from "./draft-04/index.js";
 import * as schemaDraft06 from "./draft-06/index.js";
 import * as schemaDraft07 from "./draft-07/index.js";
@@ -25,24 +23,6 @@ export class SchemaManager implements LoaderStrategy {
         [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaLoader(this),
         [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaLoader(this),
         [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
-    };
-
-    private readonly specCodeGenerators = {
-        [schema202012.metaSchemaId]: new schema202012.SchemaSpecCodeGenerator(
-            this,
-        ),
-        [schema201909.metaSchemaId]: new schema201909.SchemaSpecCodeGenerator(
-            this,
-        ),
-        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaSpecCodeGenerator(
-            this,
-        ),
-        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaSpecCodeGenerator(
-            this,
-        ),
-        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaSpecCodeGenerator(
-            this,
-        ),
     };
 
     private readonly exampleGenerators = {
@@ -181,91 +161,6 @@ export class SchemaManager implements LoaderStrategy {
 
     public getNodeRootUrl(nodeRetrievalId: string) {
         return this.retrievalRootNodeMap.get(nodeRetrievalId);
-    }
-
-    /**
-     * @deprecated
-     */
-    public *generateSpecStatements(
-        factory: ts.NodeFactory,
-        namer: Namer,
-        nodeUrl: URL,
-    ) {
-        const nodeId = String(nodeUrl);
-
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("types")),
-            ),
-            factory.createStringLiteral("./types.js"),
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("validators")),
-            ),
-            factory.createStringLiteral("./validators.js"),
-        );
-
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                factory.createIdentifier("assert"),
-                undefined,
-            ),
-            factory.createStringLiteral("node:assert"),
-            undefined,
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                factory.createIdentifier("fs"),
-                undefined,
-            ),
-            factory.createStringLiteral("node:fs"),
-            undefined,
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                undefined,
-                factory.createNamespaceImport(factory.createIdentifier("path")),
-            ),
-            factory.createStringLiteral("node:path"),
-            undefined,
-        );
-        yield factory.createImportDeclaration(
-            undefined,
-            factory.createImportClause(
-                false,
-                factory.createIdentifier("test"),
-                undefined,
-            ),
-            factory.createStringLiteral("node:test"),
-            undefined,
-        );
-
-        {
-            const metaSchemaId = this.nodeMetaMap.get(nodeId);
-            if (metaSchemaId == null) {
-                throw new Error("node not found");
-            }
-
-            const codeGenerator = this.specCodeGenerators[metaSchemaId];
-            yield* codeGenerator.generateStatements(
-                factory,
-                namer,
-                nodeId,
-            );
-        }
     }
 
     /**
