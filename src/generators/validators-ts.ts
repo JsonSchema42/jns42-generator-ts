@@ -414,6 +414,63 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
+        if (typeDescriptor.minimumLength != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("value"),
+                        f.createIdentifier("length"),
+                    ),
+                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createNumericLiteral(typeDescriptor.minimumLength),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.maximumLength != null) {
+            yield f.createIfStatement(
+                f.createBinaryExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("value"),
+                        f.createIdentifier("length"),
+                    ),
+                    f.createToken(ts.SyntaxKind.LessThanToken),
+                    f.createNumericLiteral(typeDescriptor.maximumLength),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
+        if (typeDescriptor.valuePattern != null) {
+            yield f.createIfStatement(
+                f.createPrefixUnaryExpression(
+                    ts.SyntaxKind.ExclamationToken,
+                    f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createRegularExpressionLiteral(`/${typeDescriptor.valuePattern}/`),
+                            f.createIdentifier("test"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+                f.createBlock(
+                    [f.createReturnStatement(f.createFalse())],
+                    true,
+                ),
+                undefined,
+            );
+        }
+
         if (typeDescriptor.options != null) {
             yield f.createIfStatement(
                 typeDescriptor.options.map(option => f.createBinaryExpression(
