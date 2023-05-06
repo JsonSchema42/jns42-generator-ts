@@ -74,11 +74,4 @@ export function generatePackage(
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
-    // {
-    //     const content = path.join(projectRoot, "src", "includes", "validation.ts");
-    //     const filePath = path.join(options.directoryPath, "validation.ts");
-    //     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    //     fs.copyFileSync(content, filePath);
-    // }
-
 }
