@@ -25,29 +25,6 @@ export class SchemaManager implements LoaderStrategy {
         [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
     };
 
-    private readonly exampleGenerators = {
-        [schema202012.metaSchemaId]: new schema202012.SchemaExampleGenerator(
-            this,
-            this.loaders[schema202012.metaSchemaId],
-        ),
-        [schema201909.metaSchemaId]: new schema201909.SchemaExampleGenerator(
-            this,
-            this.loaders[schema201909.metaSchemaId],
-        ),
-        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaExampleGenerator(
-            this,
-            this.loaders[schemaDraft07.metaSchemaId],
-        ),
-        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaExampleGenerator(
-            this,
-            this.loaders[schemaDraft06.metaSchemaId],
-        ),
-        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaExampleGenerator(
-            this,
-            this.loaders[schemaDraft04.metaSchemaId],
-        ),
-    };
-
     public async loadRootNode(
         rootNode: unknown,
         rootNodeUrl: URL,
@@ -161,45 +138,6 @@ export class SchemaManager implements LoaderStrategy {
 
     public getNodeRootUrl(nodeRetrievalId: string) {
         return this.retrievalRootNodeMap.get(nodeRetrievalId);
-    }
-
-    /**
-     * @deprecated
-     */
-    public generateExamples(nodeId: string) {
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("node not found");
-        }
-
-        const exampleGenerator = this.exampleGenerators[metaSchemaId];
-        return exampleGenerator.generateFromNode(nodeId);
-    }
-
-    /**
-     * @deprecated
-     */
-    public *generateValidExamples(nodeUrl: URL) {
-        const nodeId = String(nodeUrl);
-        for (const [error, example] of this.generateExamples(nodeId)) {
-            if (error > 0) {
-                continue;
-            }
-            yield example;
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public *generateInvalidExamples(nodeUrl: URL) {
-        const nodeId = String(nodeUrl);
-        for (const [error, example] of this.generateExamples(nodeId)) {
-            if (error !== 1) {
-                continue;
-            }
-            yield example;
-        }
     }
 
     public * getTypeNames() {
