@@ -38,7 +38,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createToken(ts.SyntaxKind.ExportKeyword),
             ],
             undefined,
-            `isValid${typeName}`,
+            `is${typeName}`,
             undefined,
             [
                 f.createParameterDeclaration(
@@ -63,7 +63,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
-                `isValid${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`,
+                `is${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`,
                 undefined,
                 [
                     f.createParameterDeclaration(
@@ -89,7 +89,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
-                `isValid${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`,
+                `is${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`,
                 undefined,
                 [
                     f.createParameterDeclaration(
@@ -130,7 +130,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createCallExpression(
-                        f.createIdentifier(`isValid${referencingTypeName}`),
+                        f.createIdentifier(`is${referencingTypeName}`),
                         undefined,
                         [f.createIdentifier("value")],
                     ),
@@ -148,7 +148,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createParenthesizedExpression(
                         typeDescriptors.
                             map(typeDescriptor => f.createCallExpression(
-                                f.createIdentifier(`isValid${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`),
+                                f.createIdentifier(`is${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`),
                                 undefined,
                                 [f.createIdentifier("value")],
                             ) as ts.Expression).
@@ -171,7 +171,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createParenthesizedExpression(
                         compoundDescriptors.
                             map(compoundDescriptor => f.createCallExpression(
-                                f.createIdentifier(`isValid${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`),
+                                f.createIdentifier(`is${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`),
                                 undefined,
                                 [f.createIdentifier("value")],
                             ) as ts.Expression).
@@ -676,7 +676,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createPrefixUnaryExpression(
                             ts.SyntaxKind.ExclamationToken,
                             f.createCallExpression(
-                                f.createIdentifier(`isValid${typeName}`),
+                                f.createIdentifier(`is${typeName}`),
                                 undefined,
                                 [
                                     f.createIdentifier("elementValue"),
@@ -827,7 +827,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createPrefixUnaryExpression(
                         ts.SyntaxKind.ExclamationToken,
                         f.createCallExpression(
-                            f.createIdentifier(`isValid${typeName}`),
+                            f.createIdentifier(`is${typeName}`),
                             undefined,
                             [
                                 f.createIdentifier("elementValue"),
@@ -957,7 +957,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createPrefixUnaryExpression(
                             ts.SyntaxKind.ExclamationToken,
                             f.createCallExpression(
-                                f.createIdentifier(`isValid${typeName}`),
+                                f.createIdentifier(`is${typeName}`),
                                 undefined,
                                 [
                                     f.createIdentifier("propertyValue"),
@@ -1074,7 +1074,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createPrefixUnaryExpression(
                         ts.SyntaxKind.ExclamationToken,
                         f.createCallExpression(
-                            f.createIdentifier(`isValid${typeName}`),
+                            f.createIdentifier(`is${typeName}`),
                             undefined,
                             [
                                 f.createIdentifier("propertyValue"),
@@ -1143,7 +1143,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
             yield f.createIfStatement(
                 f.createCallExpression(
-                    f.createIdentifier(`isValid${typeName}`),
+                    f.createIdentifier(`is${typeName}`),
                     undefined,
                     [
                         f.createIdentifier("value"),
@@ -1181,7 +1181,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
             yield f.createIfStatement(
                 f.createCallExpression(
-                    f.createIdentifier(`isValid${typeName}`),
+                    f.createIdentifier(`is${typeName}`),
                     undefined,
                     [
                         f.createIdentifier("value"),
@@ -1207,7 +1207,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createCallExpression(
-                        f.createIdentifier(`isValid${typeName}`),
+                        f.createIdentifier(`is${typeName}`),
                         undefined,
                         [
                             f.createIdentifier("value"),
