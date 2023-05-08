@@ -36,12 +36,12 @@ function isInterfaceSchema(value: unknown): value is unknown {
                 }
                 break;
             case "$recursiveAnchor":
-                if (!isSchemaRecursiveanchor(propertyValue)) {
+                if (!isSchemaRecursiveAnchor(propertyValue)) {
                     return false;
                 }
                 break;
             case "$recursiveRef":
-                if (!isSchemaRecursiveref(propertyValue)) {
+                if (!isSchemaRecursiveRef(propertyValue)) {
                     return false;
                 }
                 break;
@@ -91,13 +91,13 @@ function isRecordSchemaDefinitions(value: unknown): value is unknown {
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isSchemaDefinitionsAdditionalproperties(propertyValue)) {
+        if (!isSchemaDefinitionsAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isSchemaDefinitionsAdditionalproperties(value: unknown): value is types.SchemaDefinitionsAdditionalproperties {
+export function isSchemaDefinitionsAdditionalProperties(value: unknown): value is types.SchemaDefinitionsAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
@@ -115,47 +115,47 @@ function isRecordSchemaDependencies(value: unknown): value is unknown {
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isSchemaDependenciesAdditionalproperties(propertyValue)) {
+        if (!isSchemaDependenciesAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isSchemaDependenciesAdditionalproperties(value: unknown): value is types.SchemaDependenciesAdditionalproperties {
-    if (!(isAnyOfSchemaDependenciesAdditionalproperties(value))) {
+export function isSchemaDependenciesAdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalProperties {
+    if (!(isAnyOfSchemaDependenciesAdditionalProperties(value))) {
         return false;
     }
     return true;
 }
-function isAnyOfSchemaDependenciesAdditionalproperties(value: unknown): value is unknown {
-    if (isSchemaDependenciesAdditionalproperties0(value)) {
+function isAnyOfSchemaDependenciesAdditionalProperties(value: unknown): value is unknown {
+    if (isSchemaDependenciesAdditionalProperties0(value)) {
         return true;
     }
-    if (isSchemaDependenciesAdditionalproperties1(value)) {
+    if (isSchemaDependenciesAdditionalProperties1(value)) {
         return true;
     }
     return false;
 }
-export function isSchemaDependenciesAdditionalproperties0(value: unknown): value is types.SchemaDependenciesAdditionalproperties0 {
+export function isSchemaDependenciesAdditionalProperties0(value: unknown): value is types.SchemaDependenciesAdditionalProperties0 {
     if (!isSchema(value)) {
         return false;
     }
     return true;
 }
-export function isSchemaDependenciesAdditionalproperties1(value: unknown): value is types.SchemaDependenciesAdditionalproperties1 {
-    if (!isValidationStringarray(value)) {
+export function isSchemaDependenciesAdditionalProperties1(value: unknown): value is types.SchemaDependenciesAdditionalProperties1 {
+    if (!isValidationStringArray(value)) {
         return false;
     }
     return true;
 }
-export function isSchemaRecursiveanchor(value: unknown): value is types.SchemaRecursiveanchor {
-    if (!isCoreAnchorstring(value)) {
+export function isSchemaRecursiveAnchor(value: unknown): value is types.SchemaRecursiveAnchor {
+    if (!isCoreAnchorString(value)) {
         return false;
     }
     return true;
 }
-export function isSchemaRecursiveref(value: unknown): value is types.SchemaRecursiveref {
-    if (!isCoreUrireferencestring(value)) {
+export function isSchemaRecursiveRef(value: unknown): value is types.SchemaRecursiveRef {
+    if (!isCoreUriReferenceString(value)) {
         return false;
     }
     return true;
@@ -236,12 +236,12 @@ function isInterfaceCore(value: unknown): value is unknown {
                 }
                 break;
             case "$dynamicRef":
-                if (!isCoreDynamicref(propertyValue)) {
+                if (!isCoreDynamicRef(propertyValue)) {
                     return false;
                 }
                 break;
             case "$dynamicAnchor":
-                if (!isCoreDynamicanchor(propertyValue)) {
+                if (!isCoreDynamicAnchor(propertyValue)) {
                     return false;
                 }
                 break;
@@ -270,13 +270,13 @@ function isBooleanCore(value: unknown): value is unknown {
     }
     return true;
 }
-export function isCoreAnchorstring(value: unknown): value is types.CoreAnchorstring {
-    if (!(isStringCoreAnchorstring(value))) {
+export function isCoreAnchorString(value: unknown): value is types.CoreAnchorString {
+    if (!(isStringCoreAnchorString(value))) {
         return false;
     }
     return true;
 }
-function isStringCoreAnchorstring(value: unknown): value is unknown {
+function isStringCoreAnchorString(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
@@ -285,62 +285,62 @@ function isStringCoreAnchorstring(value: unknown): value is unknown {
     }
     return true;
 }
-export function isCoreUristring(value: unknown): value is types.CoreUristring {
-    if (!(isStringCoreUristring(value))) {
+export function isCoreUriString(value: unknown): value is types.CoreUriString {
+    if (!(isStringCoreUriString(value))) {
         return false;
     }
     return true;
 }
-function isStringCoreUristring(value: unknown): value is unknown {
+function isStringCoreUriString(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
     return true;
 }
-export function isCoreUrireferencestring(value: unknown): value is types.CoreUrireferencestring {
-    if (!(isStringCoreUrireferencestring(value))) {
+export function isCoreUriReferenceString(value: unknown): value is types.CoreUriReferenceString {
+    if (!(isStringCoreUriReferenceString(value))) {
         return false;
     }
     return true;
 }
-function isStringCoreUrireferencestring(value: unknown): value is unknown {
+function isStringCoreUriReferenceString(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
     return true;
 }
 export function isCoreId(value: unknown): value is types.CoreId {
-    if (!isCoreUrireferencestring(value)) {
+    if (!isCoreUriReferenceString(value)) {
         return false;
     }
     return true;
 }
 export function isCoreSchema(value: unknown): value is types.CoreSchema {
-    if (!isCoreUristring(value)) {
+    if (!isCoreUriString(value)) {
         return false;
     }
     return true;
 }
 export function isCoreRef(value: unknown): value is types.CoreRef {
-    if (!isCoreUrireferencestring(value)) {
+    if (!isCoreUriReferenceString(value)) {
         return false;
     }
     return true;
 }
 export function isCoreAnchor(value: unknown): value is types.CoreAnchor {
-    if (!isCoreAnchorstring(value)) {
+    if (!isCoreAnchorString(value)) {
         return false;
     }
     return true;
 }
-export function isCoreDynamicref(value: unknown): value is types.CoreDynamicref {
-    if (!isCoreUrireferencestring(value)) {
+export function isCoreDynamicRef(value: unknown): value is types.CoreDynamicRef {
+    if (!isCoreUriReferenceString(value)) {
         return false;
     }
     return true;
 }
-export function isCoreDynamicanchor(value: unknown): value is types.CoreDynamicanchor {
-    if (!isCoreAnchorstring(value)) {
+export function isCoreDynamicAnchor(value: unknown): value is types.CoreDynamicAnchor {
+    if (!isCoreAnchorString(value)) {
         return false;
     }
     return true;
@@ -357,19 +357,19 @@ function isRecordCoreVocabulary(value: unknown): value is unknown {
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isCoreVocabularyAdditionalproperties(propertyValue)) {
+        if (!isCoreVocabularyAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isCoreVocabularyAdditionalproperties(value: unknown): value is types.CoreVocabularyAdditionalproperties {
-    if (!(isBooleanCoreVocabularyAdditionalproperties(value))) {
+export function isCoreVocabularyAdditionalProperties(value: unknown): value is types.CoreVocabularyAdditionalProperties {
+    if (!(isBooleanCoreVocabularyAdditionalProperties(value))) {
         return false;
     }
     return true;
 }
-function isBooleanCoreVocabularyAdditionalproperties(value: unknown): value is unknown {
+function isBooleanCoreVocabularyAdditionalProperties(value: unknown): value is unknown {
     if (typeof value !== "boolean") {
         return false;
     }
@@ -399,13 +399,13 @@ function isRecordCoreDefs(value: unknown): value is unknown {
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isCoreDefsAdditionalproperties(propertyValue)) {
+        if (!isCoreDefsAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isCoreDefsAdditionalproperties(value: unknown): value is types.CoreDefsAdditionalproperties {
+export function isCoreDefsAdditionalProperties(value: unknown): value is types.CoreDefsAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
@@ -425,7 +425,7 @@ function isInterfaceApplicator(value: unknown): value is unknown {
         const propertyValue = value[propertyName as keyof typeof value];
         switch (propertyName) {
             case "prefixItems":
-                if (!isApplicatorPrefixitems(propertyValue)) {
+                if (!isApplicatorPrefixItems(propertyValue)) {
                     return false;
                 }
                 break;
@@ -440,7 +440,7 @@ function isInterfaceApplicator(value: unknown): value is unknown {
                 }
                 break;
             case "additionalProperties":
-                if (!isApplicatorAdditionalproperties(propertyValue)) {
+                if (!isApplicatorAdditionalProperties(propertyValue)) {
                     return false;
                 }
                 break;
@@ -450,17 +450,17 @@ function isInterfaceApplicator(value: unknown): value is unknown {
                 }
                 break;
             case "patternProperties":
-                if (!isApplicatorPatternproperties(propertyValue)) {
+                if (!isApplicatorPatternProperties(propertyValue)) {
                     return false;
                 }
                 break;
             case "dependentSchemas":
-                if (!isApplicatorDependentschemas(propertyValue)) {
+                if (!isApplicatorDependentSchemas(propertyValue)) {
                     return false;
                 }
                 break;
             case "propertyNames":
-                if (!isApplicatorPropertynames(propertyValue)) {
+                if (!isApplicatorPropertyNames(propertyValue)) {
                     return false;
                 }
                 break;
@@ -480,17 +480,17 @@ function isInterfaceApplicator(value: unknown): value is unknown {
                 }
                 break;
             case "allOf":
-                if (!isApplicatorAllof(propertyValue)) {
+                if (!isApplicatorAllOf(propertyValue)) {
                     return false;
                 }
                 break;
             case "anyOf":
-                if (!isApplicatorAnyof(propertyValue)) {
+                if (!isApplicatorAnyOf(propertyValue)) {
                     return false;
                 }
                 break;
             case "oneOf":
-                if (!isApplicatorOneof(propertyValue)) {
+                if (!isApplicatorOneOf(propertyValue)) {
                     return false;
                 }
                 break;
@@ -509,13 +509,13 @@ function isBooleanApplicator(value: unknown): value is unknown {
     }
     return true;
 }
-export function isApplicatorSchemaarray(value: unknown): value is types.ApplicatorSchemaarray {
-    if (!(isArrayApplicatorSchemaarray(value))) {
+export function isApplicatorSchemaArray(value: unknown): value is types.ApplicatorSchemaArray {
+    if (!(isArrayApplicatorSchemaArray(value))) {
         return false;
     }
     return true;
 }
-function isArrayApplicatorSchemaarray(value: unknown): value is unknown {
+function isArrayApplicatorSchemaArray(value: unknown): value is unknown {
     if (!Array.isArray(value)) {
         return false;
     }
@@ -524,20 +524,20 @@ function isArrayApplicatorSchemaarray(value: unknown): value is unknown {
     }
     for (const elementIndex in value) {
         const elementValue = value[elementIndex];
-        if (!isApplicatorSchemaarrayItems(elementValue)) {
+        if (!isApplicatorSchemaArrayItems(elementValue)) {
             return false;
         }
     }
     return true;
 }
-export function isApplicatorSchemaarrayItems(value: unknown): value is types.ApplicatorSchemaarrayItems {
+export function isApplicatorSchemaArrayItems(value: unknown): value is types.ApplicatorSchemaArrayItems {
     if (!isSchema(value)) {
         return false;
     }
     return true;
 }
-export function isApplicatorPrefixitems(value: unknown): value is types.ApplicatorPrefixitems {
-    if (!isApplicatorSchemaarray(value)) {
+export function isApplicatorPrefixItems(value: unknown): value is types.ApplicatorPrefixItems {
+    if (!isApplicatorSchemaArray(value)) {
         return false;
     }
     return true;
@@ -554,7 +554,7 @@ export function isApplicatorContains(value: unknown): value is types.ApplicatorC
     }
     return true;
 }
-export function isApplicatorAdditionalproperties(value: unknown): value is types.ApplicatorAdditionalproperties {
+export function isApplicatorAdditionalProperties(value: unknown): value is types.ApplicatorAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
@@ -572,67 +572,67 @@ function isRecordApplicatorProperties(value: unknown): value is unknown {
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isApplicatorPropertiesAdditionalproperties(propertyValue)) {
+        if (!isApplicatorPropertiesAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isApplicatorPropertiesAdditionalproperties(value: unknown): value is types.ApplicatorPropertiesAdditionalproperties {
+export function isApplicatorPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPropertiesAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
     return true;
 }
-export function isApplicatorPatternproperties(value: unknown): value is types.ApplicatorPatternproperties {
-    if (!(isRecordApplicatorPatternproperties(value))) {
+export function isApplicatorPatternProperties(value: unknown): value is types.ApplicatorPatternProperties {
+    if (!(isRecordApplicatorPatternProperties(value))) {
         return false;
     }
     return true;
 }
-function isRecordApplicatorPatternproperties(value: unknown): value is unknown {
+function isRecordApplicatorPatternProperties(value: unknown): value is unknown {
     if (typeof value !== "object" || value === null || Array.isArray(value)) {
         return false;
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isApplicatorPatternpropertiesAdditionalproperties(propertyValue)) {
+        if (!isApplicatorPatternPropertiesAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isApplicatorPatternpropertiesAdditionalproperties(value: unknown): value is types.ApplicatorPatternpropertiesAdditionalproperties {
+export function isApplicatorPatternPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPatternPropertiesAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
     return true;
 }
-export function isApplicatorDependentschemas(value: unknown): value is types.ApplicatorDependentschemas {
-    if (!(isRecordApplicatorDependentschemas(value))) {
+export function isApplicatorDependentSchemas(value: unknown): value is types.ApplicatorDependentSchemas {
+    if (!(isRecordApplicatorDependentSchemas(value))) {
         return false;
     }
     return true;
 }
-function isRecordApplicatorDependentschemas(value: unknown): value is unknown {
+function isRecordApplicatorDependentSchemas(value: unknown): value is unknown {
     if (typeof value !== "object" || value === null || Array.isArray(value)) {
         return false;
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isApplicatorDependentschemasAdditionalproperties(propertyValue)) {
+        if (!isApplicatorDependentSchemasAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isApplicatorDependentschemasAdditionalproperties(value: unknown): value is types.ApplicatorDependentschemasAdditionalproperties {
+export function isApplicatorDependentSchemasAdditionalProperties(value: unknown): value is types.ApplicatorDependentSchemasAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
     return true;
 }
-export function isApplicatorPropertynames(value: unknown): value is types.ApplicatorPropertynames {
+export function isApplicatorPropertyNames(value: unknown): value is types.ApplicatorPropertyNames {
     if (!isSchema(value)) {
         return false;
     }
@@ -656,20 +656,20 @@ export function isApplicatorElse(value: unknown): value is types.ApplicatorElse 
     }
     return true;
 }
-export function isApplicatorAllof(value: unknown): value is types.ApplicatorAllof {
-    if (!isApplicatorSchemaarray(value)) {
+export function isApplicatorAllOf(value: unknown): value is types.ApplicatorAllOf {
+    if (!isApplicatorSchemaArray(value)) {
         return false;
     }
     return true;
 }
-export function isApplicatorAnyof(value: unknown): value is types.ApplicatorAnyof {
-    if (!isApplicatorSchemaarray(value)) {
+export function isApplicatorAnyOf(value: unknown): value is types.ApplicatorAnyOf {
+    if (!isApplicatorSchemaArray(value)) {
         return false;
     }
     return true;
 }
-export function isApplicatorOneof(value: unknown): value is types.ApplicatorOneof {
-    if (!isApplicatorSchemaarray(value)) {
+export function isApplicatorOneOf(value: unknown): value is types.ApplicatorOneOf {
+    if (!isApplicatorSchemaArray(value)) {
         return false;
     }
     return true;
@@ -694,12 +694,12 @@ function isInterfaceUnevaluated(value: unknown): value is unknown {
         const propertyValue = value[propertyName as keyof typeof value];
         switch (propertyName) {
             case "unevaluatedItems":
-                if (!isUnevaluatedUnevaluateditems(propertyValue)) {
+                if (!isUnevaluatedUnevaluatedItems(propertyValue)) {
                     return false;
                 }
                 break;
             case "unevaluatedProperties":
-                if (!isUnevaluatedUnevaluatedproperties(propertyValue)) {
+                if (!isUnevaluatedUnevaluatedProperties(propertyValue)) {
                     return false;
                 }
                 break;
@@ -713,13 +713,13 @@ function isBooleanUnevaluated(value: unknown): value is unknown {
     }
     return true;
 }
-export function isUnevaluatedUnevaluateditems(value: unknown): value is types.UnevaluatedUnevaluateditems {
+export function isUnevaluatedUnevaluatedItems(value: unknown): value is types.UnevaluatedUnevaluatedItems {
     if (!isSchema(value)) {
         return false;
     }
     return true;
 }
-export function isUnevaluatedUnevaluatedproperties(value: unknown): value is types.UnevaluatedUnevaluatedproperties {
+export function isUnevaluatedUnevaluatedProperties(value: unknown): value is types.UnevaluatedUnevaluatedProperties {
     if (!isSchema(value)) {
         return false;
     }
@@ -754,7 +754,7 @@ function isInterfaceValidation(value: unknown): value is unknown {
                 }
                 break;
             case "multipleOf":
-                if (!isValidationMultipleof(propertyValue)) {
+                if (!isValidationMultipleOf(propertyValue)) {
                     return false;
                 }
                 break;
@@ -764,7 +764,7 @@ function isInterfaceValidation(value: unknown): value is unknown {
                 }
                 break;
             case "exclusiveMaximum":
-                if (!isValidationExclusivemaximum(propertyValue)) {
+                if (!isValidationExclusiveMaximum(propertyValue)) {
                     return false;
                 }
                 break;
@@ -774,17 +774,17 @@ function isInterfaceValidation(value: unknown): value is unknown {
                 }
                 break;
             case "exclusiveMinimum":
-                if (!isValidationExclusiveminimum(propertyValue)) {
+                if (!isValidationExclusiveMinimum(propertyValue)) {
                     return false;
                 }
                 break;
             case "maxLength":
-                if (!isValidationMaxlength(propertyValue)) {
+                if (!isValidationMaxLength(propertyValue)) {
                     return false;
                 }
                 break;
             case "minLength":
-                if (!isValidationMinlength(propertyValue)) {
+                if (!isValidationMinLength(propertyValue)) {
                     return false;
                 }
                 break;
@@ -794,37 +794,37 @@ function isInterfaceValidation(value: unknown): value is unknown {
                 }
                 break;
             case "maxItems":
-                if (!isValidationMaxitems(propertyValue)) {
+                if (!isValidationMaxItems(propertyValue)) {
                     return false;
                 }
                 break;
             case "minItems":
-                if (!isValidationMinitems(propertyValue)) {
+                if (!isValidationMinItems(propertyValue)) {
                     return false;
                 }
                 break;
             case "uniqueItems":
-                if (!isValidationUniqueitems(propertyValue)) {
+                if (!isValidationUniqueItems(propertyValue)) {
                     return false;
                 }
                 break;
             case "maxContains":
-                if (!isValidationMaxcontains(propertyValue)) {
+                if (!isValidationMaxContains(propertyValue)) {
                     return false;
                 }
                 break;
             case "minContains":
-                if (!isValidationMincontains(propertyValue)) {
+                if (!isValidationMinContains(propertyValue)) {
                     return false;
                 }
                 break;
             case "maxProperties":
-                if (!isValidationMaxproperties(propertyValue)) {
+                if (!isValidationMaxProperties(propertyValue)) {
                     return false;
                 }
                 break;
             case "minProperties":
-                if (!isValidationMinproperties(propertyValue)) {
+                if (!isValidationMinProperties(propertyValue)) {
                     return false;
                 }
                 break;
@@ -834,7 +834,7 @@ function isInterfaceValidation(value: unknown): value is unknown {
                 }
                 break;
             case "dependentRequired":
-                if (!isValidationDependentrequired(propertyValue)) {
+                if (!isValidationDependentRequired(propertyValue)) {
                     return false;
                 }
                 break;
@@ -848,13 +848,13 @@ function isBooleanValidation(value: unknown): value is unknown {
     }
     return true;
 }
-export function isValidationNonnegativeinteger(value: unknown): value is types.ValidationNonnegativeinteger {
-    if (!(isNumberValidationNonnegativeinteger(value))) {
+export function isValidationNonNegativeInteger(value: unknown): value is types.ValidationNonNegativeInteger {
+    if (!(isNumberValidationNonNegativeInteger(value))) {
         return false;
     }
     return true;
 }
-function isNumberValidationNonnegativeinteger(value: unknown): value is unknown {
+function isNumberValidationNonNegativeInteger(value: unknown): value is unknown {
     if (typeof value !== "number" || isNaN(value)) {
         return false;
     }
@@ -866,45 +866,45 @@ function isNumberValidationNonnegativeinteger(value: unknown): value is unknown 
     }
     return true;
 }
-export function isValidationNonnegativeintegerdefault0(value: unknown): value is types.ValidationNonnegativeintegerdefault0 {
-    if (!isValidationNonnegativeinteger(value)) {
+export function isValidationNonNegativeIntegerDefault0(value: unknown): value is types.ValidationNonNegativeIntegerDefault0 {
+    if (!isValidationNonNegativeInteger(value)) {
         return false;
     }
     return true;
 }
-export function isValidationSimpletypes(value: unknown): value is types.ValidationSimpletypes {
+export function isValidationSimpleTypes(value: unknown): value is types.ValidationSimpleTypes {
     return true;
 }
-export function isValidationStringarray(value: unknown): value is types.ValidationStringarray {
-    if (!(isArrayValidationStringarray(value))) {
+export function isValidationStringArray(value: unknown): value is types.ValidationStringArray {
+    if (!(isArrayValidationStringArray(value))) {
         return false;
     }
     return true;
 }
-function isArrayValidationStringarray(value: unknown): value is unknown {
+function isArrayValidationStringArray(value: unknown): value is unknown {
     if (!Array.isArray(value)) {
         return false;
     }
-    const elementValueSeen = new Set<types.ValidationStringarrayItems>();
+    const elementValueSeen = new Set<types.ValidationStringArrayItems>();
     for (const elementIndex in value) {
         const elementValue = value[elementIndex];
         if (elementValueSeen.has(elementValue)) {
             return false;
         }
         elementValueSeen.add(elementValue);
-        if (!isValidationStringarrayItems(elementValue)) {
+        if (!isValidationStringArrayItems(elementValue)) {
             return false;
         }
     }
     return true;
 }
-export function isValidationStringarrayItems(value: unknown): value is types.ValidationStringarrayItems {
-    if (!(isStringValidationStringarrayItems(value))) {
+export function isValidationStringArrayItems(value: unknown): value is types.ValidationStringArrayItems {
+    if (!(isStringValidationStringArrayItems(value))) {
         return false;
     }
     return true;
 }
-function isStringValidationStringarrayItems(value: unknown): value is unknown {
+function isStringValidationStringArrayItems(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
@@ -926,7 +926,7 @@ function isAnyOfValidationType(value: unknown): value is unknown {
     return false;
 }
 export function isValidationType0(value: unknown): value is types.ValidationType0 {
-    if (!isValidationSimpletypes(value)) {
+    if (!isValidationSimpleTypes(value)) {
         return false;
     }
     return true;
@@ -958,7 +958,7 @@ function isArrayValidationType1(value: unknown): value is unknown {
     return true;
 }
 export function isValidationType1Items(value: unknown): value is types.ValidationType1Items {
-    if (!isValidationSimpletypes(value)) {
+    if (!isValidationSimpleTypes(value)) {
         return false;
     }
     return true;
@@ -999,13 +999,13 @@ export function isValidationEnumItems(value: unknown): value is types.Validation
 function isAnyValidationEnumItems(value: unknown): value is unknown {
     return true;
 }
-export function isValidationMultipleof(value: unknown): value is types.ValidationMultipleof {
-    if (!(isNumberValidationMultipleof(value))) {
+export function isValidationMultipleOf(value: unknown): value is types.ValidationMultipleOf {
+    if (!(isNumberValidationMultipleOf(value))) {
         return false;
     }
     return true;
 }
-function isNumberValidationMultipleof(value: unknown): value is unknown {
+function isNumberValidationMultipleOf(value: unknown): value is unknown {
     if (typeof value !== "number" || isNaN(value)) {
         return false;
     }
@@ -1026,13 +1026,13 @@ function isNumberValidationMaximum(value: unknown): value is unknown {
     }
     return true;
 }
-export function isValidationExclusivemaximum(value: unknown): value is types.ValidationExclusivemaximum {
-    if (!(isNumberValidationExclusivemaximum(value))) {
+export function isValidationExclusiveMaximum(value: unknown): value is types.ValidationExclusiveMaximum {
+    if (!(isNumberValidationExclusiveMaximum(value))) {
         return false;
     }
     return true;
 }
-function isNumberValidationExclusivemaximum(value: unknown): value is unknown {
+function isNumberValidationExclusiveMaximum(value: unknown): value is unknown {
     if (typeof value !== "number" || isNaN(value)) {
         return false;
     }
@@ -1050,26 +1050,26 @@ function isNumberValidationMinimum(value: unknown): value is unknown {
     }
     return true;
 }
-export function isValidationExclusiveminimum(value: unknown): value is types.ValidationExclusiveminimum {
-    if (!(isNumberValidationExclusiveminimum(value))) {
+export function isValidationExclusiveMinimum(value: unknown): value is types.ValidationExclusiveMinimum {
+    if (!(isNumberValidationExclusiveMinimum(value))) {
         return false;
     }
     return true;
 }
-function isNumberValidationExclusiveminimum(value: unknown): value is unknown {
+function isNumberValidationExclusiveMinimum(value: unknown): value is unknown {
     if (typeof value !== "number" || isNaN(value)) {
         return false;
     }
     return true;
 }
-export function isValidationMaxlength(value: unknown): value is types.ValidationMaxlength {
-    if (!isValidationNonnegativeinteger(value)) {
+export function isValidationMaxLength(value: unknown): value is types.ValidationMaxLength {
+    if (!isValidationNonNegativeInteger(value)) {
         return false;
     }
     return true;
 }
-export function isValidationMinlength(value: unknown): value is types.ValidationMinlength {
-    if (!isValidationNonnegativeintegerdefault0(value)) {
+export function isValidationMinLength(value: unknown): value is types.ValidationMinLength {
+    if (!isValidationNonNegativeIntegerDefault0(value)) {
         return false;
     }
     return true;
@@ -1086,80 +1086,80 @@ function isStringValidationPattern(value: unknown): value is unknown {
     }
     return true;
 }
-export function isValidationMaxitems(value: unknown): value is types.ValidationMaxitems {
-    if (!isValidationNonnegativeinteger(value)) {
+export function isValidationMaxItems(value: unknown): value is types.ValidationMaxItems {
+    if (!isValidationNonNegativeInteger(value)) {
         return false;
     }
     return true;
 }
-export function isValidationMinitems(value: unknown): value is types.ValidationMinitems {
-    if (!isValidationNonnegativeintegerdefault0(value)) {
+export function isValidationMinItems(value: unknown): value is types.ValidationMinItems {
+    if (!isValidationNonNegativeIntegerDefault0(value)) {
         return false;
     }
     return true;
 }
-export function isValidationUniqueitems(value: unknown): value is types.ValidationUniqueitems {
-    if (!(isBooleanValidationUniqueitems(value))) {
+export function isValidationUniqueItems(value: unknown): value is types.ValidationUniqueItems {
+    if (!(isBooleanValidationUniqueItems(value))) {
         return false;
     }
     return true;
 }
-function isBooleanValidationUniqueitems(value: unknown): value is unknown {
+function isBooleanValidationUniqueItems(value: unknown): value is unknown {
     if (typeof value !== "boolean") {
         return false;
     }
     return true;
 }
-export function isValidationMaxcontains(value: unknown): value is types.ValidationMaxcontains {
-    if (!isValidationNonnegativeinteger(value)) {
+export function isValidationMaxContains(value: unknown): value is types.ValidationMaxContains {
+    if (!isValidationNonNegativeInteger(value)) {
         return false;
     }
     return true;
 }
-export function isValidationMincontains(value: unknown): value is types.ValidationMincontains {
-    if (!isValidationNonnegativeinteger(value)) {
+export function isValidationMinContains(value: unknown): value is types.ValidationMinContains {
+    if (!isValidationNonNegativeInteger(value)) {
         return false;
     }
     return true;
 }
-export function isValidationMaxproperties(value: unknown): value is types.ValidationMaxproperties {
-    if (!isValidationNonnegativeinteger(value)) {
+export function isValidationMaxProperties(value: unknown): value is types.ValidationMaxProperties {
+    if (!isValidationNonNegativeInteger(value)) {
         return false;
     }
     return true;
 }
-export function isValidationMinproperties(value: unknown): value is types.ValidationMinproperties {
-    if (!isValidationNonnegativeintegerdefault0(value)) {
+export function isValidationMinProperties(value: unknown): value is types.ValidationMinProperties {
+    if (!isValidationNonNegativeIntegerDefault0(value)) {
         return false;
     }
     return true;
 }
 export function isValidationRequired(value: unknown): value is types.ValidationRequired {
-    if (!isValidationStringarray(value)) {
+    if (!isValidationStringArray(value)) {
         return false;
     }
     return true;
 }
-export function isValidationDependentrequired(value: unknown): value is types.ValidationDependentrequired {
-    if (!(isRecordValidationDependentrequired(value))) {
+export function isValidationDependentRequired(value: unknown): value is types.ValidationDependentRequired {
+    if (!(isRecordValidationDependentRequired(value))) {
         return false;
     }
     return true;
 }
-function isRecordValidationDependentrequired(value: unknown): value is unknown {
+function isRecordValidationDependentRequired(value: unknown): value is unknown {
     if (typeof value !== "object" || value === null || Array.isArray(value)) {
         return false;
     }
     for (const propertyName in value) {
         const propertyValue = value[propertyName as keyof typeof value];
-        if (!isValidationDependentrequiredAdditionalproperties(propertyValue)) {
+        if (!isValidationDependentRequiredAdditionalProperties(propertyValue)) {
             return false;
         }
     }
     return true;
 }
-export function isValidationDependentrequiredAdditionalproperties(value: unknown): value is types.ValidationDependentrequiredAdditionalproperties {
-    if (!isValidationStringarray(value)) {
+export function isValidationDependentRequiredAdditionalProperties(value: unknown): value is types.ValidationDependentRequiredAdditionalProperties {
+    if (!isValidationStringArray(value)) {
         return false;
     }
     return true;
@@ -1198,12 +1198,12 @@ function isInterfaceMetaData(value: unknown): value is unknown {
                 }
                 break;
             case "readOnly":
-                if (!isMetaDataReadonly(propertyValue)) {
+                if (!isMetaDataReadOnly(propertyValue)) {
                     return false;
                 }
                 break;
             case "writeOnly":
-                if (!isMetaDataWriteonly(propertyValue)) {
+                if (!isMetaDataWriteOnly(propertyValue)) {
                     return false;
                 }
                 break;
@@ -1267,25 +1267,25 @@ function isBooleanMetaDataDeprecated(value: unknown): value is unknown {
     }
     return true;
 }
-export function isMetaDataReadonly(value: unknown): value is types.MetaDataReadonly {
-    if (!(isBooleanMetaDataReadonly(value))) {
+export function isMetaDataReadOnly(value: unknown): value is types.MetaDataReadOnly {
+    if (!(isBooleanMetaDataReadOnly(value))) {
         return false;
     }
     return true;
 }
-function isBooleanMetaDataReadonly(value: unknown): value is unknown {
+function isBooleanMetaDataReadOnly(value: unknown): value is unknown {
     if (typeof value !== "boolean") {
         return false;
     }
     return true;
 }
-export function isMetaDataWriteonly(value: unknown): value is types.MetaDataWriteonly {
-    if (!(isBooleanMetaDataWriteonly(value))) {
+export function isMetaDataWriteOnly(value: unknown): value is types.MetaDataWriteOnly {
+    if (!(isBooleanMetaDataWriteOnly(value))) {
         return false;
     }
     return true;
 }
-function isBooleanMetaDataWriteonly(value: unknown): value is unknown {
+function isBooleanMetaDataWriteOnly(value: unknown): value is unknown {
     if (typeof value !== "boolean") {
         return false;
     }
@@ -1372,17 +1372,17 @@ function isInterfaceContent(value: unknown): value is unknown {
         const propertyValue = value[propertyName as keyof typeof value];
         switch (propertyName) {
             case "contentEncoding":
-                if (!isContentContentencoding(propertyValue)) {
+                if (!isContentContentEncoding(propertyValue)) {
                     return false;
                 }
                 break;
             case "contentMediaType":
-                if (!isContentContentmediatype(propertyValue)) {
+                if (!isContentContentMediaType(propertyValue)) {
                     return false;
                 }
                 break;
             case "contentSchema":
-                if (!isContentContentschema(propertyValue)) {
+                if (!isContentContentSchema(propertyValue)) {
                     return false;
                 }
                 break;
@@ -1396,31 +1396,31 @@ function isBooleanContent(value: unknown): value is unknown {
     }
     return true;
 }
-export function isContentContentencoding(value: unknown): value is types.ContentContentencoding {
-    if (!(isStringContentContentencoding(value))) {
+export function isContentContentEncoding(value: unknown): value is types.ContentContentEncoding {
+    if (!(isStringContentContentEncoding(value))) {
         return false;
     }
     return true;
 }
-function isStringContentContentencoding(value: unknown): value is unknown {
+function isStringContentContentEncoding(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
     return true;
 }
-export function isContentContentmediatype(value: unknown): value is types.ContentContentmediatype {
-    if (!(isStringContentContentmediatype(value))) {
+export function isContentContentMediaType(value: unknown): value is types.ContentContentMediaType {
+    if (!(isStringContentContentMediaType(value))) {
         return false;
     }
     return true;
 }
-function isStringContentContentmediatype(value: unknown): value is unknown {
+function isStringContentContentMediaType(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
     return true;
 }
-export function isContentContentschema(value: unknown): value is types.ContentContentschema {
+export function isContentContentSchema(value: unknown): value is types.ContentContentSchema {
     if (!isSchema(value)) {
         return false;
     }

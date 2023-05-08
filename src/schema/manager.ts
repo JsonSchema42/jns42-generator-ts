@@ -166,13 +166,11 @@ export class SchemaManager implements LoaderStrategy {
         const pathParts = nodeRootUrl.pathname.
             split("/").
             map(decodeURI).
-            map(value => value.toLowerCase()).
             map(value => value.replace(reReplace, "")).
             filter(value => reFilter.test(value));
         const pointerParts = nodePointer.
             split("/").
             map(decodeURI).
-            map(value => value.toLowerCase()).
             map(value => value.replace(reReplace, ""));
 
         if (nodePointer === "") {
