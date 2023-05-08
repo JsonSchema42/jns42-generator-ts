@@ -1,13 +1,18 @@
+import camelcase from "camelcase";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { projectRoot } from "../utils/index.js";
 
-const packages = ["string-or-boolean"];
+const packageNames = [
+    "string-or-boolean",
+];
 
-for (const generatedPackage of packages) {
-    const schema = await import(`${projectRoot}/.package/${generatedPackage}/main.js`);
+for (const packageName of packageNames) {
+    const typeName = camelcase(packageName, { pascalCase: true });
+
+    const schema = await import(`${projectRoot}/.package/${packageName}/main.js`);
 
     const goodDirectory = path.join(
         projectRoot,
@@ -32,7 +37,7 @@ for (const generatedPackage of packages) {
                 "utf-8",
             );
             const instance = JSON.parse(data);
-            assert.equal(schema.isStringOrBoolean(instance), true);
+            assert.equal(schema[`is${typeName}`](instance), true);
         }
     });
 
@@ -43,7 +48,7 @@ for (const generatedPackage of packages) {
                 "utf-8",
             );
             const instance = JSON.parse(data);
-            assert.equal(schema.isStringOrBoolean(instance), false);
+            assert.equal(schema[`is${typeName}`](instance), false);
         }
     });
 }
