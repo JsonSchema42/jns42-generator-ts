@@ -4,7 +4,7 @@ import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeExamples, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
-import { validateSchema } from "./validators.js";
+import { isSchema } from "./validators.js";
 
 export class SchemaLoader extends SchemaLoaderBase<Schema> {
     protected readonly metaSchemaId = metaSchemaId;
@@ -18,10 +18,7 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
     }
 
     public isSchema(node: unknown): node is Schema {
-        for (const error of validateSchema(node as Schema, [])) {
-            return false;
-        }
-        return true;
+        return isSchema(node);
     }
 
     public *getReferencedNodeUrls(
