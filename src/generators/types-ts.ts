@@ -16,17 +16,9 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected generateTypeDeclarationStatement(
         nodeId: string,
     ) {
-        let typeDefinition = this.generateTypeDefinition(
+        const typeDefinition = this.generateTypeDefinition(
             nodeId,
         );
-
-        const referencingNodeId = this.manager.getReferencingNodeId(nodeId);
-        if (referencingNodeId != null) {
-            typeDefinition = this.factory.createIntersectionTypeNode([
-                typeDefinition,
-                this.generateTypeReference(referencingNodeId),
-            ]);
-        }
 
         const typeName = this.getTypeName(nodeId);
         const declaration = this.factory.createTypeAliasDeclaration(
@@ -54,13 +46,59 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected generateTypeDefinition(
         nodeId: string,
     ): ts.TypeNode {
+        const { factory: f } = this;
+
         const typeNodes = [...this.generateTypeDefinitionElements(nodeId)];
-        const node = typeNodes.length === 0 ?
-            this.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword) :
-            this.factory.createParenthesizedType(this.factory.createUnionTypeNode(
+        const compoundNodes = [...this.generateCompoundDefinitionElements(nodeId)];
+
+        const referencingNodeId = this.manager.getReferencingNodeId(nodeId);
+
+        let node: ts.TypeNode | undefined;
+        if (compoundNodes.length > 0) {
+            const typeNode = f.createParenthesizedType(f.createIntersectionTypeNode(
+                compoundNodes,
+            ));
+            node = node == null ?
+                typeNode :
+                f.createParenthesizedType(f.createIntersectionTypeNode([
+                    node,
+                    typeNode,
+                ]));
+        }
+        if (typeNodes.length > 0) {
+            const typeNode = f.createParenthesizedType(f.createUnionTypeNode(
                 typeNodes,
             ));
+            node = node == null ?
+                typeNode :
+                f.createParenthesizedType(f.createIntersectionTypeNode([
+                    node,
+                    typeNode,
+                ]));
+        }
+        if (referencingNodeId != null) {
+            const typeNode = this.generateTypeReference(referencingNodeId);
+            node = node == null ?
+                typeNode :
+                f.createParenthesizedType(f.createIntersectionTypeNode([
+                    node,
+                    typeNode,
+                ]));
+        }
+
+        if (node == null) {
+            node = f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+        }
+
         return node;
+    }
+
+    protected *generateCompoundDefinitionElements(
+        nodeId: string,
+    ): Iterable<ts.TypeNode> {
+        for (const compoundDescriptor of this.manager.selectNodeCompoundDescriptors(nodeId)) {
+            yield this.generateCompoundDefinitionElement(compoundDescriptor);
+        }
     }
 
     protected *generateTypeDefinitionElements(
@@ -68,9 +106,6 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.TypeNode> {
         for (const typeDescriptor of this.manager.selectNodeTypeDescriptors(nodeId)) {
             yield this.generateTypeDefinitionElement(typeDescriptor);
-        }
-        for (const compoundDescriptor of this.manager.selectNodeCompoundDescriptors(nodeId)) {
-            yield this.generateCompoundDefinitionElement(compoundDescriptor);
         }
     }
 
