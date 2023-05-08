@@ -244,6 +244,10 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         return lines;
     }
 
+    public getExamples(nodeId: string): unknown[] {
+        throw new Error("not implemented");
+    }
+
     public selectNodeTypeDescriptors(
         nodeId: string,
     ): Iterable<TypeDescriptorUnion> {

@@ -2,7 +2,7 @@ import { CompoundDescriptorUnion } from "../index.js";
 import { SchemaLoaderBase } from "../loader.js";
 import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeExamples, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -245,6 +245,14 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
             join("");
 
         return lines;
+    }
+
+    public getExamples(nodeId: string): unknown[] {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        const examples = selectNodeExamples(nodeItem.node) ?? [];
+
+        return examples;
     }
 
     public *selectNodeTypeDescriptors(

@@ -51,6 +51,10 @@ export function selectNodeDynamicRef(
     }
 }
 
+//#endregion
+
+//#region metadata
+
 export function selectNodeDescription(
     node: Metadata,
 ) {
@@ -64,6 +68,14 @@ export function selectNodeDeprecated(
 ) {
     if (typeof node === "object") {
         return node.deprecated;
+    }
+}
+
+export function selectNodeExamples(
+    node: Metadata,
+) {
+    if (typeof node === "object") {
+        return node.examples;
     }
 }
 
@@ -385,3 +397,4 @@ export function selectValidationEnum(
 }
 
 //#endregion
+

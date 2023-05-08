@@ -11,7 +11,6 @@ import { MetaSchemaId } from "./meta.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
 
 export class SchemaManager implements LoaderStrategy {
-
     private readonly rootNodeMetaMap = new Map<string, MetaSchemaId>();
     private readonly nodeMetaMap = new Map<string, MetaSchemaId>();
     private readonly retrievalRootNodeMap = new Map<string, URL>();
@@ -213,6 +212,16 @@ export class SchemaManager implements LoaderStrategy {
 
         const loader = this.loaders[metaSchemaId];
         return loader.getComments(nodeId);
+    }
+
+    public getExamples(nodeId: string) {
+        const metaSchemaId = this.nodeMetaMap.get(nodeId);
+        if (metaSchemaId == null) {
+            throw new Error("meta schema id not found");
+        }
+
+        const loader = this.loaders[metaSchemaId];
+        return loader.getExamples(nodeId);
     }
 
     public getReferencingNodeId(nodeId: string): string | undefined {

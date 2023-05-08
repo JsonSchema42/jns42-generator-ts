@@ -17,6 +17,7 @@ export interface SchemaLoaderNodeItem<N> {
 
 export interface LoaderStrategy {
     getComments(nodeId: string): string
+    getExamples(nodeId: string): unknown[];
     getReferencingNodeId(nodeId: string): string | undefined;
     selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>;
     selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>;
@@ -27,6 +28,10 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
     public abstract getComments(
         nodeId: string
     ): string
+
+    public abstract getExamples(
+        nodeId: string
+    ): unknown[]
 
     public abstract selectNodeTypeDescriptors(
         nodeId: string
@@ -93,6 +98,7 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
     ) {
         //
     }
+
     private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem<N>>();
     private readonly nodeMap = new Map<string, SchemaLoaderNodeItem<N>>();
 

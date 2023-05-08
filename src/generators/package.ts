@@ -3,7 +3,7 @@ import path from "node:path";
 import ts from "typescript";
 import { SchemaManager } from "../schema/manager.js";
 import { Namer, formatData, formatStatements } from "../utils/index.js";
-import { ExamplesSpecsTsCodeGenerator } from "./examples.specs-ts.js";
+import { ExamplesSpecsTsCodeGenerator } from "./examples-specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
