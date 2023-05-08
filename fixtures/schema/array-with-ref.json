@@ -6,6 +6,12 @@
     "array"
   ],
   "items": {
-    "$ref": "simple-object.json"
+    "$ref": "simple-object.json",
+    "examples": [
+      {
+        "id": 100,
+        "name": "Graham"
+      }
+    ]
   }
 }
