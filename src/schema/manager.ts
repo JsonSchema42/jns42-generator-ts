@@ -69,8 +69,8 @@ export class SchemaManager implements LoaderStrategy {
 
         const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
 
-        if (!loader.validateSchema(rootNode)) {
-            throw new Error("invalid schema");
+        if (!loader.isSchema(rootNode)) {
+            throw new TypeError("invalid schema");
         }
 
         rootNodeUrl = loader.selectNodeUrl(rootNode) ?? rootNodeUrl;

@@ -16,9 +16,8 @@ export class SchemaLoader extends SchemaLoaderBase<Schema> {
         }
         return schemaId === this.metaSchemaId;
     }
-    public validateSchema(node: Schema): boolean {
-
-        for (const error of validateSchema(node, [])) {
+    public isSchema(node: unknown): node is Schema {
+        for (const error of validateSchema(node as Schema, [])) {
             return false;
         }
         return true;

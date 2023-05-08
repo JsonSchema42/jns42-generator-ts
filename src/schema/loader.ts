@@ -91,7 +91,7 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
         node: N
     ): Iterable<readonly [string, N]>
 
-    public abstract validateSchema(node: N): boolean
+    public abstract isSchema(node: unknown): node is N
 
     constructor(
         protected readonly manager: SchemaManager,
