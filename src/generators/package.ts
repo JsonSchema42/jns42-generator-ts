@@ -3,6 +3,7 @@ import path from "node:path";
 import ts from "typescript";
 import { SchemaManager } from "../schema/manager.js";
 import { Namer, formatData, formatStatements } from "../utils/index.js";
+import { ExamplesSpecsTsCodeGenerator } from "./examples.specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
@@ -70,6 +71,18 @@ export function generatePackage(
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.writeFileSync(filePath, formatStatements(factory, statements));
+    }
+
+    {
+        const codeGenerator = new ExamplesSpecsTsCodeGenerator(
+            factory,
+            namer,
+            manager,
+        );
+        const statements = codeGenerator.getStatements();
+        const filePath = path.join(options.directoryPath, "examples.spec.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }

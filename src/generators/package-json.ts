@@ -17,6 +17,7 @@ export function getPackageJsonData(
         ],
         "scripts": {
             "prepare": "tsc",
+            "test": "node --test ./*.spec.js",
         },
         "author": "",
         "license": "ISC",

@@ -39,10 +39,6 @@ export function configureLabProgram(argv: yargs.Argv) {
                     describe: "version of the package",
                     type: "string",
                 }).
-                option("generate-test", {
-                    describe: "generate test for this package (use with caution!)",
-                    type: "boolean",
-                }).
                 option("unique-name-seed", {
                     describe: "seed to use when generating unique hashes, change if you ever have a naming collision (this should be very rare)",
                     type: "number",
@@ -58,7 +54,6 @@ interface MainOptions {
     packageDirectory: string
     packageName: string
     packageVersion: string
-    generateTest: boolean
     uniqueNameSeed: number
 }
 

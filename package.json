@@ -17,7 +17,7 @@
     "test": "npm run spec-all",
     "lint": "eslint \"src/**/*.ts\"",
     "spec-all": "node --test ./out/**/*.spec.js",
-    "coverage": "c8 --reporter lcov --reporter cobertura npm test",
+    "coverage": "c8 --reporter lcov npm test",
     "docs": "typedoc"
   },
   "repository": {
