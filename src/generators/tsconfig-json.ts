@@ -1,9 +1,9 @@
 export function getTsconfigJsonData() {
     const content = {
         "compilerOptions": {
-            "target": "ES2020",
-            "module": "ES2020",
-            "moduleResolution": "node",
+            "target": "ES2022",
+            "module": "Node16",
+            "moduleResolution": "node16",
             "declaration": true,
             "sourceMap": true,
             "importHelpers": true,
