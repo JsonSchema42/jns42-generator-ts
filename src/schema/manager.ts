@@ -151,8 +151,8 @@ export class SchemaManager implements LoaderStrategy {
         metaSchemaId: MetaSchemaId,
         baseName = "",
     ): Iterable<readonly [string, string]> {
-        const reReplace = /[^A-Za-z0-9]/gu;
-        const reFilter = /^[A-Za-z]/u;
+        const reReplace = /[^A-Za-z0-9-_]/gu;
+        const reFilter = /^[A-Za-z-_]/u;
 
         const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
 
