@@ -4,18 +4,30 @@ TS_SRC:=$(wildcard src/*.ts src/*/*.ts src/*/*/*.ts src/*/*/*/*.ts src/*/*/*/*/*
 JS_OUT:=$(patsubst src/%.ts,out/%.js,$(TS_SRC))
 DTS_OUT:=$(patsubst src/%.ts,out/%.d.ts,$(TS_SRC))
 
+PACKAGE:=string-or-boolean
+PACKAGE_DST:=$(patsubst %,.package/%,$(PACKAGE))
 
 rebuild: clean build
 
 build: \
 	$(JS_OUT) \
 	$(DTS_OUT) \
+	$(PACKAGE_DST) \
 
 clean:
-	rm -rf out
+	rm -rf out .package
 
 $(JS_OUT) $(DTS_OUT): tsconfig.json $(TS_SRC)
 	npx tsc --project $<
+
+.package/%: fixtures/%.json $(JS_OUT)
+	node out/program.js \
+		package file://$(PWD)/$< \
+		--package-directory $@ \
+		--package-name $* \
+		--package-version 0.0.0 \
+
+	( cd $@ ; npm install )
 
 .PHONY: \
 	rebuild \
