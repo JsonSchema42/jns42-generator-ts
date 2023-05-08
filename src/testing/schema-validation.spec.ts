@@ -6,6 +6,8 @@ import test from "node:test";
 import { projectRoot } from "../utils/index.js";
 
 const packageNames = [
+    "array-with-ref",
+    "simple-object",
     "string-or-boolean",
 ];
 
