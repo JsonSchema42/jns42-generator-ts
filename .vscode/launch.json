@@ -21,7 +21,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/string-or-boolean.json",
+        "file://${workspaceFolder}/fixtures/schema/string-or-boolean.json",
         "--package-directory",
         ".package/string-or-boolean",
         "--package-name",
@@ -44,7 +44,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/simple-object.json",
+        "file://${workspaceFolder}/fixtures/schema/simple-object.json",
         "--package-directory",
         ".package/simple-object",
         "--package-name",
@@ -67,7 +67,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/array-with-ref.json",
+        "file://${workspaceFolder}/fixtures/schema/array-with-ref.json",
         "--package-directory",
         ".package/array-with-ref",
         "--package-name",
@@ -90,7 +90,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/openapi/openapi_v3-0_2021-09-28.json",
+        "file://${workspaceFolder}/fixtures/schema/openapi/openapi_v3-0_2021-09-28.json",
         "--package-directory",
         ".package/openapi_v3-0_2021-09-28",
         "--package-name",
@@ -112,7 +112,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/openapi/openapi_v3-1_2022-10-07.json",
+        "file://${workspaceFolder}/fixtures/schema/openapi/openapi_v3-1_2022-10-07.json",
         "--package-directory",
         ".package/openapi_v3-1_2022-10-07",
         "--package-name",
@@ -134,7 +134,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/draft-2020-12/schema",
+        "file://${workspaceFolder}/fixtures/schema/draft-2020-12/schema",
         "--package-directory",
         ".package/draft-2020-12",
         "--package-name",
@@ -156,7 +156,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/draft-2019-09/schema",
+        "file://${workspaceFolder}/fixtures/schema/draft-2019-09/schema",
         "--package-directory",
         ".package/draft-2019-09",
         "--package-name",
@@ -178,7 +178,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/draft-07/schema",
+        "file://${workspaceFolder}/fixtures/schema/draft-07/schema",
         "--package-directory",
         ".package/draft-07",
         "--package-name",
@@ -200,7 +200,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/draft-06/schema",
+        "file://${workspaceFolder}/fixtures/schema/draft-06/schema",
         "--package-directory",
         ".package/draft-06",
         "--package-name",
@@ -222,7 +222,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/draft-04/schema",
+        "file://${workspaceFolder}/fixtures/schema/draft-04/schema",
         "--package-directory",
         ".package/draft-04",
         "--package-name",
@@ -244,7 +244,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/output-2020-12/schema",
+        "file://${workspaceFolder}/fixtures/schema/output-2020-12/schema",
         "--package-directory",
         ".package/output-2020-12",
         "--package-name",
@@ -266,7 +266,7 @@
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
-        "file://${workspaceFolder}/fixtures/output-2019-09/schema",
+        "file://${workspaceFolder}/fixtures/schema/output-2019-09/schema",
         "--package-directory",
         ".package/output-2019-09",
         "--package-name",

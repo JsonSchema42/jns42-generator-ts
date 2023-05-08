@@ -20,7 +20,7 @@ clean:
 $(JS_OUT) $(DTS_OUT): tsconfig.json $(TS_SRC)
 	npx tsc --project $<
 
-.package/%: fixtures/%.json $(JS_OUT)
+.package/%: fixtures/schema/%.json $(JS_OUT)
 	node out/program.js \
 		package file://$(PWD)/$< \
 		--package-directory $@ \
