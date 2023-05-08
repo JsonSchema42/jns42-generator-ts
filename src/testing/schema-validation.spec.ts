@@ -32,7 +32,7 @@ for (const packageName of packageNames) {
     const badFiles = (await fs.readdir(badDirectory)).
         filter(file => /\.json$/.test(file));
 
-    test("string-or-boolean good", async () => {
+    test(`${packageName} good`, async () => {
         for (const goodFile of goodFiles) {
             const data = await fs.readFile(
                 path.join(goodDirectory, goodFile),
@@ -43,7 +43,7 @@ for (const packageName of packageNames) {
         }
     });
 
-    test("string-or-boolean bad", async () => {
+    test(`${packageName} bad`, async () => {
         for (const badFile of badFiles) {
             const data = await fs.readFile(
                 path.join(badDirectory, badFile),
