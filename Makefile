@@ -4,7 +4,7 @@ TS_SRC:=$(wildcard src/*.ts src/*/*.ts src/*/*/*.ts src/*/*/*/*.ts src/*/*/*/*/*
 JS_OUT:=$(patsubst src/%.ts,out/%.js,$(TS_SRC))
 DTS_OUT:=$(patsubst src/%.ts,out/%.d.ts,$(TS_SRC))
 
-PACKAGE:=string-or-boolean
+PACKAGE:=array-with-ref simple-object string-or-boolean
 PACKAGE_DST:=$(patsubst %,.package/%,$(PACKAGE))
 
 rebuild: clean build
