@@ -133,7 +133,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#endregion
 
-    //#region anchors
+    //#region references
 
     private readonly anchorMap = new Map<string, string>();
     private readonly recursiveAnchorMap = new Map<string, string>();

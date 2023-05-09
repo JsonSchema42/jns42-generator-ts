@@ -509,7 +509,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#endregion
 
-    //#region anchors
+    //#region references
 
     private readonly anchorMap = new Map<string, string>();
     private readonly dynamicAnchorMap = new Map<string, string>();
