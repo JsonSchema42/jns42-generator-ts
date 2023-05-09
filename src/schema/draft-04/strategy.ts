@@ -2,7 +2,7 @@ import assert from "assert";
 import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../descriptors.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeDescription, selectNodeId, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
+import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeId, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
@@ -110,26 +110,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     }
 
-    public getComments(nodeId: string): string {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const description = selectNodeDescription(nodeItem.node) ?? "";
-
-        const lines = [
-            description,
-        ].
-            map(line => line.trim()).
-            filter(line => line.length > 0).
-            map(line => line + "\n").
-            join("");
-
-        return lines;
-    }
-
-    public getExamples(nodeId: string): unknown[] {
-        throw new Error("not implemented");
-    }
-
     public *selectNodeDescriptors(
     ): Iterable<NodeDescriptor> {
         yield* [];
@@ -147,9 +127,4 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         throw new Error("not implemented");
     }
 
-    public getReferencingNodeId(
-        nodeId: string,
-    ): string | undefined {
-        throw new Error("not implemented");
-    }
 }

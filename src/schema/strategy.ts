@@ -31,10 +31,6 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         nodeId: string
     ): Iterable<CompoundDescriptorUnion>
 
-    public abstract getReferencingNodeId(
-        nodeId: string
-    ): string | undefined
-
     protected abstract readonly metaSchemaId: string
 
     public abstract isSchemaRootNode(node: unknown): node is N;

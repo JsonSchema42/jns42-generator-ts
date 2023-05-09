@@ -239,7 +239,28 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             const deprecated = selectNodeDeprecated(node) ?? false;
             const examples = selectNodeExamples(node) ?? [];
 
-            const superNodeId = this.getReferencingNodeId(nodeId);
+            let superNodeId: string | undefined;
+
+            const nodeRef = selectNodeRef(node);
+
+            if (nodeRef != null) {
+                const resolvedNodeId = this.resolveReferenceNodeId(
+                    nodeId,
+                    nodeRef,
+                );
+
+                superNodeId = resolvedNodeId;
+            }
+
+            const nodeDynamicRef = selectNodeDynamicRef(node);
+            if (nodeDynamicRef != null) {
+                const resolvedNodeId = this.resolveDynamicReferenceNodeId(
+                    nodeId,
+                    nodeDynamicRef,
+                );
+
+                superNodeId = resolvedNodeId;
+            }
 
             yield {
                 nodeId,
@@ -605,33 +626,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                 typeNodeIds,
             };
         }
-    }
-
-    public getReferencingNodeId(
-        nodeId: string,
-    ): string | undefined {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const nodeRef = selectNodeRef(nodeItem.node);
-        if (nodeRef != null) {
-            const resolvedNodeId = this.resolveReferenceNodeId(
-                nodeId,
-                nodeRef,
-            );
-
-            return resolvedNodeId;
-        }
-
-        const nodeDynamicRef = selectNodeDynamicRef(nodeItem.node);
-        if (nodeDynamicRef != null) {
-            const resolvedNodeId = this.resolveDynamicReferenceNodeId(
-                nodeId,
-                nodeDynamicRef,
-            );
-
-            return resolvedNodeId;
-        }
-
     }
 
 }
