@@ -1,39 +1,35 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
-import * as schemaDraft04 from "./draft-04/index.js";
-import * as schemaDraft06 from "./draft-06/index.js";
-import * as schemaDraft07 from "./draft-07/index.js";
-import * as schema201909 from "./draft-2019-09/index.js";
-import * as schema202012 from "./draft-2020-12/index.js";
 import { CompoundDescriptorUnion } from "./index.js";
-import { LoaderStrategy, SchemaLoaderBase } from "./loader.js";
 import { MetaSchemaId } from "./meta.js";
+import { SchemaStrategy, SchemaStrategyBase } from "./strategy.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
 
-export class SchemaManager implements LoaderStrategy {
-    private readonly rootNodeMetaMap = new Map<string, MetaSchemaId>();
-    private readonly nodeMetaMap = new Map<string, MetaSchemaId>();
+export class SchemaContext implements SchemaStrategy {
+    private readonly rootNodeMetaMap = new Map<string, string>();
+    private readonly nodeMetaMap = new Map<string, string>();
     private readonly retrievalRootNodeMap = new Map<string, URL>();
     private readonly rootNodeRetrievalMap = new Map<string, URL>();
 
-    private readonly loaders = {
-        [schema202012.metaSchemaId]: new schema202012.SchemaLoader(this),
-        [schema201909.metaSchemaId]: new schema201909.SchemaLoader(this),
-        [schemaDraft07.metaSchemaId]: new schemaDraft07.SchemaLoader(this),
-        [schemaDraft06.metaSchemaId]: new schemaDraft06.SchemaLoader(this),
-        [schemaDraft04.metaSchemaId]: new schemaDraft04.SchemaLoader(this),
-    };
+    private strategies: Record<string, SchemaStrategyBase<unknown>> = {};
+
+    public registerStrategy(
+        metaSchemaId: string,
+        strategy: SchemaStrategyBase<unknown>,
+    ) {
+        this.strategies[metaSchemaId] = strategy;
+    }
 
     public async loadRootNode(
         rootNode: unknown,
         rootNodeUrl: URL,
         referencingNodeUrl: URL | null,
-        defaultMetaSchemaId: MetaSchemaId,
+        defaultMetaSchemaId: string,
     ) {
         const metaSchemaId = this.discoverMetaSchemaId(rootNode) ??
             defaultMetaSchemaId;
 
-        const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
+        const loader: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
         await loader.loadRootNode(
             rootNode,
@@ -52,7 +48,7 @@ export class SchemaManager implements LoaderStrategy {
         rootNodeUrl: URL,
         retrievalUrl: URL,
         referencingUrl: URL | null,
-        defaultMetaSchemaId: MetaSchemaId,
+        defaultMetaSchemaId: string,
     ) {
         const retrievalId = String(retrievalUrl);
 
@@ -67,7 +63,7 @@ export class SchemaManager implements LoaderStrategy {
 
         const metaSchemaId = this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
-        const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
+        const loader: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
         if (!loader.isSchema(rootNode)) {
             throw new TypeError("invalid schema");
@@ -124,7 +120,7 @@ export class SchemaManager implements LoaderStrategy {
     private discoverMetaSchemaId(
         node: unknown,
     ) {
-        for (const [metaSchemaId, loader] of Object.entries(this.loaders)) {
+        for (const [metaSchemaId, loader] of Object.entries(this.strategies)) {
             if (loader.isSchemaRootNode(node)) {
                 return metaSchemaId as MetaSchemaId;
             }
@@ -147,13 +143,13 @@ export class SchemaManager implements LoaderStrategy {
 
     private * getNodeTypeNames(
         nodeId: string,
-        metaSchemaId: MetaSchemaId,
+        metaSchemaId: string,
         baseName = "",
     ): Iterable<readonly [string, string]> {
         const reReplace = /[^A-Za-z0-9-_]/gu;
         const reFilter = /^[A-Za-z-_]/u;
 
-        const loader: SchemaLoaderBase<unknown> = this.loaders[metaSchemaId];
+        const loader: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
         const item = loader.getNodeItem(nodeId);
 
@@ -208,7 +204,7 @@ export class SchemaManager implements LoaderStrategy {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.loaders[metaSchemaId];
+        const loader = this.strategies[metaSchemaId];
         return loader.getComments(nodeId);
     }
 
@@ -218,7 +214,7 @@ export class SchemaManager implements LoaderStrategy {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.loaders[metaSchemaId];
+        const loader = this.strategies[metaSchemaId];
         return loader.getExamples(nodeId);
     }
 
@@ -228,7 +224,7 @@ export class SchemaManager implements LoaderStrategy {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.loaders[metaSchemaId];
+        const loader = this.strategies[metaSchemaId];
         return loader.getReferencingNodeId(nodeId);
     }
 
@@ -238,7 +234,7 @@ export class SchemaManager implements LoaderStrategy {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.loaders[metaSchemaId];
+        const loader = this.strategies[metaSchemaId];
         return loader.selectNodeTypeDescriptors(nodeId);
     }
 
@@ -248,7 +244,7 @@ export class SchemaManager implements LoaderStrategy {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.loaders[metaSchemaId];
+        const loader = this.strategies[metaSchemaId];
         return loader.selectNodeCompoundDescriptors(nodeId);
     }
 

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
-import { SchemaManager } from "../schema/manager.js";
+import { SchemaContext } from "../schema/context.js";
 import { Namer, formatData, formatStatements } from "../utils/index.js";
 import { ExamplesSpecsTsCodeGenerator } from "./examples-specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
@@ -18,7 +18,7 @@ export interface PackageOptions {
 
 export function generatePackage(
     factory: ts.NodeFactory,
-    manager: SchemaManager,
+    manager: SchemaContext,
     namer: Namer,
     options: PackageOptions,
 ) {

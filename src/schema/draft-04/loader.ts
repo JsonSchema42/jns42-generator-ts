@@ -1,12 +1,12 @@
 import { CompoundDescriptorUnion } from "../compound-descriptors.js";
-import { SchemaLoaderBase } from "../loader.js";
+import { SchemaStrategyBase } from "../strategy.js";
 import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeDescription, selectNodeId, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
 import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
-export class SchemaLoader extends SchemaLoaderBase<Schema | boolean> {
+export class SchemaLoader extends SchemaStrategyBase<Schema | boolean> {
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {

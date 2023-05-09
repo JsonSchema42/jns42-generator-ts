@@ -1,21 +1,21 @@
 import { CompoundDescriptorUnion } from "./compound-descriptors.js";
-import { SchemaManager } from "./manager.js";
+import { SchemaContext } from "./context.js";
 import { MetaSchemaId } from "./meta.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
 
-export interface SchemaLoaderRootNodeItem<N> {
+export interface SchemaStrategyRootNodeItem<N> {
     node: N;
     nodeUrl: URL;
     referencingNodeUrl: URL | null;
 }
 
-export interface SchemaLoaderNodeItem<N> {
+export interface SchemaStrategyNodeItem<N> {
     node: N;
     nodeRootUrl: URL;
     nodePointer: string;
 }
 
-export interface LoaderStrategy {
+export interface SchemaStrategy {
     getComments(nodeId: string): string
     getExamples(nodeId: string): unknown[];
     getReferencingNodeId(nodeId: string): string | undefined;
@@ -23,7 +23,7 @@ export interface LoaderStrategy {
     selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>;
 }
 
-export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
+export abstract class SchemaStrategyBase<N> implements SchemaStrategy {
 
     public abstract getComments(
         nodeId: string
@@ -94,13 +94,13 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
     public abstract isSchema(node: unknown): node is N
 
     constructor(
-        protected readonly manager: SchemaManager,
+        protected readonly manager: SchemaContext,
     ) {
         //
     }
 
-    private readonly rootNodeMap = new Map<string, SchemaLoaderRootNodeItem<N>>();
-    private readonly nodeMap = new Map<string, SchemaLoaderNodeItem<N>>();
+    private readonly rootNodeMap = new Map<string, SchemaStrategyRootNodeItem<N>>();
+    private readonly nodeMap = new Map<string, SchemaStrategyNodeItem<N>>();
 
     public hasRootNodeItem(nodeId: string) {
         return this.rootNodeMap.has(nodeId);
@@ -163,7 +163,7 @@ export abstract class SchemaLoaderBase<N> implements LoaderStrategy {
         );
         const nodeId = String(nodeUrl);
 
-        const item: SchemaLoaderNodeItem<N> = {
+        const item: SchemaStrategyNodeItem<N> = {
             node,
             nodeRootUrl,
             nodePointer,

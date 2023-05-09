@@ -2,7 +2,12 @@ import * as path from "node:path";
 import ts from "typescript";
 import * as yargs from "yargs";
 import { generatePackage } from "../generators/index.js";
-import { SchemaManager } from "../schema/index.js";
+import * as schemaDraft04 from "../schema/draft-04/index.js";
+import * as schemaDraft06 from "../schema/draft-06/index.js";
+import * as schemaDraft07 from "../schema/draft-07/index.js";
+import * as schema201909 from "../schema/draft-2019-09/index.js";
+import * as schema202012 from "../schema/draft-2020-12/index.js";
+import { SchemaContext } from "../schema/index.js";
 import { Namer } from "../utils/index.js";
 
 export function configureLabProgram(argv: yargs.Argv) {
@@ -19,13 +24,13 @@ export function configureLabProgram(argv: yargs.Argv) {
                     describe: "the default meta schema to use",
                     type: "string",
                     choices: [
-                        "https://json-schema.org/draft/2020-12/schema",
-                        "https://json-schema.org/draft/2019-09/schema",
-                        "http://json-schema.org/draft-07/schema#",
-                        "http://json-schema.org/draft-06/schema#",
-                        "http://json-schema.org/draft-04/schema#",
+                        schema202012.metaSchemaId,
+                        schema201909.metaSchemaId,
+                        schemaDraft07.metaSchemaId,
+                        schemaDraft06.metaSchemaId,
+                        schemaDraft04.metaSchemaId,
                     ] as const,
-                    default: "https://json-schema.org/draft/2020-12/schema",
+                    default: schema202012.metaSchemaId,
                 }).
                 option("package-directory", {
                     describe: "where to output the package",
@@ -50,7 +55,7 @@ export function configureLabProgram(argv: yargs.Argv) {
 
 interface MainOptions {
     schemaUrl: string
-    defaultMetaSchemaUrl: "https://json-schema.org/draft/2020-12/schema"
+    defaultMetaSchemaUrl: string
     packageDirectory: string
     packageName: string
     packageVersion: string
@@ -66,20 +71,26 @@ async function main(options: MainOptions) {
     const factory = ts.factory;
 
     const namer = new Namer(options.uniqueNameSeed);
-    const manager = new SchemaManager();
+    const context = new SchemaContext();
 
-    const rootNodeUrl = await manager.loadFromUrl(
+    context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaLoader(this));
+    context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaLoader(this));
+    context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaLoader(this));
+    context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaLoader(this));
+    context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaLoader(this));
+
+    await context.loadFromUrl(
         schemaUrl,
         schemaUrl,
         null,
         defaultMetaSchemaId,
     );
 
-    for (const [nodeId, typeName] of manager.getTypeNames()) {
+    for (const [nodeId, typeName] of context.getTypeNames()) {
         namer.registerName(nodeId, typeName);
     }
 
-    generatePackage(factory, manager, namer, {
+    generatePackage(factory, context, namer, {
         directoryPath: packageDirectoryPath,
         name: packageName,
         version: packageVersion,

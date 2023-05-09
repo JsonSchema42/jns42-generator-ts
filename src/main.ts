@@ -1,3 +1,3 @@
-export * from "./schema/manager.js";
+export * from "./schema/context.js";
 export * from "./utils/namer.js";
 
