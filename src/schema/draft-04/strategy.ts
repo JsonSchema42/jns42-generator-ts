@@ -1,4 +1,3 @@
-import assert from "assert";
 import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../descriptors.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
@@ -92,8 +91,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         nodeUrl: URL,
         retrievalUrl: URL,
     ) {
-        assert(this.context != null);
-
         const nodeRef = selectNodeRef(node);
 
         if (nodeRef != null) {

@@ -1,3 +1,4 @@
+import assert from "assert";
 import { SchemaContext } from "./context.js";
 import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./descriptors.js";
 
@@ -79,9 +80,13 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
     public abstract isSchema(node: unknown): node is N
 
-    protected context?: SchemaContext;
+    private maybeContext?: SchemaContext;
+    protected get context() {
+        assert(this.maybeContext != null);
+        return this.maybeContext;
+    }
     public registerContext(context: SchemaContext) {
-        this.context = context;
+        this.maybeContext = context;
     }
 
     private readonly rootNodeMap = new Map<string, SchemaStrategyRootNodeItem<N>>();
