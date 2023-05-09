@@ -88,7 +88,7 @@ function isInterfaceSchema(value: unknown): value is unknown {
                 }
                 break;
             case "additionalItems":
-                if (!isSchemaAdditionalItems(propertyValue)) {
+                if (!isSchemaAdditionalItems_561860(propertyValue)) {
                     return false;
                 }
                 break;
@@ -128,7 +128,7 @@ function isInterfaceSchema(value: unknown): value is unknown {
                 }
                 break;
             case "additionalProperties":
-                if (!isSchemaAdditionalProperties(propertyValue)) {
+                if (!isSchemaAdditionalProperties_478926(propertyValue)) {
                     return false;
                 }
                 break;
@@ -412,13 +412,13 @@ function isStringSchemaPattern(value: unknown): value is unknown {
     }
     return true;
 }
-export function isSchemaAdditionalItems(value: unknown): value is types.SchemaAdditionalItems {
-    if (!(isAnyOfSchemaAdditionalItems(value))) {
+export function isSchemaAdditionalItems_561860(value: unknown): value is types.SchemaAdditionalItems_561860 {
+    if (!(isAnyOfSchemaAdditionalItems_561860(value))) {
         return false;
     }
     return true;
 }
-function isAnyOfSchemaAdditionalItems(value: unknown): value is unknown {
+function isAnyOfSchemaAdditionalItems_561860(value: unknown): value is unknown {
     if (isSchemaAdditionalItems0(value)) {
         return true;
     }
@@ -484,13 +484,13 @@ export function isSchemaRequired(value: unknown): value is types.SchemaRequired 
     }
     return true;
 }
-export function isSchemaAdditionalProperties(value: unknown): value is types.SchemaAdditionalProperties {
-    if (!(isAnyOfSchemaAdditionalProperties(value))) {
+export function isSchemaAdditionalProperties_478926(value: unknown): value is types.SchemaAdditionalProperties_478926 {
+    if (!(isAnyOfSchemaAdditionalProperties_478926(value))) {
         return false;
     }
     return true;
 }
-function isAnyOfSchemaAdditionalProperties(value: unknown): value is unknown {
+function isAnyOfSchemaAdditionalProperties_478926(value: unknown): value is unknown {
     if (isSchemaAdditionalProperties0(value)) {
         return true;
     }
@@ -572,6 +572,29 @@ function isRecordSchemaDependencies(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaEnum(value: unknown): value is types.SchemaEnum {
+    if (!(isArraySchemaEnum(value))) {
+        return false;
+    }
+    return true;
+}
+function isArraySchemaEnum(value: unknown): value is unknown {
+    if (!Array.isArray(value)) {
+        return false;
+    }
+    if (value.length < 1) {
+        return false;
+    }
+    const elementValueSeen = new Set<types.SchemaEnumAdditionalItems>();
+    for (const elementIndex in value) {
+        const elementValue = value[elementIndex];
+        if (elementValueSeen.has(elementValue)) {
+            return false;
+        }
+        elementValueSeen.add(elementValue);
+        if (!isSchemaEnumAdditionalItems(elementValue)) {
+            return false;
+        }
+    }
     return true;
 }
 export function isSchemaType(value: unknown): value is types.SchemaType {
@@ -625,10 +648,100 @@ export function isSchemaNot(value: unknown): value is types.SchemaNot {
     }
     return true;
 }
+export function isSchemaAdditionalProperties_778301(value: unknown): value is types.SchemaAdditionalProperties_778301 {
+    if (!(isAnySchemaAdditionalProperties_778301(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalProperties_778301(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalItems_001623(value: unknown): value is types.SchemaAdditionalItems_001623 {
+    if (!(isAnySchemaAdditionalItems_001623(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItems_001623(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSchemaArrayAdditionalProperties(value: unknown): value is types.SchemaSchemaArrayAdditionalProperties {
+    if (!(isAnySchemaSchemaArrayAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSchemaArrayAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
 export function isSchemaSchemaArrayItems(value: unknown): value is types.SchemaSchemaArrayItems {
     if (!isSchema(value)) {
         return false;
     }
+    return true;
+}
+export function isSchemaSchemaArrayAdditionalItems(value: unknown): value is types.SchemaSchemaArrayAdditionalItems {
+    if (!(isAnySchemaSchemaArrayAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSchemaArrayAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSchemaArrayItemsAdditionalProperties(value: unknown): value is types.SchemaSchemaArrayItemsAdditionalProperties {
+    if (!(isAnySchemaSchemaArrayItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSchemaArrayItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSchemaArrayItemsAdditionalItems(value: unknown): value is types.SchemaSchemaArrayItemsAdditionalItems {
+    if (!(isAnySchemaSchemaArrayItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSchemaArrayItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerAdditionalProperties(value: unknown): value is types.SchemaPositiveIntegerAdditionalProperties {
+    if (!(isAnySchemaPositiveIntegerAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerAdditionalItems(value: unknown): value is types.SchemaPositiveIntegerAdditionalItems {
+    if (!(isAnySchemaPositiveIntegerAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerDefault0AdditionalProperties(value: unknown): value is types.SchemaPositiveIntegerDefault0AdditionalProperties {
+    if (!(isAnySchemaPositiveIntegerDefault0AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerDefault0AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerDefault0AdditionalItems(value: unknown): value is types.SchemaPositiveIntegerDefault0AdditionalItems {
+    if (!(isAnySchemaPositiveIntegerDefault0AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerDefault0AdditionalItems(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaPositiveIntegerDefault00(value: unknown): value is types.SchemaPositiveIntegerDefault00 {
@@ -638,6 +751,69 @@ export function isSchemaPositiveIntegerDefault00(value: unknown): value is types
     return true;
 }
 export function isSchemaPositiveIntegerDefault01(value: unknown): value is types.SchemaPositiveIntegerDefault01 {
+    return true;
+}
+export function isSchemaPositiveIntegerDefault00AdditionalProperties(value: unknown): value is types.SchemaPositiveIntegerDefault00AdditionalProperties {
+    if (!(isAnySchemaPositiveIntegerDefault00AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerDefault00AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerDefault00AdditionalItems(value: unknown): value is types.SchemaPositiveIntegerDefault00AdditionalItems {
+    if (!(isAnySchemaPositiveIntegerDefault00AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerDefault00AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerDefault01AdditionalProperties(value: unknown): value is types.SchemaPositiveIntegerDefault01AdditionalProperties {
+    if (!(isAnySchemaPositiveIntegerDefault01AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerDefault01AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPositiveIntegerDefault01AdditionalItems(value: unknown): value is types.SchemaPositiveIntegerDefault01AdditionalItems {
+    if (!(isAnySchemaPositiveIntegerDefault01AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPositiveIntegerDefault01AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSimpleTypesAdditionalProperties(value: unknown): value is types.SchemaSimpleTypesAdditionalProperties {
+    if (!(isAnySchemaSimpleTypesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSimpleTypesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSimpleTypesAdditionalItems(value: unknown): value is types.SchemaSimpleTypesAdditionalItems {
+    if (!(isAnySchemaSimpleTypesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSimpleTypesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaStringArrayAdditionalProperties(value: unknown): value is types.SchemaStringArrayAdditionalProperties {
+    if (!(isAnySchemaStringArrayAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaStringArrayAdditionalProperties(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaStringArrayItems(value: unknown): value is types.SchemaStringArrayItems {
@@ -650,6 +826,285 @@ function isStringSchemaStringArrayItems(value: unknown): value is unknown {
     if (typeof value !== "string") {
         return false;
     }
+    return true;
+}
+export function isSchemaStringArrayAdditionalItems(value: unknown): value is types.SchemaStringArrayAdditionalItems {
+    if (!(isAnySchemaStringArrayAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaStringArrayAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaStringArrayItemsAdditionalProperties(value: unknown): value is types.SchemaStringArrayItemsAdditionalProperties {
+    if (!(isAnySchemaStringArrayItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaStringArrayItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaStringArrayItemsAdditionalItems(value: unknown): value is types.SchemaStringArrayItemsAdditionalItems {
+    if (!(isAnySchemaStringArrayItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaStringArrayItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaIdAdditionalProperties(value: unknown): value is types.SchemaIdAdditionalProperties {
+    if (!(isAnySchemaIdAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaIdAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaIdAdditionalItems(value: unknown): value is types.SchemaIdAdditionalItems {
+    if (!(isAnySchemaIdAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaIdAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSchemaAdditionalProperties(value: unknown): value is types.SchemaSchemaAdditionalProperties {
+    if (!(isAnySchemaSchemaAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSchemaAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaSchemaAdditionalItems(value: unknown): value is types.SchemaSchemaAdditionalItems {
+    if (!(isAnySchemaSchemaAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaSchemaAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaTitleAdditionalProperties(value: unknown): value is types.SchemaTitleAdditionalProperties {
+    if (!(isAnySchemaTitleAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaTitleAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaTitleAdditionalItems(value: unknown): value is types.SchemaTitleAdditionalItems {
+    if (!(isAnySchemaTitleAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaTitleAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDescriptionAdditionalProperties(value: unknown): value is types.SchemaDescriptionAdditionalProperties {
+    if (!(isAnySchemaDescriptionAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDescriptionAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDescriptionAdditionalItems(value: unknown): value is types.SchemaDescriptionAdditionalItems {
+    if (!(isAnySchemaDescriptionAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDescriptionAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDefaultAdditionalProperties(value: unknown): value is types.SchemaDefaultAdditionalProperties {
+    if (!(isAnySchemaDefaultAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDefaultAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDefaultAdditionalItems(value: unknown): value is types.SchemaDefaultAdditionalItems {
+    if (!(isAnySchemaDefaultAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDefaultAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMultipleOfAdditionalProperties(value: unknown): value is types.SchemaMultipleOfAdditionalProperties {
+    if (!(isAnySchemaMultipleOfAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMultipleOfAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMultipleOfAdditionalItems(value: unknown): value is types.SchemaMultipleOfAdditionalItems {
+    if (!(isAnySchemaMultipleOfAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMultipleOfAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaximumAdditionalProperties(value: unknown): value is types.SchemaMaximumAdditionalProperties {
+    if (!(isAnySchemaMaximumAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaximumAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaximumAdditionalItems(value: unknown): value is types.SchemaMaximumAdditionalItems {
+    if (!(isAnySchemaMaximumAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaximumAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaExclusiveMaximumAdditionalProperties(value: unknown): value is types.SchemaExclusiveMaximumAdditionalProperties {
+    if (!(isAnySchemaExclusiveMaximumAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaExclusiveMaximumAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaExclusiveMaximumAdditionalItems(value: unknown): value is types.SchemaExclusiveMaximumAdditionalItems {
+    if (!(isAnySchemaExclusiveMaximumAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaExclusiveMaximumAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinimumAdditionalProperties(value: unknown): value is types.SchemaMinimumAdditionalProperties {
+    if (!(isAnySchemaMinimumAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinimumAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinimumAdditionalItems(value: unknown): value is types.SchemaMinimumAdditionalItems {
+    if (!(isAnySchemaMinimumAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinimumAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaExclusiveMinimumAdditionalProperties(value: unknown): value is types.SchemaExclusiveMinimumAdditionalProperties {
+    if (!(isAnySchemaExclusiveMinimumAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaExclusiveMinimumAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaExclusiveMinimumAdditionalItems(value: unknown): value is types.SchemaExclusiveMinimumAdditionalItems {
+    if (!(isAnySchemaExclusiveMinimumAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaExclusiveMinimumAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaxLengthAdditionalProperties(value: unknown): value is types.SchemaMaxLengthAdditionalProperties {
+    if (!(isAnySchemaMaxLengthAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaxLengthAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaxLengthAdditionalItems(value: unknown): value is types.SchemaMaxLengthAdditionalItems {
+    if (!(isAnySchemaMaxLengthAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaxLengthAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinLengthAdditionalProperties(value: unknown): value is types.SchemaMinLengthAdditionalProperties {
+    if (!(isAnySchemaMinLengthAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinLengthAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinLengthAdditionalItems(value: unknown): value is types.SchemaMinLengthAdditionalItems {
+    if (!(isAnySchemaMinLengthAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinLengthAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPatternAdditionalProperties(value: unknown): value is types.SchemaPatternAdditionalProperties {
+    if (!(isAnySchemaPatternAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPatternAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPatternAdditionalItems(value: unknown): value is types.SchemaPatternAdditionalItems {
+    if (!(isAnySchemaPatternAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPatternAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalItemsAdditionalProperties(value: unknown): value is types.SchemaAdditionalItemsAdditionalProperties {
+    if (!(isAnySchemaAdditionalItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalItemsAdditionalItems(value: unknown): value is types.SchemaAdditionalItemsAdditionalItems {
+    if (!(isAnySchemaAdditionalItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItemsAdditionalItems(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaAdditionalItems0(value: unknown): value is types.SchemaAdditionalItems0 {
@@ -670,6 +1125,60 @@ export function isSchemaAdditionalItems1(value: unknown): value is types.SchemaA
     }
     return true;
 }
+export function isSchemaAdditionalItems0AdditionalProperties(value: unknown): value is types.SchemaAdditionalItems0AdditionalProperties {
+    if (!(isAnySchemaAdditionalItems0AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItems0AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalItems0AdditionalItems(value: unknown): value is types.SchemaAdditionalItems0AdditionalItems {
+    if (!(isAnySchemaAdditionalItems0AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItems0AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalItems1AdditionalProperties(value: unknown): value is types.SchemaAdditionalItems1AdditionalProperties {
+    if (!(isAnySchemaAdditionalItems1AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItems1AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalItems1AdditionalItems(value: unknown): value is types.SchemaAdditionalItems1AdditionalItems {
+    if (!(isAnySchemaAdditionalItems1AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalItems1AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaItemsAdditionalProperties(value: unknown): value is types.SchemaItemsAdditionalProperties {
+    if (!(isAnySchemaItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaItemsAdditionalItems(value: unknown): value is types.SchemaItemsAdditionalItems {
+    if (!(isAnySchemaItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
 export function isSchemaItems0(value: unknown): value is types.SchemaItems0 {
     if (!isSchema(value)) {
         return false;
@@ -680,6 +1189,168 @@ export function isSchemaItems1(value: unknown): value is types.SchemaItems1 {
     if (!isSchemaSchemaArray(value)) {
         return false;
     }
+    return true;
+}
+export function isSchemaItems0AdditionalProperties(value: unknown): value is types.SchemaItems0AdditionalProperties {
+    if (!(isAnySchemaItems0AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaItems0AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaItems0AdditionalItems(value: unknown): value is types.SchemaItems0AdditionalItems {
+    if (!(isAnySchemaItems0AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaItems0AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaItems1AdditionalProperties(value: unknown): value is types.SchemaItems1AdditionalProperties {
+    if (!(isAnySchemaItems1AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaItems1AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaItems1AdditionalItems(value: unknown): value is types.SchemaItems1AdditionalItems {
+    if (!(isAnySchemaItems1AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaItems1AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaxItemsAdditionalProperties(value: unknown): value is types.SchemaMaxItemsAdditionalProperties {
+    if (!(isAnySchemaMaxItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaxItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaxItemsAdditionalItems(value: unknown): value is types.SchemaMaxItemsAdditionalItems {
+    if (!(isAnySchemaMaxItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaxItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinItemsAdditionalProperties(value: unknown): value is types.SchemaMinItemsAdditionalProperties {
+    if (!(isAnySchemaMinItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinItemsAdditionalItems(value: unknown): value is types.SchemaMinItemsAdditionalItems {
+    if (!(isAnySchemaMinItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaUniqueItemsAdditionalProperties(value: unknown): value is types.SchemaUniqueItemsAdditionalProperties {
+    if (!(isAnySchemaUniqueItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaUniqueItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaUniqueItemsAdditionalItems(value: unknown): value is types.SchemaUniqueItemsAdditionalItems {
+    if (!(isAnySchemaUniqueItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaUniqueItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaxPropertiesAdditionalProperties(value: unknown): value is types.SchemaMaxPropertiesAdditionalProperties {
+    if (!(isAnySchemaMaxPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaxPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMaxPropertiesAdditionalItems(value: unknown): value is types.SchemaMaxPropertiesAdditionalItems {
+    if (!(isAnySchemaMaxPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMaxPropertiesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinPropertiesAdditionalProperties(value: unknown): value is types.SchemaMinPropertiesAdditionalProperties {
+    if (!(isAnySchemaMinPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaMinPropertiesAdditionalItems(value: unknown): value is types.SchemaMinPropertiesAdditionalItems {
+    if (!(isAnySchemaMinPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaMinPropertiesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaRequiredAdditionalProperties(value: unknown): value is types.SchemaRequiredAdditionalProperties {
+    if (!(isAnySchemaRequiredAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaRequiredAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaRequiredAdditionalItems(value: unknown): value is types.SchemaRequiredAdditionalItems {
+    if (!(isAnySchemaRequiredAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaRequiredAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalPropertiesAdditionalProperties(value: unknown): value is types.SchemaAdditionalPropertiesAdditionalProperties {
+    if (!(isAnySchemaAdditionalPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalPropertiesAdditionalItems(value: unknown): value is types.SchemaAdditionalPropertiesAdditionalItems {
+    if (!(isAnySchemaAdditionalPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalPropertiesAdditionalItems(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaAdditionalProperties0(value: unknown): value is types.SchemaAdditionalProperties0 {
@@ -700,10 +1371,73 @@ export function isSchemaAdditionalProperties1(value: unknown): value is types.Sc
     }
     return true;
 }
+export function isSchemaAdditionalProperties0AdditionalProperties(value: unknown): value is types.SchemaAdditionalProperties0AdditionalProperties {
+    if (!(isAnySchemaAdditionalProperties0AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalProperties0AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalProperties0AdditionalItems(value: unknown): value is types.SchemaAdditionalProperties0AdditionalItems {
+    if (!(isAnySchemaAdditionalProperties0AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalProperties0AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalProperties1AdditionalProperties(value: unknown): value is types.SchemaAdditionalProperties1AdditionalProperties {
+    if (!(isAnySchemaAdditionalProperties1AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalProperties1AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAdditionalProperties1AdditionalItems(value: unknown): value is types.SchemaAdditionalProperties1AdditionalItems {
+    if (!(isAnySchemaAdditionalProperties1AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAdditionalProperties1AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
 export function isSchemaDefinitionsAdditionalProperties(value: unknown): value is types.SchemaDefinitionsAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
+    return true;
+}
+export function isSchemaDefinitionsAdditionalItems(value: unknown): value is types.SchemaDefinitionsAdditionalItems {
+    if (!(isAnySchemaDefinitionsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDefinitionsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDefinitionsAdditionalPropertiesAdditionalProperties(value: unknown): value is types.SchemaDefinitionsAdditionalPropertiesAdditionalProperties {
+    if (!(isAnySchemaDefinitionsAdditionalPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDefinitionsAdditionalPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDefinitionsAdditionalPropertiesAdditionalItems(value: unknown): value is types.SchemaDefinitionsAdditionalPropertiesAdditionalItems {
+    if (!(isAnySchemaDefinitionsAdditionalPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDefinitionsAdditionalPropertiesAdditionalItems(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaPropertiesAdditionalProperties(value: unknown): value is types.SchemaPropertiesAdditionalProperties {
@@ -712,10 +1446,64 @@ export function isSchemaPropertiesAdditionalProperties(value: unknown): value is
     }
     return true;
 }
+export function isSchemaPropertiesAdditionalItems(value: unknown): value is types.SchemaPropertiesAdditionalItems {
+    if (!(isAnySchemaPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPropertiesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPropertiesAdditionalPropertiesAdditionalProperties(value: unknown): value is types.SchemaPropertiesAdditionalPropertiesAdditionalProperties {
+    if (!(isAnySchemaPropertiesAdditionalPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPropertiesAdditionalPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPropertiesAdditionalPropertiesAdditionalItems(value: unknown): value is types.SchemaPropertiesAdditionalPropertiesAdditionalItems {
+    if (!(isAnySchemaPropertiesAdditionalPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPropertiesAdditionalPropertiesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
 export function isSchemaPatternPropertiesAdditionalProperties(value: unknown): value is types.SchemaPatternPropertiesAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
+    return true;
+}
+export function isSchemaPatternPropertiesAdditionalItems(value: unknown): value is types.SchemaPatternPropertiesAdditionalItems {
+    if (!(isAnySchemaPatternPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPatternPropertiesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPatternPropertiesAdditionalPropertiesAdditionalProperties(value: unknown): value is types.SchemaPatternPropertiesAdditionalPropertiesAdditionalProperties {
+    if (!(isAnySchemaPatternPropertiesAdditionalPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPatternPropertiesAdditionalPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaPatternPropertiesAdditionalPropertiesAdditionalItems(value: unknown): value is types.SchemaPatternPropertiesAdditionalPropertiesAdditionalItems {
+    if (!(isAnySchemaPatternPropertiesAdditionalPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaPatternPropertiesAdditionalPropertiesAdditionalItems(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaDependenciesAdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalProperties {
@@ -733,6 +1521,33 @@ function isAnyOfSchemaDependenciesAdditionalProperties(value: unknown): value is
     }
     return false;
 }
+export function isSchemaDependenciesAdditionalItems(value: unknown): value is types.SchemaDependenciesAdditionalItems {
+    if (!(isAnySchemaDependenciesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDependenciesAdditionalPropertiesAdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalPropertiesAdditionalProperties {
+    if (!(isAnySchemaDependenciesAdditionalPropertiesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalPropertiesAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDependenciesAdditionalPropertiesAdditionalItems(value: unknown): value is types.SchemaDependenciesAdditionalPropertiesAdditionalItems {
+    if (!(isAnySchemaDependenciesAdditionalPropertiesAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalPropertiesAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
 export function isSchemaDependenciesAdditionalProperties0(value: unknown): value is types.SchemaDependenciesAdditionalProperties0 {
     if (!isSchema(value)) {
         return false;
@@ -743,6 +1558,78 @@ export function isSchemaDependenciesAdditionalProperties1(value: unknown): value
     if (!isSchemaStringArray(value)) {
         return false;
     }
+    return true;
+}
+export function isSchemaDependenciesAdditionalProperties0AdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalProperties0AdditionalProperties {
+    if (!(isAnySchemaDependenciesAdditionalProperties0AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalProperties0AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDependenciesAdditionalProperties0AdditionalItems(value: unknown): value is types.SchemaDependenciesAdditionalProperties0AdditionalItems {
+    if (!(isAnySchemaDependenciesAdditionalProperties0AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalProperties0AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDependenciesAdditionalProperties1AdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalProperties1AdditionalProperties {
+    if (!(isAnySchemaDependenciesAdditionalProperties1AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalProperties1AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaDependenciesAdditionalProperties1AdditionalItems(value: unknown): value is types.SchemaDependenciesAdditionalProperties1AdditionalItems {
+    if (!(isAnySchemaDependenciesAdditionalProperties1AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaDependenciesAdditionalProperties1AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaEnumAdditionalProperties(value: unknown): value is types.SchemaEnumAdditionalProperties {
+    if (!(isAnySchemaEnumAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaEnumAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaEnumAdditionalItems(value: unknown): value is types.SchemaEnumAdditionalItems {
+    if (!(isAnySchemaEnumAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaEnumAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaTypeAdditionalProperties(value: unknown): value is types.SchemaTypeAdditionalProperties {
+    if (!(isAnySchemaTypeAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaTypeAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaTypeAdditionalItems(value: unknown): value is types.SchemaTypeAdditionalItems {
+    if (!(isAnySchemaTypeAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaTypeAdditionalItems(value: unknown): value is unknown {
     return true;
 }
 export function isSchemaType0(value: unknown): value is types.SchemaType0 {
@@ -777,9 +1664,153 @@ function isArraySchemaType1(value: unknown): value is unknown {
     }
     return true;
 }
+export function isSchemaType0AdditionalProperties(value: unknown): value is types.SchemaType0AdditionalProperties {
+    if (!(isAnySchemaType0AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaType0AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaType0AdditionalItems(value: unknown): value is types.SchemaType0AdditionalItems {
+    if (!(isAnySchemaType0AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaType0AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaType1AdditionalProperties(value: unknown): value is types.SchemaType1AdditionalProperties {
+    if (!(isAnySchemaType1AdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaType1AdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
 export function isSchemaType1Items(value: unknown): value is types.SchemaType1Items {
     if (!isSchemaSimpleTypes(value)) {
         return false;
     }
+    return true;
+}
+export function isSchemaType1AdditionalItems(value: unknown): value is types.SchemaType1AdditionalItems {
+    if (!(isAnySchemaType1AdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaType1AdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaType1ItemsAdditionalProperties(value: unknown): value is types.SchemaType1ItemsAdditionalProperties {
+    if (!(isAnySchemaType1ItemsAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaType1ItemsAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaType1ItemsAdditionalItems(value: unknown): value is types.SchemaType1ItemsAdditionalItems {
+    if (!(isAnySchemaType1ItemsAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaType1ItemsAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaFormatAdditionalProperties(value: unknown): value is types.SchemaFormatAdditionalProperties {
+    if (!(isAnySchemaFormatAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaFormatAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaFormatAdditionalItems(value: unknown): value is types.SchemaFormatAdditionalItems {
+    if (!(isAnySchemaFormatAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaFormatAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAllOfAdditionalProperties(value: unknown): value is types.SchemaAllOfAdditionalProperties {
+    if (!(isAnySchemaAllOfAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAllOfAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAllOfAdditionalItems(value: unknown): value is types.SchemaAllOfAdditionalItems {
+    if (!(isAnySchemaAllOfAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAllOfAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAnyOfAdditionalProperties(value: unknown): value is types.SchemaAnyOfAdditionalProperties {
+    if (!(isAnySchemaAnyOfAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAnyOfAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaAnyOfAdditionalItems(value: unknown): value is types.SchemaAnyOfAdditionalItems {
+    if (!(isAnySchemaAnyOfAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaAnyOfAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaOneOfAdditionalProperties(value: unknown): value is types.SchemaOneOfAdditionalProperties {
+    if (!(isAnySchemaOneOfAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaOneOfAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaOneOfAdditionalItems(value: unknown): value is types.SchemaOneOfAdditionalItems {
+    if (!(isAnySchemaOneOfAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaOneOfAdditionalItems(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaNotAdditionalProperties(value: unknown): value is types.SchemaNotAdditionalProperties {
+    if (!(isAnySchemaNotAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaNotAdditionalProperties(value: unknown): value is unknown {
+    return true;
+}
+export function isSchemaNotAdditionalItems(value: unknown): value is types.SchemaNotAdditionalItems {
+    if (!(isAnySchemaNotAdditionalItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnySchemaNotAdditionalItems(value: unknown): value is unknown {
     return true;
 }

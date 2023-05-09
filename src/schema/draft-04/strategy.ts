@@ -341,7 +341,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
             };
         }
 
-        if (itemsOne.length > 0) {
+        else if (itemsOne.length > 0) {
             const itemTypeNodeIds = itemsOne.map(([itemNodePointer]) => {
                 const itemNodeUrl = new URL(
                     `#${itemNodePointer}`,
@@ -362,7 +362,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
             }
         }
 
-        if (additionalItems.length > 0) {
+        else if (additionalItems.length > 0) {
             const itemTypeNodeIds = additionalItems.map(([itemNodePointer]) => {
                 const itemNodeUrl = new URL(
                     `#${itemNodePointer}`,
@@ -416,7 +416,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
             };
         }
 
-        if (additionalProperties.length > 0) {
+        else if (additionalProperties.length > 0) {
             const propertyTypeNodeIds = additionalProperties.map(([propertyNodePointer]) => {
                 const propertyNodeUrl = new URL(
                     `#${propertyNodePointer}`,
