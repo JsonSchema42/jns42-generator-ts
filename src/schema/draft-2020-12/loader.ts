@@ -95,7 +95,7 @@ export class SchemaLoader extends SchemaStrategyBase<Schema> {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
             const retrievalRefUrl = new URL(nodeRef, retrievalUrl);
             retrievalRefUrl.hash = "";
-            await this.manager.loadFromUrl(
+            await this.context.loadFromUrl(
                 nodeRefUrl,
                 retrievalRefUrl,
                 nodeUrl,
@@ -120,13 +120,13 @@ export class SchemaLoader extends SchemaStrategyBase<Schema> {
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
-        const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
 
         const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
         const hash = nodeRefRetrievalUrl.hash;
         nodeRefRetrievalUrl.hash = "";
         const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-        const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
 
         const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
         let resolvedNodeId = String(resolvedNodeUrl);
@@ -145,13 +145,13 @@ export class SchemaLoader extends SchemaStrategyBase<Schema> {
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
-        const nodeRetrievalUrl = this.manager.getNodeRetrievalUrl(nodeRootId);
+        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
 
         const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
         const hash = nodeRefRetrievalUrl.hash;
         nodeRefRetrievalUrl.hash = "";
         const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-        const nodeRefRootUrl = this.manager.getNodeRootUrl(nodeRefRetrievalId);
+        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
 
         const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
         let resolvedNodeId = String(resolvedNodeUrl);

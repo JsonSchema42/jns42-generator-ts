@@ -6,7 +6,7 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        for (const [nodeId] of this.manager.getTypeNames()) {
+        for (const [nodeId] of this.context.getTypeNames()) {
             yield this.generateTypeDeclarationStatement(
                 nodeId,
             );
@@ -30,7 +30,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             typeDefinition,
         );
 
-        const comments = this.manager.getComments(nodeId);
+        const comments = this.context.getComments(nodeId);
         if (comments.length > 0) {
             ts.addSyntheticLeadingComment(
                 declaration,
@@ -51,7 +51,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         const typeNodes = [...this.generateTypeDefinitionElements(nodeId)];
         const compoundNodes = [...this.generateCompoundDefinitionElements(nodeId)];
 
-        const referencingNodeId = this.manager.getReferencingNodeId(nodeId);
+        const referencingNodeId = this.context.getReferencingNodeId(nodeId);
 
         let node: ts.TypeNode | undefined;
         if (compoundNodes.length > 0) {
@@ -96,7 +96,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected *generateCompoundDefinitionElements(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        for (const compoundDescriptor of this.manager.selectNodeCompoundDescriptors(nodeId)) {
+        for (const compoundDescriptor of this.context.selectNodeCompoundDescriptors(nodeId)) {
             yield this.generateCompoundDefinitionElement(compoundDescriptor);
         }
     }
@@ -104,7 +104,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected *generateTypeDefinitionElements(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        for (const typeDescriptor of this.manager.selectNodeTypeDescriptors(nodeId)) {
+        for (const typeDescriptor of this.context.selectNodeTypeDescriptors(nodeId)) {
             yield this.generateTypeDefinitionElement(typeDescriptor);
         }
     }

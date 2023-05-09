@@ -98,7 +98,7 @@ export class SchemaLoader extends SchemaStrategyBase<Schema | boolean> {
             const nodeRefUrl = new URL(nodeRef, nodeUrl);
             const retrievalRefUrl = new URL(nodeRef, retrievalUrl);
             retrievalRefUrl.hash = "";
-            await this.manager.loadFromUrl(
+            await this.context.loadFromUrl(
                 nodeRefUrl,
                 retrievalRefUrl,
                 nodeUrl,

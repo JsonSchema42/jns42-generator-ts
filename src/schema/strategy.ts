@@ -93,7 +93,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategy {
     public abstract isSchema(node: unknown): node is N
 
     constructor(
-        protected readonly manager: SchemaContext,
+        protected readonly context: SchemaContext,
     ) {
         //
     }

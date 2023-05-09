@@ -67,7 +67,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const [nodeId] of this.manager.getTypeNames()) {
+        for (const [nodeId] of this.context.getTypeNames()) {
             yield* this.generateAssertStatementsForNode(
                 nodeId,
             );
@@ -81,7 +81,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
 
         const typeName = this.getTypeName(nodeId);
 
-        const examples = this.manager.getExamples(nodeId);
+        const examples = this.context.getExamples(nodeId);
 
         for (const example of examples) {
             yield f.createExpressionStatement(f.createCallExpression(

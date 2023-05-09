@@ -18,7 +18,7 @@ export interface PackageOptions {
 
 export function generatePackage(
     factory: ts.NodeFactory,
-    manager: SchemaContext,
+    context: SchemaContext,
     namer: Namer,
     options: PackageOptions,
 ) {
@@ -43,7 +43,7 @@ export function generatePackage(
         const codeGenerator = new MainTsCodeGenerator(
             factory,
             namer,
-            manager,
+            context,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.ts");
@@ -55,7 +55,7 @@ export function generatePackage(
         const codeGenerator = new TypesTsCodeGenerator(
             factory,
             namer,
-            manager,
+            context,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "types.ts");
@@ -67,7 +67,7 @@ export function generatePackage(
         const codeGenerator = new ValidatorsTsCodeGenerator(
             factory,
             namer,
-            manager,
+            context,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
@@ -79,7 +79,7 @@ export function generatePackage(
         const codeGenerator = new ExamplesSpecsTsCodeGenerator(
             factory,
             namer,
-            manager,
+            context,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "examples.spec.ts");

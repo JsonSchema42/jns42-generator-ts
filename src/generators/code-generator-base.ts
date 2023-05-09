@@ -6,7 +6,7 @@ export abstract class CodeGeneratorBase {
     constructor(
         protected readonly factory: ts.NodeFactory,
         protected readonly namer: Namer,
-        protected readonly manager: SchemaContext,
+        protected readonly context: SchemaContext,
     ) {
 
     }
