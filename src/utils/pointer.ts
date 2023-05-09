@@ -3,3 +3,4 @@ export function appendJsonPointer(basePointer: string, ...subPointerParts: strin
         map(part => "/" + encodeURI(part)).
         join("");
 }
+

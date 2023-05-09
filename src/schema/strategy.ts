@@ -1,12 +1,10 @@
 import { SchemaContext } from "./context.js";
-import { CompoundDescriptorUnion, TypeDescriptorUnion } from "./descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./descriptors.js";
 
 export interface SchemaStrategyInterface {
-    getComments(nodeId: string): string
-    getExamples(nodeId: string): unknown[];
-    getReferencingNodeId(nodeId: string): string | undefined;
-    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>;
-    selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>;
+    selectNodeDescriptors(): Iterable<NodeDescriptor>
+    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>
+    selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -23,13 +21,7 @@ export interface SchemaStrategyNodeItem<N> {
 
 export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
-    public abstract getComments(
-        nodeId: string
-    ): string
-
-    public abstract getExamples(
-        nodeId: string
-    ): unknown[]
+    public abstract selectNodeDescriptors(): Iterable<NodeDescriptor>
 
     public abstract selectNodeTypeDescriptors(
         nodeId: string
@@ -184,5 +176,8 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return item;
     }
 
+    public getNodeItemEntries() {
+        return this.nodeMap.entries();
+    }
 }
 

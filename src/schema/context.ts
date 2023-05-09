@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
-import { CompoundDescriptorUnion, TypeDescriptorUnion } from "./descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./descriptors.js";
 import { SchemaStrategyBase, SchemaStrategyInterface } from "./strategy.js";
 
 export class SchemaContext implements SchemaStrategyInterface {
@@ -28,15 +28,15 @@ export class SchemaContext implements SchemaStrategyInterface {
         const metaSchemaId = this.discoverMetaSchemaId(rootNode) ??
             defaultMetaSchemaId;
 
-        const loader: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
-        await loader.loadRootNode(
+        await strategy.loadRootNode(
             rootNode,
             rootNodeUrl,
             referencingNodeUrl,
         );
 
-        for (const nodeUrl of loader.indexRootNode(rootNodeUrl)) {
+        for (const nodeUrl of strategy.indexRootNode(rootNodeUrl)) {
             const nodeId = String(nodeUrl);
             this.nodeMetaMap.set(nodeId, metaSchemaId);
         }
@@ -62,13 +62,13 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         const metaSchemaId = this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
-        const loader: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
-        if (!loader.isSchema(rootNode)) {
+        if (!strategy.isSchema(rootNode)) {
             throw new TypeError("invalid schema");
         }
 
-        rootNodeUrl = loader.selectNodeUrl(rootNode) ?? rootNodeUrl;
+        rootNodeUrl = strategy.selectNodeUrl(rootNode) ?? rootNodeUrl;
 
         const rootNodeId = String(rootNodeUrl);
 
@@ -78,7 +78,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         for (
             const [subNodeUrl, subRetrievalUrl] of
-            loader.getReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
+            strategy.getReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
         ) {
             await this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
         }
@@ -119,8 +119,8 @@ export class SchemaContext implements SchemaStrategyInterface {
     private discoverMetaSchemaId(
         node: unknown,
     ) {
-        for (const [metaSchemaId, loader] of Object.entries(this.strategies)) {
-            if (loader.isSchemaRootNode(node)) {
+        for (const [metaSchemaId, strategy] of Object.entries(this.strategies)) {
+            if (strategy.isSchemaRootNode(node)) {
                 return metaSchemaId;
             }
         }
@@ -148,9 +148,9 @@ export class SchemaContext implements SchemaStrategyInterface {
         const reReplace = /[^A-Za-z0-9-_]/gu;
         const reFilter = /^[A-Za-z-_]/u;
 
-        const loader: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
-        const item = loader.getNodeItem(nodeId);
+        const item = strategy.getNodeItem(nodeId);
 
         const {
             node,
@@ -185,7 +185,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         for (
             const [subNodePointer] of
-            loader.selectSubNodeEntries(nodePointer, node)
+            strategy.selectSubNodeEntries(nodePointer, node)
         ) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
             const subNodeId = String(subNodeUrl);
@@ -197,34 +197,10 @@ export class SchemaContext implements SchemaStrategyInterface {
         }
     }
 
-    public getComments(nodeId: string) {
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("meta schema id not found");
+    public *selectNodeDescriptors(): Iterable<NodeDescriptor> {
+        for (const strategy of Object.values(this.strategies)) {
+            yield* strategy.selectNodeDescriptors();
         }
-
-        const loader = this.strategies[metaSchemaId];
-        return loader.getComments(nodeId);
-    }
-
-    public getExamples(nodeId: string) {
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("meta schema id not found");
-        }
-
-        const loader = this.strategies[metaSchemaId];
-        return loader.getExamples(nodeId);
-    }
-
-    public getReferencingNodeId(nodeId: string): string | undefined {
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("meta schema id not found");
-        }
-
-        const loader = this.strategies[metaSchemaId];
-        return loader.getReferencingNodeId(nodeId);
     }
 
     public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion> {
@@ -233,8 +209,8 @@ export class SchemaContext implements SchemaStrategyInterface {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.strategies[metaSchemaId];
-        return loader.selectNodeTypeDescriptors(nodeId);
+        const strategy = this.strategies[metaSchemaId];
+        return strategy.selectNodeTypeDescriptors(nodeId);
     }
 
     public selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion> {
@@ -243,8 +219,8 @@ export class SchemaContext implements SchemaStrategyInterface {
             throw new Error("meta schema id not found");
         }
 
-        const loader = this.strategies[metaSchemaId];
-        return loader.selectNodeCompoundDescriptors(nodeId);
+        const strategy = this.strategies[metaSchemaId];
+        return strategy.selectNodeCompoundDescriptors(nodeId);
     }
 
 }

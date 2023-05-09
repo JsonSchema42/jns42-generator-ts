@@ -9,199 +9,6 @@
 /* spellchecker: disable */
 
 import * as types from "./types.js";
-export function isSchema(value: unknown): value is types.Schema {
-    if (!(isInterfaceSchema(value) || isBooleanSchema(value))) {
-        return false;
-    }
-    if (!(isAllOfSchema(value))) {
-        return false;
-    }
-    return true;
-}
-function isInterfaceSchema(value: unknown): value is unknown {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-        return false;
-    }
-    for (const propertyName in value) {
-        const propertyValue = value[propertyName as keyof typeof value];
-        switch (propertyName) {
-            case "definitions":
-                if (!isSchemaDefinitions(propertyValue)) {
-                    return false;
-                }
-                break;
-            case "dependencies":
-                if (!isSchemaDependencies(propertyValue)) {
-                    return false;
-                }
-                break;
-            case "$recursiveAnchor":
-                if (!isSchemaRecursiveAnchor(propertyValue)) {
-                    return false;
-                }
-                break;
-            case "$recursiveRef":
-                if (!isSchemaRecursiveRef(propertyValue)) {
-                    return false;
-                }
-                break;
-        }
-    }
-    return true;
-}
-function isBooleanSchema(value: unknown): value is unknown {
-    if (typeof value !== "boolean") {
-        return false;
-    }
-    return true;
-}
-function isAllOfSchema(value: unknown): value is unknown {
-    if (!isSchema0(value)) {
-        return false;
-    }
-    if (!isSchema1(value)) {
-        return false;
-    }
-    if (!isSchema2(value)) {
-        return false;
-    }
-    if (!isSchema3(value)) {
-        return false;
-    }
-    if (!isSchema4(value)) {
-        return false;
-    }
-    if (!isSchema5(value)) {
-        return false;
-    }
-    if (!isSchema6(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchemaDefinitions(value: unknown): value is types.SchemaDefinitions {
-    if (!(isRecordSchemaDefinitions(value))) {
-        return false;
-    }
-    return true;
-}
-function isRecordSchemaDefinitions(value: unknown): value is unknown {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-        return false;
-    }
-    for (const propertyName in value) {
-        const propertyValue = value[propertyName as keyof typeof value];
-        if (!isSchemaDefinitionsAdditionalProperties(propertyValue)) {
-            return false;
-        }
-    }
-    return true;
-}
-export function isSchemaDefinitionsAdditionalProperties(value: unknown): value is types.SchemaDefinitionsAdditionalProperties {
-    if (!isSchema(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchemaDependencies(value: unknown): value is types.SchemaDependencies {
-    if (!(isRecordSchemaDependencies(value))) {
-        return false;
-    }
-    return true;
-}
-function isRecordSchemaDependencies(value: unknown): value is unknown {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-        return false;
-    }
-    for (const propertyName in value) {
-        const propertyValue = value[propertyName as keyof typeof value];
-        if (!isSchemaDependenciesAdditionalProperties(propertyValue)) {
-            return false;
-        }
-    }
-    return true;
-}
-export function isSchemaDependenciesAdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalProperties {
-    if (!(isAnyOfSchemaDependenciesAdditionalProperties(value))) {
-        return false;
-    }
-    return true;
-}
-function isAnyOfSchemaDependenciesAdditionalProperties(value: unknown): value is unknown {
-    if (isSchemaDependenciesAdditionalProperties0(value)) {
-        return true;
-    }
-    if (isSchemaDependenciesAdditionalProperties1(value)) {
-        return true;
-    }
-    return false;
-}
-export function isSchemaDependenciesAdditionalProperties0(value: unknown): value is types.SchemaDependenciesAdditionalProperties0 {
-    if (!isSchema(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchemaDependenciesAdditionalProperties1(value: unknown): value is types.SchemaDependenciesAdditionalProperties1 {
-    if (!isValidationStringArray(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchemaRecursiveAnchor(value: unknown): value is types.SchemaRecursiveAnchor {
-    if (!isCoreAnchorString(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchemaRecursiveRef(value: unknown): value is types.SchemaRecursiveRef {
-    if (!isCoreUriReferenceString(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema0(value: unknown): value is types.Schema0 {
-    if (!isCore(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema1(value: unknown): value is types.Schema1 {
-    if (!isApplicator(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema2(value: unknown): value is types.Schema2 {
-    if (!isUnevaluated(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema3(value: unknown): value is types.Schema3 {
-    if (!isValidation(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema4(value: unknown): value is types.Schema4 {
-    if (!isMetaData(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema5(value: unknown): value is types.Schema5 {
-    if (!isFormatAnnotation(value)) {
-        return false;
-    }
-    return true;
-}
-export function isSchema6(value: unknown): value is types.Schema6 {
-    if (!isContent(value)) {
-        return false;
-    }
-    return true;
-}
 export function isCore(value: unknown): value is types.Core {
     if (!(isInterfaceCore(value) || isBooleanCore(value))) {
         return false;
@@ -363,18 +170,6 @@ function isRecordCoreVocabulary(value: unknown): value is unknown {
     }
     return true;
 }
-export function isCoreVocabularyAdditionalProperties(value: unknown): value is types.CoreVocabularyAdditionalProperties {
-    if (!(isBooleanCoreVocabularyAdditionalProperties(value))) {
-        return false;
-    }
-    return true;
-}
-function isBooleanCoreVocabularyAdditionalProperties(value: unknown): value is unknown {
-    if (typeof value !== "boolean") {
-        return false;
-    }
-    return true;
-}
 export function isCoreComment(value: unknown): value is types.CoreComment {
     if (!(isStringCoreComment(value))) {
         return false;
@@ -402,6 +197,18 @@ function isRecordCoreDefs(value: unknown): value is unknown {
         if (!isCoreDefsAdditionalProperties(propertyValue)) {
             return false;
         }
+    }
+    return true;
+}
+export function isCoreVocabularyAdditionalProperties(value: unknown): value is types.CoreVocabularyAdditionalProperties {
+    if (!(isBooleanCoreVocabularyAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isBooleanCoreVocabularyAdditionalProperties(value: unknown): value is unknown {
+    if (typeof value !== "boolean") {
+        return false;
     }
     return true;
 }
@@ -530,12 +337,6 @@ function isArrayApplicatorSchemaArray(value: unknown): value is unknown {
     }
     return true;
 }
-export function isApplicatorSchemaArrayItems(value: unknown): value is types.ApplicatorSchemaArrayItems {
-    if (!isSchema(value)) {
-        return false;
-    }
-    return true;
-}
 export function isApplicatorPrefixItems(value: unknown): value is types.ApplicatorPrefixItems {
     if (!isApplicatorSchemaArray(value)) {
         return false;
@@ -578,12 +379,6 @@ function isRecordApplicatorProperties(value: unknown): value is unknown {
     }
     return true;
 }
-export function isApplicatorPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPropertiesAdditionalProperties {
-    if (!isSchema(value)) {
-        return false;
-    }
-    return true;
-}
 export function isApplicatorPatternProperties(value: unknown): value is types.ApplicatorPatternProperties {
     if (!(isRecordApplicatorPatternProperties(value))) {
         return false;
@@ -602,12 +397,6 @@ function isRecordApplicatorPatternProperties(value: unknown): value is unknown {
     }
     return true;
 }
-export function isApplicatorPatternPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPatternPropertiesAdditionalProperties {
-    if (!isSchema(value)) {
-        return false;
-    }
-    return true;
-}
 export function isApplicatorDependentSchemas(value: unknown): value is types.ApplicatorDependentSchemas {
     if (!(isRecordApplicatorDependentSchemas(value))) {
         return false;
@@ -623,12 +412,6 @@ function isRecordApplicatorDependentSchemas(value: unknown): value is unknown {
         if (!isApplicatorDependentSchemasAdditionalProperties(propertyValue)) {
             return false;
         }
-    }
-    return true;
-}
-export function isApplicatorDependentSchemasAdditionalProperties(value: unknown): value is types.ApplicatorDependentSchemasAdditionalProperties {
-    if (!isSchema(value)) {
-        return false;
     }
     return true;
 }
@@ -675,6 +458,30 @@ export function isApplicatorOneOf(value: unknown): value is types.ApplicatorOneO
     return true;
 }
 export function isApplicatorNot(value: unknown): value is types.ApplicatorNot {
+    if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isApplicatorSchemaArrayItems(value: unknown): value is types.ApplicatorSchemaArrayItems {
+    if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isApplicatorPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPropertiesAdditionalProperties {
+    if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isApplicatorPatternPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPatternPropertiesAdditionalProperties {
+    if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isApplicatorDependentSchemasAdditionalProperties(value: unknown): value is types.ApplicatorDependentSchemasAdditionalProperties {
     if (!isSchema(value)) {
         return false;
     }
@@ -898,18 +705,6 @@ function isArrayValidationStringArray(value: unknown): value is unknown {
     }
     return true;
 }
-export function isValidationStringArrayItems(value: unknown): value is types.ValidationStringArrayItems {
-    if (!(isStringValidationStringArrayItems(value))) {
-        return false;
-    }
-    return true;
-}
-function isStringValidationStringArrayItems(value: unknown): value is unknown {
-    if (typeof value !== "string") {
-        return false;
-    }
-    return true;
-}
 export function isValidationType(value: unknown): value is types.ValidationType {
     if (!(isAnyOfValidationType(value))) {
         return false;
@@ -924,44 +719,6 @@ function isAnyOfValidationType(value: unknown): value is unknown {
         return true;
     }
     return false;
-}
-export function isValidationType0(value: unknown): value is types.ValidationType0 {
-    if (!isValidationSimpleTypes(value)) {
-        return false;
-    }
-    return true;
-}
-export function isValidationType1(value: unknown): value is types.ValidationType1 {
-    if (!(isArrayValidationType1(value))) {
-        return false;
-    }
-    return true;
-}
-function isArrayValidationType1(value: unknown): value is unknown {
-    if (!Array.isArray(value)) {
-        return false;
-    }
-    if (value.length < 1) {
-        return false;
-    }
-    const elementValueSeen = new Set<types.ValidationType1Items>();
-    for (const elementIndex in value) {
-        const elementValue = value[elementIndex];
-        if (elementValueSeen.has(elementValue)) {
-            return false;
-        }
-        elementValueSeen.add(elementValue);
-        if (!isValidationType1Items(elementValue)) {
-            return false;
-        }
-    }
-    return true;
-}
-export function isValidationType1Items(value: unknown): value is types.ValidationType1Items {
-    if (!isValidationSimpleTypes(value)) {
-        return false;
-    }
-    return true;
 }
 export function isValidationConst(value: unknown): value is types.ValidationConst {
     if (!(isAnyValidationConst(value))) {
@@ -988,15 +745,6 @@ function isArrayValidationEnum(value: unknown): value is unknown {
             return false;
         }
     }
-    return true;
-}
-export function isValidationEnumItems(value: unknown): value is types.ValidationEnumItems {
-    if (!(isAnyValidationEnumItems(value))) {
-        return false;
-    }
-    return true;
-}
-function isAnyValidationEnumItems(value: unknown): value is unknown {
     return true;
 }
 export function isValidationMultipleOf(value: unknown): value is types.ValidationMultipleOf {
@@ -1156,6 +904,65 @@ function isRecordValidationDependentRequired(value: unknown): value is unknown {
             return false;
         }
     }
+    return true;
+}
+export function isValidationStringArrayItems(value: unknown): value is types.ValidationStringArrayItems {
+    if (!(isStringValidationStringArrayItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isStringValidationStringArrayItems(value: unknown): value is unknown {
+    if (typeof value !== "string") {
+        return false;
+    }
+    return true;
+}
+export function isValidationType0(value: unknown): value is types.ValidationType0 {
+    if (!isValidationSimpleTypes(value)) {
+        return false;
+    }
+    return true;
+}
+export function isValidationType1(value: unknown): value is types.ValidationType1 {
+    if (!(isArrayValidationType1(value))) {
+        return false;
+    }
+    return true;
+}
+function isArrayValidationType1(value: unknown): value is unknown {
+    if (!Array.isArray(value)) {
+        return false;
+    }
+    if (value.length < 1) {
+        return false;
+    }
+    const elementValueSeen = new Set<types.ValidationType1Items>();
+    for (const elementIndex in value) {
+        const elementValue = value[elementIndex];
+        if (elementValueSeen.has(elementValue)) {
+            return false;
+        }
+        elementValueSeen.add(elementValue);
+        if (!isValidationType1Items(elementValue)) {
+            return false;
+        }
+    }
+    return true;
+}
+export function isValidationType1Items(value: unknown): value is types.ValidationType1Items {
+    if (!isValidationSimpleTypes(value)) {
+        return false;
+    }
+    return true;
+}
+export function isValidationEnumItems(value: unknown): value is types.ValidationEnumItems {
+    if (!(isAnyValidationEnumItems(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnyValidationEnumItems(value: unknown): value is unknown {
     return true;
 }
 export function isValidationDependentRequiredAdditionalProperties(value: unknown): value is types.ValidationDependentRequiredAdditionalProperties {
@@ -1422,6 +1229,199 @@ function isStringContentContentMediaType(value: unknown): value is unknown {
 }
 export function isContentContentSchema(value: unknown): value is types.ContentContentSchema {
     if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema(value: unknown): value is types.Schema {
+    if (!(isInterfaceSchema(value) || isBooleanSchema(value))) {
+        return false;
+    }
+    if (!(isAllOfSchema(value))) {
+        return false;
+    }
+    return true;
+}
+function isInterfaceSchema(value: unknown): value is unknown {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false;
+    }
+    for (const propertyName in value) {
+        const propertyValue = value[propertyName as keyof typeof value];
+        switch (propertyName) {
+            case "definitions":
+                if (!isSchemaDefinitions(propertyValue)) {
+                    return false;
+                }
+                break;
+            case "dependencies":
+                if (!isSchemaDependencies(propertyValue)) {
+                    return false;
+                }
+                break;
+            case "$recursiveAnchor":
+                if (!isSchemaRecursiveAnchor(propertyValue)) {
+                    return false;
+                }
+                break;
+            case "$recursiveRef":
+                if (!isSchemaRecursiveRef(propertyValue)) {
+                    return false;
+                }
+                break;
+        }
+    }
+    return true;
+}
+function isBooleanSchema(value: unknown): value is unknown {
+    if (typeof value !== "boolean") {
+        return false;
+    }
+    return true;
+}
+function isAllOfSchema(value: unknown): value is unknown {
+    if (!isSchema0(value)) {
+        return false;
+    }
+    if (!isSchema1(value)) {
+        return false;
+    }
+    if (!isSchema2(value)) {
+        return false;
+    }
+    if (!isSchema3(value)) {
+        return false;
+    }
+    if (!isSchema4(value)) {
+        return false;
+    }
+    if (!isSchema5(value)) {
+        return false;
+    }
+    if (!isSchema6(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchemaDefinitions(value: unknown): value is types.SchemaDefinitions {
+    if (!(isRecordSchemaDefinitions(value))) {
+        return false;
+    }
+    return true;
+}
+function isRecordSchemaDefinitions(value: unknown): value is unknown {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false;
+    }
+    for (const propertyName in value) {
+        const propertyValue = value[propertyName as keyof typeof value];
+        if (!isSchemaDefinitionsAdditionalProperties(propertyValue)) {
+            return false;
+        }
+    }
+    return true;
+}
+export function isSchemaDependencies(value: unknown): value is types.SchemaDependencies {
+    if (!(isRecordSchemaDependencies(value))) {
+        return false;
+    }
+    return true;
+}
+function isRecordSchemaDependencies(value: unknown): value is unknown {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false;
+    }
+    for (const propertyName in value) {
+        const propertyValue = value[propertyName as keyof typeof value];
+        if (!isSchemaDependenciesAdditionalProperties(propertyValue)) {
+            return false;
+        }
+    }
+    return true;
+}
+export function isSchemaRecursiveAnchor(value: unknown): value is types.SchemaRecursiveAnchor {
+    if (!isCoreAnchorString(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchemaRecursiveRef(value: unknown): value is types.SchemaRecursiveRef {
+    if (!isCoreUriReferenceString(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema0(value: unknown): value is types.Schema0 {
+    if (!isCore(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema1(value: unknown): value is types.Schema1 {
+    if (!isApplicator(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema2(value: unknown): value is types.Schema2 {
+    if (!isUnevaluated(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema3(value: unknown): value is types.Schema3 {
+    if (!isValidation(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema4(value: unknown): value is types.Schema4 {
+    if (!isMetaData(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema5(value: unknown): value is types.Schema5 {
+    if (!isFormatAnnotation(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchema6(value: unknown): value is types.Schema6 {
+    if (!isContent(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchemaDefinitionsAdditionalProperties(value: unknown): value is types.SchemaDefinitionsAdditionalProperties {
+    if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchemaDependenciesAdditionalProperties(value: unknown): value is types.SchemaDependenciesAdditionalProperties {
+    if (!(isAnyOfSchemaDependenciesAdditionalProperties(value))) {
+        return false;
+    }
+    return true;
+}
+function isAnyOfSchemaDependenciesAdditionalProperties(value: unknown): value is unknown {
+    if (isSchemaDependenciesAdditionalProperties0(value)) {
+        return true;
+    }
+    if (isSchemaDependenciesAdditionalProperties1(value)) {
+        return true;
+    }
+    return false;
+}
+export function isSchemaDependenciesAdditionalProperties0(value: unknown): value is types.SchemaDependenciesAdditionalProperties0 {
+    if (!isSchema(value)) {
+        return false;
+    }
+    return true;
+}
+export function isSchemaDependenciesAdditionalProperties1(value: unknown): value is types.SchemaDependenciesAdditionalProperties1 {
+    if (!isValidationStringArray(value)) {
         return false;
     }
     return true;

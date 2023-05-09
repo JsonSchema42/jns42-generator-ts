@@ -1,5 +1,5 @@
 import assert from "assert";
-import { CompoundDescriptorUnion, TypeDescriptorUnion } from "../descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../descriptors.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeDescription, selectNodeId, selectNodeRef, selectNodeSchema, selectSubNodes } from "./selectors.js";
@@ -127,6 +127,11 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     public getExamples(nodeId: string): unknown[] {
         throw new Error("not implemented");
+    }
+
+    public *selectNodeDescriptors(
+    ): Iterable<NodeDescriptor> {
+        yield* [];
     }
 
     public selectNodeTypeDescriptors(

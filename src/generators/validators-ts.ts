@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import ts from "typescript";
-import { ArrayTypeDescriptor, BooleanTypeDescriptor, CompoundDescriptorUnion, InterfaceTypeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/descriptors.js";
+import { ArrayTypeDescriptor, BooleanTypeDescriptor, CompoundDescriptorUnion, InterfaceTypeDescriptor, NodeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -18,19 +18,19 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createStringLiteral("./types.js"),
         );
 
-        for (const [nodeId] of this.context.getTypeNames()) {
+        for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
             yield* this.generateValidatorFunctionDeclarationStatements(
-                nodeId,
+                nodeDescriptor,
             );
         }
     }
 
     protected * generateValidatorFunctionDeclarationStatements(
-        nodeId: string,
+        nodeDescriptor: NodeDescriptor,
     ): Iterable<ts.FunctionDeclaration> {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeId);
+        const typeName = this.getTypeName(nodeDescriptor.nodeId);
 
         yield f.createFunctionDeclaration(
             [
@@ -51,14 +51,17 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createTypePredicateNode(
                 undefined,
                 f.createIdentifier("value"),
-                this.generateTypeReference(nodeId),
+                this.generateTypeReference(nodeDescriptor.nodeId),
             ),
             f.createBlock([
-                ...this.generateValidatorFunctionBodyStatements(nodeId),
+                ...this.generateValidatorFunctionBodyStatements(nodeDescriptor),
             ], true),
         );
 
-        for (const typeDescriptor of this.context.selectNodeTypeDescriptors(nodeId)) {
+        for (
+            const typeDescriptor of
+            this.context.selectNodeTypeDescriptors(nodeDescriptor.nodeId)
+        ) {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
@@ -79,12 +82,15 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
                 f.createBlock([
-                    ...this.generateTypeValidationStatements(nodeId, typeDescriptor),
+                    ...this.generateTypeValidationStatements(nodeDescriptor.nodeId, typeDescriptor),
                 ], true),
             );
         }
 
-        for (const compoundDescriptor of this.context.selectNodeCompoundDescriptors(nodeId)) {
+        for (
+            const compoundDescriptor of
+            this.context.selectNodeCompoundDescriptors(nodeDescriptor.nodeId)
+        ) {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
@@ -105,7 +111,10 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
                 f.createBlock([
-                    ...this.generateCompoundValidationStatements(nodeId, compoundDescriptor),
+                    ...this.generateCompoundValidationStatements(
+                        nodeDescriptor.nodeId,
+                        compoundDescriptor,
+                    ),
                 ], true),
             );
         }
@@ -113,17 +122,20 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateValidatorFunctionBodyStatements(
-        nodeId: string,
+        nodeDescriptor: NodeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeId);
-        const typeDescriptors = [...this.context.selectNodeTypeDescriptors(nodeId)];
-        const compoundDescriptors = [...this.context.selectNodeCompoundDescriptors(nodeId)];
+        const typeName = this.getTypeName(nodeDescriptor.nodeId);
+        const typeDescriptors = [
+            ...this.context.selectNodeTypeDescriptors(nodeDescriptor.nodeId),
+        ];
+        const compoundDescriptors = [
+            ...this.context.selectNodeCompoundDescriptors(nodeDescriptor.nodeId),
+        ];
 
-        const referencingNodeId = this.context.getReferencingNodeId(nodeId);
-        if (referencingNodeId != null) {
-            const referencingTypeName = this.getTypeName(referencingNodeId);
+        if (nodeDescriptor.superNodeId != null) {
+            const referencingTypeName = this.getTypeName(nodeDescriptor.superNodeId);
 
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(

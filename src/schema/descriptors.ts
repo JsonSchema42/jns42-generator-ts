@@ -1,3 +1,11 @@
+export interface NodeDescriptor {
+    nodeId: string
+    superNodeId?: string
+    deprecated: boolean
+    description: string
+    examples: unknown[]
+}
+
 export type TypeDescriptorUnion =
     NullTypeDescriptor |
     AnyTypeDescriptor |

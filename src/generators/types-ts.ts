@@ -1,25 +1,25 @@
 import ts from "typescript";
-import { CompoundDescriptorUnion, TypeDescriptorUnion } from "../schema/descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../schema/descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        for (const [nodeId] of this.context.getTypeNames()) {
+        for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
             yield this.generateTypeDeclarationStatement(
-                nodeId,
+                nodeDescriptor,
             );
         }
     }
 
     protected generateTypeDeclarationStatement(
-        nodeId: string,
+        nodeDescriptor: NodeDescriptor,
     ) {
         const typeDefinition = this.generateTypeDefinition(
-            nodeId,
+            nodeDescriptor,
         );
 
-        const typeName = this.getTypeName(nodeId);
+        const typeName = this.getTypeName(nodeDescriptor.nodeId);
         const declaration = this.factory.createTypeAliasDeclaration(
             [
                 this.factory.createToken(ts.SyntaxKind.ExportKeyword),
@@ -29,7 +29,15 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             typeDefinition,
         );
 
-        const comments = this.context.getComments(nodeId);
+        const comments = [
+            nodeDescriptor.description,
+            nodeDescriptor.deprecated ? "@deprecated" : "",
+        ].
+            map(line => line.trim()).
+            filter(line => line.length > 0).
+            map(line => line + "\n").
+            join("");
+
         if (comments.length > 0) {
             ts.addSyntheticLeadingComment(
                 declaration,
@@ -43,14 +51,12 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateTypeDefinition(
-        nodeId: string,
+        nodeDescriptor: NodeDescriptor,
     ): ts.TypeNode {
         const { factory: f } = this;
 
-        const typeNodes = [...this.generateTypeDefinitionElements(nodeId)];
-        const compoundNodes = [...this.generateCompoundDefinitionElements(nodeId)];
-
-        const referencingNodeId = this.context.getReferencingNodeId(nodeId);
+        const typeNodes = [...this.generateTypeDefinitionElements(nodeDescriptor.nodeId)];
+        const compoundNodes = [...this.generateCompoundDefinitionElements(nodeDescriptor.nodeId)];
 
         let node: ts.TypeNode | undefined;
         if (compoundNodes.length > 0) {
@@ -75,8 +81,8 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
                     typeNode,
                 ]));
         }
-        if (referencingNodeId != null) {
-            const typeNode = this.generateTypeReference(referencingNodeId);
+        if (nodeDescriptor.superNodeId != null) {
+            const typeNode = this.generateTypeReference(nodeDescriptor.superNodeId);
             node = node == null ?
                 typeNode :
                 f.createParenthesizedType(f.createIntersectionTypeNode([

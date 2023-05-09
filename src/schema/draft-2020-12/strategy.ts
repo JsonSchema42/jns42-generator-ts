@@ -1,5 +1,5 @@
 import assert from "assert";
-import { CompoundDescriptorUnion, TypeDescriptorUnion } from "../descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../descriptors.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeExamples, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
@@ -232,30 +232,23 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         );
     }
 
-    public getComments(nodeId: string): string {
-        const nodeItem = this.getNodeItem(nodeId);
+    public * selectNodeDescriptors(
+    ): Iterable<NodeDescriptor> {
+        for (const [nodeId, { node }] of this.getNodeItemEntries()) {
+            const description = selectNodeDescription(node) ?? "";
+            const deprecated = selectNodeDeprecated(node) ?? false;
+            const examples = selectNodeExamples(node) ?? [];
 
-        const description = selectNodeDescription(nodeItem.node) ?? "";
-        const deprecated = selectNodeDeprecated(nodeItem.node) ?? false;
+            const superNodeId = this.getReferencingNodeId(nodeId);
 
-        const lines = [
-            description,
-            deprecated ? "@deprecated" : "",
-        ].
-            map(line => line.trim()).
-            filter(line => line.length > 0).
-            map(line => line + "\n").
-            join("");
-
-        return lines;
-    }
-
-    public getExamples(nodeId: string): unknown[] {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const examples = selectNodeExamples(nodeItem.node) ?? [];
-
-        return examples;
+            yield {
+                nodeId,
+                superNodeId,
+                deprecated,
+                description,
+                examples,
+            };
+        }
     }
 
     public *selectNodeTypeDescriptors(

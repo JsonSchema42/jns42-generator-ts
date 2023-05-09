@@ -8,39 +8,6 @@
 /* eslint-disable */
 /* spellchecker: disable */
 
-export type Schema = (((Schema0 & Schema1 & Schema2 & Schema3 & Schema4 & Schema5 & Schema6)) & ({
-    definitions?: SchemaDefinitions;
-    dependencies?: SchemaDependencies;
-    $recursiveAnchor?: SchemaRecursiveAnchor;
-    $recursiveRef?: SchemaRecursiveRef;
-} | boolean));
-/**
-@deprecated
-*/
-export type SchemaDefinitions = (Record<string, SchemaDefinitionsAdditionalProperties>);
-export type SchemaDefinitionsAdditionalProperties = Schema;
-/**
-@deprecated
-*/
-export type SchemaDependencies = (Record<string, SchemaDependenciesAdditionalProperties>);
-export type SchemaDependenciesAdditionalProperties = ((Partial<SchemaDependenciesAdditionalProperties0> & Partial<SchemaDependenciesAdditionalProperties1>));
-export type SchemaDependenciesAdditionalProperties0 = Schema;
-export type SchemaDependenciesAdditionalProperties1 = ValidationStringArray;
-/**
-@deprecated
-*/
-export type SchemaRecursiveAnchor = CoreAnchorString;
-/**
-@deprecated
-*/
-export type SchemaRecursiveRef = CoreUriReferenceString;
-export type Schema0 = Core;
-export type Schema1 = Applicator;
-export type Schema2 = Unevaluated;
-export type Schema3 = Validation;
-export type Schema4 = MetaData;
-export type Schema5 = FormatAnnotation;
-export type Schema6 = Content;
 export type Core = ({
     $id?: CoreId;
     $schema?: CoreSchema;
@@ -62,9 +29,9 @@ export type CoreAnchor = CoreAnchorString;
 export type CoreDynamicRef = CoreUriReferenceString;
 export type CoreDynamicAnchor = CoreAnchorString;
 export type CoreVocabulary = (Record<string, CoreVocabularyAdditionalProperties>);
-export type CoreVocabularyAdditionalProperties = (boolean);
 export type CoreComment = (string);
 export type CoreDefs = (Record<string, CoreDefsAdditionalProperties>);
+export type CoreVocabularyAdditionalProperties = (boolean);
 export type CoreDefsAdditionalProperties = Schema;
 export type Applicator = ({
     prefixItems?: ApplicatorPrefixItems;
@@ -84,17 +51,13 @@ export type Applicator = ({
     not?: ApplicatorNot;
 } | boolean);
 export type ApplicatorSchemaArray = (ApplicatorSchemaArrayItems[]);
-export type ApplicatorSchemaArrayItems = Schema;
 export type ApplicatorPrefixItems = ApplicatorSchemaArray;
 export type ApplicatorItems = Schema;
 export type ApplicatorContains = Schema;
 export type ApplicatorAdditionalProperties = Schema;
 export type ApplicatorProperties = (Record<string, ApplicatorPropertiesAdditionalProperties>);
-export type ApplicatorPropertiesAdditionalProperties = Schema;
 export type ApplicatorPatternProperties = (Record<string, ApplicatorPatternPropertiesAdditionalProperties>);
-export type ApplicatorPatternPropertiesAdditionalProperties = Schema;
 export type ApplicatorDependentSchemas = (Record<string, ApplicatorDependentSchemasAdditionalProperties>);
-export type ApplicatorDependentSchemasAdditionalProperties = Schema;
 export type ApplicatorPropertyNames = Schema;
 export type ApplicatorIf = Schema;
 export type ApplicatorThen = Schema;
@@ -103,6 +66,10 @@ export type ApplicatorAllOf = ApplicatorSchemaArray;
 export type ApplicatorAnyOf = ApplicatorSchemaArray;
 export type ApplicatorOneOf = ApplicatorSchemaArray;
 export type ApplicatorNot = Schema;
+export type ApplicatorSchemaArrayItems = Schema;
+export type ApplicatorPropertiesAdditionalProperties = Schema;
+export type ApplicatorPatternPropertiesAdditionalProperties = Schema;
+export type ApplicatorDependentSchemasAdditionalProperties = Schema;
 export type Unevaluated = ({
     unevaluatedItems?: UnevaluatedUnevaluatedItems;
     unevaluatedProperties?: UnevaluatedUnevaluatedProperties;
@@ -135,14 +102,9 @@ export type ValidationNonNegativeInteger = (number);
 export type ValidationNonNegativeIntegerDefault0 = ValidationNonNegativeInteger;
 export type ValidationSimpleTypes = unknown;
 export type ValidationStringArray = (ValidationStringArrayItems[]);
-export type ValidationStringArrayItems = (string);
 export type ValidationType = ((Partial<ValidationType0> & Partial<ValidationType1>));
-export type ValidationType0 = ValidationSimpleTypes;
-export type ValidationType1 = (ValidationType1Items[]);
-export type ValidationType1Items = ValidationSimpleTypes;
 export type ValidationConst = (any);
 export type ValidationEnum = (ValidationEnumItems[]);
-export type ValidationEnumItems = (any);
 export type ValidationMultipleOf = (number);
 export type ValidationMaximum = (number);
 export type ValidationExclusiveMaximum = (number);
@@ -160,6 +122,11 @@ export type ValidationMaxProperties = ValidationNonNegativeInteger;
 export type ValidationMinProperties = ValidationNonNegativeIntegerDefault0;
 export type ValidationRequired = ValidationStringArray;
 export type ValidationDependentRequired = (Record<string, ValidationDependentRequiredAdditionalProperties>);
+export type ValidationStringArrayItems = (string);
+export type ValidationType0 = ValidationSimpleTypes;
+export type ValidationType1 = (ValidationType1Items[]);
+export type ValidationType1Items = ValidationSimpleTypes;
+export type ValidationEnumItems = (any);
 export type ValidationDependentRequiredAdditionalProperties = ValidationStringArray;
 export type MetaData = ({
     title?: MetaDataTitle;
@@ -190,3 +157,36 @@ export type Content = ({
 export type ContentContentEncoding = (string);
 export type ContentContentMediaType = (string);
 export type ContentContentSchema = Schema;
+export type Schema = (((Schema0 & Schema1 & Schema2 & Schema3 & Schema4 & Schema5 & Schema6)) & ({
+    definitions?: SchemaDefinitions;
+    dependencies?: SchemaDependencies;
+    $recursiveAnchor?: SchemaRecursiveAnchor;
+    $recursiveRef?: SchemaRecursiveRef;
+} | boolean));
+/**
+@deprecated
+*/
+export type SchemaDefinitions = (Record<string, SchemaDefinitionsAdditionalProperties>);
+/**
+@deprecated
+*/
+export type SchemaDependencies = (Record<string, SchemaDependenciesAdditionalProperties>);
+/**
+@deprecated
+*/
+export type SchemaRecursiveAnchor = CoreAnchorString;
+/**
+@deprecated
+*/
+export type SchemaRecursiveRef = CoreUriReferenceString;
+export type Schema0 = Core;
+export type Schema1 = Applicator;
+export type Schema2 = Unevaluated;
+export type Schema3 = Validation;
+export type Schema4 = MetaData;
+export type Schema5 = FormatAnnotation;
+export type Schema6 = Content;
+export type SchemaDefinitionsAdditionalProperties = Schema;
+export type SchemaDependenciesAdditionalProperties = ((Partial<SchemaDependenciesAdditionalProperties0> & Partial<SchemaDependenciesAdditionalProperties1>));
+export type SchemaDependenciesAdditionalProperties0 = Schema;
+export type SchemaDependenciesAdditionalProperties1 = ValidationStringArray;

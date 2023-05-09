@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { NodeDescriptor } from "../schema/descriptors.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
@@ -67,23 +68,21 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const [nodeId] of this.context.getTypeNames()) {
+        for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
             yield* this.generateAssertStatementsForNode(
-                nodeId,
+                nodeDescriptor,
             );
         }
     }
 
     protected *generateAssertStatementsForNode(
-        nodeId: string,
+        nodeDescriptor: NodeDescriptor,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeId);
+        const typeName = this.getTypeName(nodeDescriptor.nodeId);
 
-        const examples = this.context.getExamples(nodeId);
-
-        for (const example of examples) {
+        for (const example of nodeDescriptor.examples) {
             yield f.createExpressionStatement(f.createCallExpression(
                 f.createPropertyAccessExpression(
                     f.createIdentifier("assert"),
