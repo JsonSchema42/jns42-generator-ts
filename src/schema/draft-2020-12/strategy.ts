@@ -10,7 +10,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {
-        const schemaId = selectNodeSchema(node as any);
+        const schemaId = selectNodeSchema(node as Schema);
         if (schemaId == null) {
             return false;
         }
