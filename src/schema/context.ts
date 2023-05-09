@@ -1,7 +1,6 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
 import { CompoundDescriptorUnion } from "./index.js";
-import { MetaSchemaId } from "./meta.js";
 import { SchemaStrategy, SchemaStrategyBase } from "./strategy.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
 
@@ -122,7 +121,7 @@ export class SchemaContext implements SchemaStrategy {
     ) {
         for (const [metaSchemaId, loader] of Object.entries(this.strategies)) {
             if (loader.isSchemaRootNode(node)) {
-                return metaSchemaId as MetaSchemaId;
+                return metaSchemaId;
             }
         }
     }

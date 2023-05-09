@@ -1,6 +1,5 @@
 import { CompoundDescriptorUnion } from "./compound-descriptors.js";
 import { SchemaContext } from "./context.js";
-import { MetaSchemaId } from "./meta.js";
 import { TypeDescriptorUnion } from "./type-descriptors.js";
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -45,7 +44,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategy {
         nodeId: string
     ): string | undefined
 
-    protected abstract readonly metaSchemaId: MetaSchemaId
+    protected abstract readonly metaSchemaId: string
 
     public abstract isSchemaRootNode(node: unknown): node is N;
 
