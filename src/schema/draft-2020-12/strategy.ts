@@ -109,132 +109,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#endregion
 
-    //#region anchors
-
-    private readonly anchorMap = new Map<string, string>();
-    private readonly dynamicAnchorMap = new Map<string, string>();
-
-    private getAnchorNodeId(nodeId: string) {
-        return this.anchorMap.get(nodeId);
-    }
-
-    private getDynamicAnchorNodeId(nodeId: string) {
-        return this.dynamicAnchorMap.get(nodeId);
-    }
-
-    private resolveReferenceNodeId(nodeId: string, nodeRef: string) {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const nodeRootId = String(nodeItem.nodeRootUrl);
-        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
-
-        const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
-        const hash = nodeRefRetrievalUrl.hash;
-        nodeRefRetrievalUrl.hash = "";
-        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
-
-        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
-        let resolvedNodeId = String(resolvedNodeUrl);
-
-        const anchorNodeId = this.getAnchorNodeId(resolvedNodeId);
-
-        if (anchorNodeId != null) {
-            resolvedNodeId = anchorNodeId;
-        }
-
-        return resolvedNodeId;
-
-    }
-
-    private resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const nodeRootId = String(nodeItem.nodeRootUrl);
-        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
-
-        const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
-        const hash = nodeRefRetrievalUrl.hash;
-        nodeRefRetrievalUrl.hash = "";
-        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
-
-        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
-        let resolvedNodeId = String(resolvedNodeUrl);
-
-        let currentRootNodeUrl: URL | null = new URL("", resolvedNodeUrl);
-        while (currentRootNodeUrl != null) {
-            const currentRootNodeId = String(currentRootNodeUrl);
-            const currentRootNode = this.getRootNodeItem(currentRootNodeId);
-
-            const currentNodeUrl = new URL(
-                hash,
-                currentRootNode.nodeUrl,
-            );
-            const currentNodeId = String(currentNodeUrl);
-            const dynamicAnchorNodeId = this.getDynamicAnchorNodeId(
-                currentNodeId,
-            );
-            if (dynamicAnchorNodeId != null) {
-                resolvedNodeId = dynamicAnchorNodeId;
-            }
-
-            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
-        }
-
-        return resolvedNodeId;
-    }
-
-    /*
-    override the super function to load dynamic anchors
-    */
-    protected * indexNode(
-        node: Schema,
-        nodeRootUrl: URL,
-        nodePointer: string,
-    ) {
-        const nodeUrl = this.makeNodeUrl(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
-        const nodeId = String(nodeUrl);
-
-        const nodeAnchor = selectNodeAnchor(node);
-        if (nodeAnchor != null) {
-            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
-            const anchorId = String(anchorUrl);
-            if (this.anchorMap.has(anchorId)) {
-                throw new Error("duplicate anchorId");
-            }
-            this.anchorMap.set(anchorId, nodeId);
-
-            yield anchorUrl;
-        }
-
-        const nodeDynamicAnchor = selectNodeDynamicAnchor(node);
-        if (nodeDynamicAnchor != null) {
-            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeRootUrl);
-            const dynamicAnchorId = String(dynamicAnchorUrl);
-            if (this.dynamicAnchorMap.has(dynamicAnchorId)) {
-                throw new Error("duplicate dynamicAnchorId");
-            }
-            this.dynamicAnchorMap.set(dynamicAnchorId, nodeId);
-
-            // TODO should wel yield this?
-            // yield dynamicAnchorUrl;
-        }
-
-        yield* super.indexNode(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
-    }
-
-    //#endregion
-
-    //#region descriptors
+    //#region strategy implementation
 
     public * selectNodeDescriptors(
     ): Iterable<NodeDescriptor> {
@@ -630,6 +505,131 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                 typeNodeIds,
             };
         }
+    }
+
+    //#endregion
+
+    //#region anchors
+
+    private readonly anchorMap = new Map<string, string>();
+    private readonly dynamicAnchorMap = new Map<string, string>();
+
+    private getAnchorNodeId(nodeId: string) {
+        return this.anchorMap.get(nodeId);
+    }
+
+    private getDynamicAnchorNodeId(nodeId: string) {
+        return this.dynamicAnchorMap.get(nodeId);
+    }
+
+    private resolveReferenceNodeId(nodeId: string, nodeRef: string) {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        const nodeRootId = String(nodeItem.nodeRootUrl);
+        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
+
+        const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
+        const hash = nodeRefRetrievalUrl.hash;
+        nodeRefRetrievalUrl.hash = "";
+        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
+
+        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
+        let resolvedNodeId = String(resolvedNodeUrl);
+
+        const anchorNodeId = this.getAnchorNodeId(resolvedNodeId);
+
+        if (anchorNodeId != null) {
+            resolvedNodeId = anchorNodeId;
+        }
+
+        return resolvedNodeId;
+
+    }
+
+    private resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
+        const nodeItem = this.getNodeItem(nodeId);
+
+        const nodeRootId = String(nodeItem.nodeRootUrl);
+        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
+
+        const nodeRefRetrievalUrl = new URL(nodeDynamicRef, nodeRetrievalUrl);
+        const hash = nodeRefRetrievalUrl.hash;
+        nodeRefRetrievalUrl.hash = "";
+        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
+        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
+
+        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
+        let resolvedNodeId = String(resolvedNodeUrl);
+
+        let currentRootNodeUrl: URL | null = new URL("", resolvedNodeUrl);
+        while (currentRootNodeUrl != null) {
+            const currentRootNodeId = String(currentRootNodeUrl);
+            const currentRootNode = this.getRootNodeItem(currentRootNodeId);
+
+            const currentNodeUrl = new URL(
+                hash,
+                currentRootNode.nodeUrl,
+            );
+            const currentNodeId = String(currentNodeUrl);
+            const dynamicAnchorNodeId = this.getDynamicAnchorNodeId(
+                currentNodeId,
+            );
+            if (dynamicAnchorNodeId != null) {
+                resolvedNodeId = dynamicAnchorNodeId;
+            }
+
+            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
+        }
+
+        return resolvedNodeId;
+    }
+
+    /*
+    override the super function to load dynamic anchors
+    */
+    protected * indexNode(
+        node: Schema,
+        nodeRootUrl: URL,
+        nodePointer: string,
+    ) {
+        const nodeUrl = this.makeNodeUrl(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
+        const nodeId = String(nodeUrl);
+
+        const nodeAnchor = selectNodeAnchor(node);
+        if (nodeAnchor != null) {
+            const anchorUrl = new URL(`#${nodeAnchor}`, nodeRootUrl);
+            const anchorId = String(anchorUrl);
+            if (this.anchorMap.has(anchorId)) {
+                throw new Error("duplicate anchorId");
+            }
+            this.anchorMap.set(anchorId, nodeId);
+
+            yield anchorUrl;
+        }
+
+        const nodeDynamicAnchor = selectNodeDynamicAnchor(node);
+        if (nodeDynamicAnchor != null) {
+            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeRootUrl);
+            const dynamicAnchorId = String(dynamicAnchorUrl);
+            if (this.dynamicAnchorMap.has(dynamicAnchorId)) {
+                throw new Error("duplicate dynamicAnchorId");
+            }
+            this.dynamicAnchorMap.set(dynamicAnchorId, nodeId);
+
+            // TODO should wel yield this?
+            // yield dynamicAnchorUrl;
+        }
+
+        yield* super.indexNode(
+            node,
+            nodeRootUrl,
+            nodePointer,
+        );
     }
 
     //#endregion
