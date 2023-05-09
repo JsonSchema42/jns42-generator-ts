@@ -6,6 +6,9 @@ import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
 export class SchemaStrategy extends SchemaStrategyBase<Schema> {
+
+    //#region super implementation
+
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {
@@ -107,6 +110,10 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     }
 
+    //#endregion
+
+    //#region strategy implementation
+
     public *selectNodeDescriptors(
     ): Iterable<NodeDescriptor> {
         yield* [];
@@ -123,5 +130,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     ): Iterable<CompoundDescriptorUnion> {
         throw new Error("not implemented");
     }
+
+    //#endregion
 
 }

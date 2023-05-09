@@ -6,6 +6,9 @@ import { Schema } from "./types.js";
 import { validateSchema } from "./validators.js";
 
 export class SchemaStrategy extends SchemaStrategyBase<Schema> {
+
+    //#region super implementation
+
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {
@@ -107,6 +110,31 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     }
 
+    //#endregion
+
+    //#region strategy implementation
+
+    public *selectNodeDescriptors(
+    ): Iterable<NodeDescriptor> {
+        yield* [];
+    }
+
+    public selectNodeTypeDescriptors(
+        nodeId: string,
+    ): Iterable<TypeDescriptorUnion> {
+        throw new Error("not implemented");
+    }
+
+    public selectNodeCompoundDescriptors(
+        nodeId: string,
+    ): Iterable<CompoundDescriptorUnion> {
+        throw new Error("not implemented");
+    }
+
+    //#endregion
+
+    //#region anchors
+
     private readonly anchorMap = new Map<string, string>();
     private readonly recursiveAnchorMap = new Map<string, string>();
 
@@ -162,21 +190,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         );
     }
 
-    public *selectNodeDescriptors(
-    ): Iterable<NodeDescriptor> {
-        yield* [];
-    }
-
-    public selectNodeTypeDescriptors(
-        nodeId: string,
-    ): Iterable<TypeDescriptorUnion> {
-        throw new Error("not implemented");
-    }
-
-    public selectNodeCompoundDescriptors(
-        nodeId: string,
-    ): Iterable<CompoundDescriptorUnion> {
-        throw new Error("not implemented");
-    }
+    //#endregion
 
 }
