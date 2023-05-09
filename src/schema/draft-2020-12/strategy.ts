@@ -6,6 +6,9 @@ import { Schema } from "./types.js";
 import { isSchema } from "./validators.js";
 
 export class SchemaStrategy extends SchemaStrategyBase<Schema> {
+
+    //#region super implementation
+
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {
@@ -20,32 +23,25 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         return isSchema(node);
     }
 
-    public *getReferencedNodeUrls(
-        rootNode: Schema,
-        rootNodeUrl: URL,
+    protected async loadFromNode(
+        node: Schema,
+        nodeUrl: URL,
         retrievalUrl: URL,
-    ): Iterable<readonly [URL, URL]> {
-        for (const [pointer, node] of selectAllSubNodesAndSelf("", rootNode)) {
-            const nodeRef = selectNodeRef(node);
-            if (nodeRef == null) {
-                continue;
-            }
+    ) {
+        const nodeRef = selectNodeRef(node);
 
-            const refNodeUrl = new URL(nodeRef, rootNodeUrl);
-            const refRetrievalUrl = new URL(nodeRef, retrievalUrl);
-            refRetrievalUrl.hash = "";
-
-            yield [refNodeUrl, refRetrievalUrl] as const;
-
+        if (nodeRef != null) {
+            const nodeRefUrl = new URL(nodeRef, nodeUrl);
+            const retrievalRefUrl = new URL(nodeRef, retrievalUrl);
+            retrievalRefUrl.hash = "";
+            await this.context.loadFromUrl(
+                nodeRefUrl,
+                retrievalRefUrl,
+                nodeUrl,
+                this.metaSchemaId,
+            );
         }
-    }
 
-    public selectNodeUrl(node: Schema) {
-        const nodeId = selectNodeId(node);
-        if (nodeId != null) {
-            const nodeUrl = new URL(nodeId);
-            return nodeUrl;
-        }
     }
 
     protected makeNodeUrl(
@@ -83,39 +79,50 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         return selectAllSubNodesAndSelf(nodePointer, node);
     }
 
-    protected async loadFromNode(
-        node: Schema,
-        nodeUrl: URL,
+    public *selectAllReferencedNodeUrls(
+        rootNode: Schema,
+        rootNodeUrl: URL,
         retrievalUrl: URL,
-    ) {
-        const nodeRef = selectNodeRef(node);
+    ): Iterable<readonly [URL, URL]> {
+        for (const [pointer, node] of selectAllSubNodesAndSelf("", rootNode)) {
+            const nodeRef = selectNodeRef(node);
+            if (nodeRef == null) {
+                continue;
+            }
 
-        if (nodeRef != null) {
-            const nodeRefUrl = new URL(nodeRef, nodeUrl);
-            const retrievalRefUrl = new URL(nodeRef, retrievalUrl);
-            retrievalRefUrl.hash = "";
-            await this.context.loadFromUrl(
-                nodeRefUrl,
-                retrievalRefUrl,
-                nodeUrl,
-                this.metaSchemaId,
-            );
+            const refNodeUrl = new URL(nodeRef, rootNodeUrl);
+            const refRetrievalUrl = new URL(nodeRef, retrievalUrl);
+            refRetrievalUrl.hash = "";
+
+            yield [refNodeUrl, refRetrievalUrl] as const;
+
         }
-
     }
+
+    public selectNodeUrl(node: Schema) {
+        const nodeId = selectNodeId(node);
+        if (nodeId != null) {
+            const nodeUrl = new URL(nodeId);
+            return nodeUrl;
+        }
+    }
+
+    //#endregion
+
+    //#region anchors
 
     private readonly anchorMap = new Map<string, string>();
     private readonly dynamicAnchorMap = new Map<string, string>();
 
-    public getAnchorNodeId(nodeId: string) {
+    private getAnchorNodeId(nodeId: string) {
         return this.anchorMap.get(nodeId);
     }
 
-    public getDynamicAnchorNodeId(nodeId: string) {
+    private getDynamicAnchorNodeId(nodeId: string) {
         return this.dynamicAnchorMap.get(nodeId);
     }
 
-    public resolveReferenceNodeId(nodeId: string, nodeRef: string) {
+    private resolveReferenceNodeId(nodeId: string, nodeRef: string) {
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
@@ -140,7 +147,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     }
 
-    public resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
+    private resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
@@ -224,6 +231,10 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             nodePointer,
         );
     }
+
+    //#endregion
+
+    //#region descriptors
 
     public * selectNodeDescriptors(
     ): Iterable<NodeDescriptor> {
@@ -620,5 +631,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             };
         }
     }
+
+    //#endregion
 
 }

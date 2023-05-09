@@ -21,30 +21,11 @@ export interface SchemaStrategyNodeItem<N> {
 }
 
 export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
-
-    public abstract selectNodeDescriptors(): Iterable<NodeDescriptor>
-
-    public abstract selectNodeTypeDescriptors(
-        nodeId: string
-    ): Iterable<TypeDescriptorUnion>
-
-    public abstract selectNodeCompoundDescriptors(
-        nodeId: string
-    ): Iterable<CompoundDescriptorUnion>
-
     protected abstract readonly metaSchemaId: string
 
     public abstract isSchemaRootNode(node: unknown): node is N;
 
-    public abstract getReferencedNodeUrls(
-        rootNode: N,
-        rootNodeUrl: URL,
-        retrievalUrl: URL,
-    ): Iterable<readonly [URL, URL]>
-
-    public abstract selectNodeUrl(
-        node: N
-    ): URL | undefined
+    public abstract isSchema(node: unknown): node is N
 
     protected abstract loadFromNode(
         node: N,
@@ -78,7 +59,25 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         node: N
     ): Iterable<readonly [string, N]>
 
-    public abstract isSchema(node: unknown): node is N
+    public abstract selectAllReferencedNodeUrls(
+        rootNode: N,
+        rootNodeUrl: URL,
+        retrievalUrl: URL,
+    ): Iterable<readonly [URL, URL]>
+
+    public abstract selectNodeUrl(
+        node: N
+    ): URL | undefined
+
+    public abstract selectNodeDescriptors(): Iterable<NodeDescriptor>
+
+    public abstract selectNodeTypeDescriptors(
+        nodeId: string
+    ): Iterable<TypeDescriptorUnion>
+
+    public abstract selectNodeCompoundDescriptors(
+        nodeId: string
+    ): Iterable<CompoundDescriptorUnion>
 
     private maybeContext?: SchemaContext;
     protected get context() {

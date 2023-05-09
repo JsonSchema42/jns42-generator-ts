@@ -23,7 +23,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         return true;
     }
 
-    public *getReferencedNodeUrls(
+    public *selectAllReferencedNodeUrls(
         rootNode: Schema,
         rootNodeUrl: URL,
         retrievalUrl: URL,
@@ -117,69 +117,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     public getRecursiveAnchorNodeId(nodeId: string) {
         const nodeKey = String(nodeId);
         return this.recursiveAnchorMap.get(nodeKey);
-    }
-
-    public resolveReferenceNodeId(nodeId: string, nodeRef: string) {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const nodeRootId = String(nodeItem.nodeRootUrl);
-        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
-
-        const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
-        const hash = nodeRefRetrievalUrl.hash;
-        nodeRefRetrievalUrl.hash = "";
-        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
-
-        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
-        let resolvedNodeId = String(resolvedNodeUrl);
-
-        const anchorNodeId = this.getAnchorNodeId(resolvedNodeId);
-
-        if (anchorNodeId != null) {
-            resolvedNodeId = anchorNodeId;
-        }
-
-        return resolvedNodeId;
-
-    }
-
-    public resolveRecursiveReferenceNodeId(nodeId: string, nodeRecursiveRef: string) {
-        const nodeItem = this.getNodeItem(nodeId);
-
-        const nodeRootId = String(nodeItem.nodeRootUrl);
-        const nodeRetrievalUrl = this.context.getNodeRetrievalUrl(nodeRootId);
-
-        const nodeRefRetrievalUrl = new URL(nodeRecursiveRef, nodeRetrievalUrl);
-        const hash = nodeRefRetrievalUrl.hash;
-        nodeRefRetrievalUrl.hash = "";
-        const nodeRefRetrievalId = String(nodeRefRetrievalUrl);
-        const nodeRefRootUrl = this.context.getNodeRootUrl(nodeRefRetrievalId);
-
-        const resolvedNodeUrl = new URL(hash, nodeRefRootUrl);
-        let resolvedNodeId = String(resolvedNodeUrl);
-
-        let currentRootNodeUrl: URL | null = new URL("", resolvedNodeUrl);
-        while (currentRootNodeUrl != null) {
-            const currentRootNodeId = String(currentRootNodeUrl);
-            const currentRootNode = this.getRootNodeItem(currentRootNodeId);
-
-            const currentNodeUrl = new URL(
-                hash,
-                currentRootNode.nodeUrl,
-            );
-            const currentNodeId = String(currentNodeUrl);
-            const recursiveAnchorNodeId = this.getRecursiveAnchorNodeId(
-                currentNodeId,
-            );
-            if (recursiveAnchorNodeId != null) {
-                resolvedNodeId = recursiveAnchorNodeId;
-            }
-
-            currentRootNodeUrl = currentRootNode.referencingNodeUrl;
-        }
-
-        return resolvedNodeId;
     }
 
     /*

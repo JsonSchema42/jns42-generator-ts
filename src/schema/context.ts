@@ -78,7 +78,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         for (
             const [subNodeUrl, subRetrievalUrl] of
-            strategy.getReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
+            strategy.selectAllReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
         ) {
             await this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
         }

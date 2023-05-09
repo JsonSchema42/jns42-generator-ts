@@ -23,34 +23,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         return true;
     }
 
-    public *getReferencedNodeUrls(
-        rootNode: Schema,
-        rootNodeUrl: URL,
-        retrievalUrl: URL,
-    ): Iterable<readonly [URL, URL]> {
-        for (const [pointer, node] of selectAllSubNodesAndSelf("", rootNode)) {
-            const nodeRef = selectNodeRef(node);
-            if (nodeRef == null) {
-                continue;
-            }
-
-            const refNodeUrl = new URL(nodeRef, rootNodeUrl);
-            const refRetrievalUrl = new URL(nodeRef, retrievalUrl);
-            refRetrievalUrl.hash = "";
-
-            yield [refNodeUrl, refRetrievalUrl] as const;
-
-        }
-    }
-
-    public selectNodeUrl(node: Schema) {
-        const nodeId = selectNodeId(node);
-        if (nodeId != null) {
-            const nodeUrl = new URL(nodeId);
-            return nodeUrl;
-        }
-    }
-
     protected makeNodeUrl(
         node: Schema,
         nodeRootUrl: URL,
@@ -63,6 +35,14 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
         nodeUrl = new URL(`#${nodePointer}`, nodeRootUrl);
         return nodeUrl;
+    }
+
+    public selectNodeUrl(node: Schema) {
+        const nodeId = selectNodeId(node);
+        if (nodeId != null) {
+            const nodeUrl = new URL(nodeId);
+            return nodeUrl;
+        }
     }
 
     public selectSubNodeEntries(
@@ -86,6 +66,26 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         return selectAllSubNodesAndSelf(nodePointer, node);
 
     }
+    public *selectAllReferencedNodeUrls(
+        rootNode: Schema,
+        rootNodeUrl: URL,
+        retrievalUrl: URL,
+    ): Iterable<readonly [URL, URL]> {
+        for (const [pointer, node] of selectAllSubNodesAndSelf("", rootNode)) {
+            const nodeRef = selectNodeRef(node);
+            if (nodeRef == null) {
+                continue;
+            }
+
+            const refNodeUrl = new URL(nodeRef, rootNodeUrl);
+            const refRetrievalUrl = new URL(nodeRef, retrievalUrl);
+            refRetrievalUrl.hash = "";
+
+            yield [refNodeUrl, refRetrievalUrl] as const;
+
+        }
+    }
+
     protected async loadFromNode(
         node: Schema,
         nodeUrl: URL,

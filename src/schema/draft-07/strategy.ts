@@ -22,7 +22,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         return true;
     }
 
-    public *getReferencedNodeUrls(
+    public *selectAllReferencedNodeUrls(
         rootNode: Schema,
         rootNodeUrl: URL,
         retrievalUrl: URL,
