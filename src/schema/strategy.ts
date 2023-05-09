@@ -1,6 +1,5 @@
-import { CompoundDescriptorUnion } from "./compound-descriptors.js";
 import { SchemaContext } from "./context.js";
-import { TypeDescriptorUnion } from "./type-descriptors.js";
+import { CompoundDescriptorUnion, TypeDescriptorUnion } from "./descriptors.js";
 
 export interface SchemaStrategyRootNodeItem<N> {
     node: N;
@@ -14,7 +13,7 @@ export interface SchemaStrategyNodeItem<N> {
     nodePointer: string;
 }
 
-export interface SchemaStrategy {
+export interface SchemaStrategyInterface {
     getComments(nodeId: string): string
     getExamples(nodeId: string): unknown[];
     getReferencingNodeId(nodeId: string): string | undefined;
@@ -22,7 +21,7 @@ export interface SchemaStrategy {
     selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>;
 }
 
-export abstract class SchemaStrategyBase<N> implements SchemaStrategy {
+export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
     public abstract getComments(
         nodeId: string
@@ -92,10 +91,9 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategy {
 
     public abstract isSchema(node: unknown): node is N
 
-    constructor(
-        protected readonly context: SchemaContext,
-    ) {
-        //
+    protected context?: SchemaContext;
+    public registerContext(context: SchemaContext) {
+        this.context = context;
     }
 
     private readonly rootNodeMap = new Map<string, SchemaStrategyRootNodeItem<N>>();

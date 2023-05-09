@@ -1,6 +1,5 @@
 import ts from "typescript";
-import { CompoundDescriptorUnion } from "../schema/index.js";
-import { TypeDescriptorUnion } from "../schema/type-descriptors.js";
+import { CompoundDescriptorUnion, TypeDescriptorUnion } from "../schema/descriptors.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {

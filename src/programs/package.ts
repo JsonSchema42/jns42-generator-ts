@@ -73,11 +73,11 @@ async function main(options: MainOptions) {
     const namer = new Namer(options.uniqueNameSeed);
     const context = new SchemaContext();
 
-    context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaLoader(this));
-    context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaLoader(this));
-    context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaLoader(this));
-    context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaLoader(this));
-    context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaLoader(this));
+    context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
+    context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaStrategy());
+    context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
+    context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
+    context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
 
     await context.loadFromUrl(
         schemaUrl,

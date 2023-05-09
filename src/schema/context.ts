@@ -1,10 +1,9 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
-import { CompoundDescriptorUnion } from "./index.js";
-import { SchemaStrategy, SchemaStrategyBase } from "./strategy.js";
-import { TypeDescriptorUnion } from "./type-descriptors.js";
+import { CompoundDescriptorUnion, TypeDescriptorUnion } from "./descriptors.js";
+import { SchemaStrategyBase, SchemaStrategyInterface } from "./strategy.js";
 
-export class SchemaContext implements SchemaStrategy {
+export class SchemaContext implements SchemaStrategyInterface {
     private readonly rootNodeMetaMap = new Map<string, string>();
     private readonly nodeMetaMap = new Map<string, string>();
     private readonly retrievalRootNodeMap = new Map<string, URL>();
@@ -16,6 +15,7 @@ export class SchemaContext implements SchemaStrategy {
         metaSchemaId: string,
         strategy: SchemaStrategyBase<unknown>,
     ) {
+        strategy.registerContext(this);
         this.strategies[metaSchemaId] = strategy;
     }
 

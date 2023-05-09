@@ -1,12 +1,12 @@
-import { CompoundDescriptorUnion } from "../index.js";
+import assert from "assert";
+import { CompoundDescriptorUnion, TypeDescriptorUnion } from "../descriptors.js";
 import { SchemaStrategyBase } from "../strategy.js";
-import { TypeDescriptorUnion } from "../type-descriptors.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeExamples, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
 import { isSchema } from "./validators.js";
 
-export class SchemaLoader extends SchemaStrategyBase<Schema> {
+export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     protected readonly metaSchemaId = metaSchemaId;
 
     public isSchemaRootNode(node: unknown): node is Schema {
@@ -89,6 +89,8 @@ export class SchemaLoader extends SchemaStrategyBase<Schema> {
         nodeUrl: URL,
         retrievalUrl: URL,
     ) {
+        assert(this.context != null);
+
         const nodeRef = selectNodeRef(node);
 
         if (nodeRef != null) {
@@ -117,6 +119,8 @@ export class SchemaLoader extends SchemaStrategyBase<Schema> {
     }
 
     public resolveReferenceNodeId(nodeId: string, nodeRef: string) {
+        assert(this.context != null);
+
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
@@ -142,6 +146,8 @@ export class SchemaLoader extends SchemaStrategyBase<Schema> {
     }
 
     public resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
+        assert(this.context != null);
+
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
