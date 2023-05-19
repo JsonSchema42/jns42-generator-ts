@@ -519,6 +519,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
         const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
         let hash = nodeRefRetrievalUrl.hash;
+        // eslint-disable-next-line security/detect-possible-timing-attacks
         if (hash === "") {
             hash = "#";
         }
