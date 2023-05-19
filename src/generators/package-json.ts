@@ -22,10 +22,10 @@ export function getPackageJsonData(
         "author": "",
         "license": "ISC",
         "dependencies": withDependencies([
+            "@types/node",
         ]),
         "devDependencies": withDependencies([
             "typescript",
-            "@types/node",
         ]),
     };
 
