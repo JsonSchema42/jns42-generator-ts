@@ -1,7 +1,7 @@
 root: true
 parser: "@typescript-eslint/parser"
 parserOptions:
-  ecmaVersion: 2020
+  ecmaVersion: 2022
   sourceType: module
   project: ./tsconfig.json
 plugins:
@@ -14,16 +14,11 @@ extends:
   - plugin:security/recommended
 rules:
   "security/detect-object-injection": off
+  "security/detect-non-literal-fs-filename": off
   "@typescript-eslint/no-unused-vars": off
   "@typescript-eslint/explicit-module-boundary-types": off
   "@typescript-eslint/explicit-function-return-type": off
   "@typescript-eslint/no-use-before-define": off
-  "@typescript-eslint/ban-types":
-    - error
-    - types:
-        object: false
-        {}: false
-  deprecation/deprecation: warn
   semi: error
   comma-dangle:
     - error
@@ -42,3 +37,4 @@ rules:
       ignoreUrls: true
       ignoreComments: true
   quotes: error
+  deprecation/deprecation: warn
