@@ -1,5 +1,5 @@
 import { appendJsonPointer } from "../../utils/index.js";
-import { Applicator, Core, Metadata, Validation } from "./types.js";
+import { Applicator, Core, MetaData, Validation } from "./types.js";
 
 //#region core
 
@@ -52,7 +52,7 @@ export function selectNodeRecursiveRef(
 }
 
 export function selectNodeDescription(
-    node: Metadata,
+    node: MetaData,
 ) {
     if (typeof node === "object") {
         return node.description;
@@ -60,7 +60,7 @@ export function selectNodeDescription(
 }
 
 export function selectNodeDeprecated(
-    node: Metadata,
+    node: MetaData,
 ) {
     if (typeof node === "object") {
         return node.deprecated;
@@ -68,7 +68,7 @@ export function selectNodeDeprecated(
 }
 
 export function selectNodeExamples(
-    node: Metadata,
+    node: MetaData,
 ) {
     if (typeof node === "object") {
         return node.examples;
@@ -131,6 +131,8 @@ export function* selectSubNodeItemsManyEntries(
 ) {
     if (typeof node === "object" && node.items != null && Array.isArray(node.items)) {
         for (const [key, subNode] of Object.entries(node.items)) {
+            if (subNode == null) continue;
+
             const subNodePointer = appendJsonPointer(nodePointer, "items", key);
             yield [subNodePointer, subNode] as const;
         }

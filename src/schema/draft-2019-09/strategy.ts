@@ -3,7 +3,7 @@ import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeEnum, selectNodeExamples, selectNodeId, selectNodePropertyNamesEntries, selectNodeRecursiveAnchor, selectNodeRecursiveRef, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalItemsEntries, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsManyEntries, selectSubNodeItemsOneEntries, selectSubNodeOneOfEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
 import { Schema } from "./types.js";
-import { validateSchema } from "./validators.js";
+import { isSchema } from "./validators.js";
 
 export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
@@ -20,10 +20,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     public isSchema(node: unknown): node is Schema {
-        for (const error of validateSchema(node as Schema, [])) {
-            return false;
-        }
-        return true;
+        return isSchema(node);
     }
 
     public *selectAllReferencedNodeUrls(
