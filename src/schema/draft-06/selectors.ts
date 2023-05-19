@@ -205,7 +205,7 @@ export function* selectNodeRequiredProperties(
 
 export function* selectNodePropertyNamesEntries(
     nodePointer: string,
-    node: Schema | boolean,
+    node: Schema,
 ) {
     if (typeof node === "object" && node.properties != null) {
         for (const propertyName of Object.keys(node.properties)) {

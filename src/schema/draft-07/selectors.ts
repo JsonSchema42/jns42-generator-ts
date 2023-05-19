@@ -91,6 +91,8 @@ export function* selectSubNodeItemsManyEntries(
 ) {
     if (typeof node === "object" && node.items != null && Array.isArray(node.items)) {
         for (const [key, subNode] of Object.entries(node.items)) {
+            if (subNode == null) continue;
+
             const subNodePointer = appendJsonPointer(nodePointer, "items", key);
             yield [subNodePointer, subNode] as const;
         }
@@ -203,14 +205,14 @@ export function* selectNodeRequiredProperties(
     }
 }
 
-export function* selectNodeProperties(
+export function* selectNodePropertyNamesEntries(
     nodePointer: string,
     node: Schema,
 ) {
     if (typeof node === "object" && node.properties != null) {
-        for (const [key] of Object.entries(node.properties)) {
-            const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
-            yield [key, subNodePointer] as const;
+        for (const propertyName of Object.keys(node.properties)) {
+            const subNodePointer = appendJsonPointer(nodePointer, "properties", propertyName);
+            yield [subNodePointer, propertyName] as const;
         }
     }
 }
@@ -227,7 +229,7 @@ export function selectNodeEnum(
 
 //#region validation
 
-export function selectValidationMaxProperties(
+export function selectValidationMaximumProperties(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -235,7 +237,7 @@ export function selectValidationMaxProperties(
     }
 }
 
-export function selectValidationMinProperties(
+export function selectValidationMinimumProperties(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -251,7 +253,7 @@ export function selectValidationRequired(
     }
 }
 
-export function selectValidationMinItems(
+export function selectValidationMinimumItems(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -259,7 +261,7 @@ export function selectValidationMinItems(
     }
 }
 
-export function selectValidationMaxItems(
+export function selectValidationMaximumItems(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -275,7 +277,7 @@ export function selectValidationUniqueItems(
     }
 }
 
-export function selectValidationMinLength(
+export function selectValidationMinimumLength(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -283,7 +285,7 @@ export function selectValidationMinLength(
     }
 }
 
-export function selectValidationMaxLength(
+export function selectValidationMaximumLength(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -291,7 +293,7 @@ export function selectValidationMaxLength(
     }
 }
 
-export function selectValidationPattern(
+export function selectValidationValuePattern(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -299,7 +301,7 @@ export function selectValidationPattern(
     }
 }
 
-export function selectValidationMinimum(
+export function selectValidationMinimumInclusive(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -307,7 +309,7 @@ export function selectValidationMinimum(
     }
 }
 
-export function selectValidationExclusiveMinimum(
+export function selectValidationMinimumExclusive(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -315,7 +317,7 @@ export function selectValidationExclusiveMinimum(
     }
 }
 
-export function selectValidationMaximum(
+export function selectValidationMaximumInclusive(
     node: Schema,
 ) {
     if (typeof node === "object") {
@@ -323,7 +325,7 @@ export function selectValidationMaximum(
     }
 }
 
-export function selectValidationExclusiveMaximum(
+export function selectValidationMaximumExclusive(
     node: Schema,
 ) {
     if (typeof node === "object") {
