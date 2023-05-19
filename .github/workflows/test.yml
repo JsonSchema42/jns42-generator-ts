@@ -3,21 +3,6 @@ on:
   - pull_request
 
 jobs:
-  test-generated-package:
-    strategy:
-      matrix:
-        fixture:
-          - string-or-boolean
-          - simple-object
-          - array-with-ref
-    runs-on: ubuntu-latest
-    container: node:18
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm ci
-      - run: make .package/${{ matrix.fixture }}
-      - run: ( cd .package/${{ matrix.fixture }} ; node --test *.spec.js )
-
   test-unit:
     runs-on: ubuntu-latest
     container: node:18

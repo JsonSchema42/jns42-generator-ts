@@ -17,50 +17,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package openapi_v3-0_2021-09-28",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/openapi/openapi_v3-0_2021-09-28.json",
-        "--package-directory",
-        ".package/openapi_v3-0_2021-09-28",
-        "--package-name",
-        "openapi_v3-0_2021-09-28",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package openapi_v3-1_2022-10-07",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/openapi/openapi_v3-1_2022-10-07.json",
-        "--package-directory",
-        ".package/openapi_v3-1_2022-10-07",
-        "--package-name",
-        "openapi_v3-1_2022-10-07",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "package draft-2020-12",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
@@ -167,50 +123,6 @@
         "${workspaceFolder}/out/**/*.js"
       ],
       "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package output-2020-12",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/output-2020-12/schema",
-        "--package-directory",
-        ".package/output-2020-12",
-        "--package-name",
-        "output-2020-12",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package output-2019-09",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/output-2019-09/schema",
-        "--package-directory",
-        ".package/output-2019-09",
-        "--package-name",
-        "output-2019-09",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
-      "preLaunchTask": "watch"
-    },
+    }
   ]
 }
