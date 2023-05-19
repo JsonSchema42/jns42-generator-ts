@@ -1,4 +1,3 @@
-
 import camelcase from "camelcase";
 import cp from "child_process";
 import assert from "node:assert/strict";
@@ -84,6 +83,11 @@ for (const schemaName of schemaNames) {
         });
 
         cp.execSync("npm install", {
+            cwd: packageDirectoryPath,
+            env: process.env,
+        });
+
+        cp.execSync("npm test", {
             cwd: packageDirectoryPath,
             env: process.env,
         });
