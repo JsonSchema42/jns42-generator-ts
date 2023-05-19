@@ -242,7 +242,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeTypeDescriptorFromBoolean(
-        node: Schema | boolean,
+        node: Schema,
     ): Iterable<TypeDescriptorUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
 
@@ -259,7 +259,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeTypeDescriptorFromNumber(
-        node: Schema | boolean,
+        node: Schema,
         numberType: "integer" | "float",
     ): Iterable<TypeDescriptorUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
@@ -289,7 +289,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeTypeDescriptorFromString(
-        node: Schema | boolean,
+        node: Schema,
     ): Iterable<TypeDescriptorUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
 
@@ -313,7 +313,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeTypeDescriptorFromArray(
-        node: Schema | boolean,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
     ): Iterable<TypeDescriptorUnion> {
@@ -384,7 +384,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeTypeDescriptorFromObject(
-        node: Schema | boolean,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
     ): Iterable<TypeDescriptorUnion> {
@@ -438,7 +438,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeCompoundDescriptorFromAllOf(
-        node: Schema | boolean,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
     ): Iterable<CompoundDescriptorUnion> {
@@ -461,7 +461,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeCompoundDescriptorFromAnyOf(
-        node: Schema | boolean,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
     ): Iterable<CompoundDescriptorUnion> {
@@ -484,7 +484,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     }
 
     private * makeNodeCompoundDescriptorFromOneOf(
-        node: Schema | boolean,
+        node: Schema,
         nodeRootUrl: URL,
         nodePointer: string,
     ): Iterable<CompoundDescriptorUnion> {
