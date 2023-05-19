@@ -1,4 +1,3 @@
-import { appendJsonPointer } from "../../utils/index.js";
 import { Schema } from "./types.js";
 
 //#region core
@@ -374,6 +373,16 @@ export function selectValidationEnum(
     if (typeof node === "object") {
         return node.enum;
     }
+}
+
+//#endregion
+
+//#region helpers
+
+function appendJsonPointer(basePointer: string, ...subPointerParts: string[]) {
+    return basePointer + subPointerParts.
+        map(part => "/" + encodeURI(part)).
+        join("");
 }
 
 //#endregion

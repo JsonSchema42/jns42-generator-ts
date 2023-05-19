@@ -1,4 +1,4 @@
-import { appendJsonPointer } from "../../utils/index.js";
+
 import { Applicator, Core, MetaData, Validation } from "./types.js";
 
 //#region core
@@ -398,3 +398,12 @@ export function selectValidationEnum(
 
 //#endregion
 
+//#region helpers
+
+function appendJsonPointer(basePointer: string, ...subPointerParts: string[]) {
+    return basePointer + subPointerParts.
+        map(part => "/" + encodeURI(part)).
+        join("");
+}
+
+//#endregion
