@@ -65,52 +65,56 @@ async function runTest(
         return;
     }
 
-    const context = new SchemaContext();
-    context.registerStrategy(
-        schema202012.metaSchemaId,
-        new schema202012.SchemaStrategy(),
-    );
-    context.registerStrategy(
-        schema201909.metaSchemaId,
-        new schema201909.SchemaStrategy(),
-    );
-    context.registerStrategy(
-        schemaDraft07.metaSchemaId,
-        new schemaDraft07.SchemaStrategy(),
-    );
-    context.registerStrategy(
-        schemaDraft06.metaSchemaId,
-        new schemaDraft06.SchemaStrategy(),
-    );
-    context.registerStrategy(
-        schemaDraft04.metaSchemaId,
-        new schemaDraft04.SchemaStrategy(),
-    );
-    await context.loadFromUrl(
-        schemaUrl,
-        schemaUrl,
-        null,
-        schema202012.metaSchemaId,
-    );
+    await test("generate package", async () => {
+        const context = new SchemaContext();
+        context.registerStrategy(
+            schema202012.metaSchemaId,
+            new schema202012.SchemaStrategy(),
+        );
+        context.registerStrategy(
+            schema201909.metaSchemaId,
+            new schema201909.SchemaStrategy(),
+        );
+        context.registerStrategy(
+            schemaDraft07.metaSchemaId,
+            new schemaDraft07.SchemaStrategy(),
+        );
+        context.registerStrategy(
+            schemaDraft06.metaSchemaId,
+            new schemaDraft06.SchemaStrategy(),
+        );
+        context.registerStrategy(
+            schemaDraft04.metaSchemaId,
+            new schemaDraft04.SchemaStrategy(),
+        );
+        await context.loadFromUrl(
+            schemaUrl,
+            schemaUrl,
+            null,
+            schema202012.metaSchemaId,
+        );
 
-    const namer = new Namer(new Date().valueOf());
-    for (const [nodeId, typeName] of context.getTypeNames()) {
-        namer.registerName(nodeId, typeName);
-    }
+        const namer = new Namer(new Date().valueOf());
+        for (const [nodeId, typeName] of context.getTypeNames()) {
+            namer.registerName(nodeId, typeName);
+        }
 
-    const factory = ts.factory;
-    generatePackage(factory, context, namer, {
-        directoryPath: packageDirectoryPath,
-        name: packageName,
-        version: "v0.0.0",
+        const factory = ts.factory;
+        generatePackage(factory, context, namer, {
+            directoryPath: packageDirectoryPath,
+            name: packageName,
+            version: "v0.0.0",
+        });
     });
 
-    cp.execSync("npm install", {
-        cwd: packageDirectoryPath,
-        env: process.env,
+    await test("install package", () => {
+        cp.execSync("npm install", {
+            cwd: packageDirectoryPath,
+            env: process.env,
+        });
     });
 
-    test("test package", () => {
+    await test("test package", () => {
         cp.execSync("test package", {
             cwd: packageDirectoryPath,
             env: process.env,
@@ -124,6 +128,7 @@ async function runTest(
         "fixtures",
         "testing",
         "good",
+        packageName,
     );
     if (fs.existsSync(goodDirectory)) {
         const goodFiles = fs.readdirSync(goodDirectory).
@@ -150,6 +155,7 @@ async function runTest(
         "fixtures",
         "testing",
         "bad",
+        packageName,
     );
     if (fs.existsSync(badDirectory)) {
         const badFiles = fs.readdirSync(badDirectory).
