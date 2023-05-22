@@ -15,9 +15,10 @@ import { SchemaContext } from "../schema/index.js";
 import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
-    "array-with-ref",
-    "simple-object",
     "string-or-boolean",
+    "simple-object",
+    "specialized-object",
+    "array-with-ref",
 ];
 
 const schemaNames = [
