@@ -123,58 +123,62 @@ async function runTest(
 
     const typeName = camelcase(`${packageName}.json`, { pascalCase: true });
 
-    const goodDirectory = path.join(
+    const validDirectory = path.join(
         projectRoot,
         "fixtures",
         "testing",
-        "good",
+        "valid",
         packageName,
     );
-    if (fs.existsSync(goodDirectory)) {
-        const goodFiles = fs.readdirSync(goodDirectory).
-            filter(file => /\.json$/.test(file));
+    if (fs.existsSync(validDirectory)) {
+        await test("valid", async () => {
+            const validFiles = fs.readdirSync(validDirectory).
+                filter(file => /\.json$/.test(file));
 
-        for (const goodFile of goodFiles) {
-            await test(goodFile, async () => {
-                const schema = await import(
-                    path.join(packageDirectoryPath, "main.js")
-                );
+            for (const validFile of validFiles) {
+                await test(validFile, async () => {
+                    const schema = await import(
+                        path.join(packageDirectoryPath, "main.js")
+                    );
 
-                const data = fs.readFileSync(
-                    path.join(goodDirectory, goodFile),
-                    "utf-8",
-                );
-                const instance = JSON.parse(data);
-                assert.equal(schema[`is${typeName}`](instance), true);
-            });
-        }
+                    const data = fs.readFileSync(
+                        path.join(validDirectory, validFile),
+                        "utf-8",
+                    );
+                    const instance = JSON.parse(data);
+                    assert.equal(schema[`is${typeName}`](instance), true);
+                });
+            }
+        });
     }
 
-    const badDirectory = path.join(
+    const invalidDirectory = path.join(
         projectRoot,
         "fixtures",
         "testing",
-        "bad",
+        "invalid",
         packageName,
     );
-    if (fs.existsSync(badDirectory)) {
-        const badFiles = fs.readdirSync(badDirectory).
-            filter(file => /\.json$/.test(file));
+    if (fs.existsSync(invalidDirectory)) {
+        await test("invalid", async () => {
+            const invalidFiles = fs.readdirSync(invalidDirectory).
+                filter(file => /\.json$/.test(file));
 
-        for (const badFile of badFiles) {
-            await test(badFile, async () => {
-                const schema = await import(
-                    path.join(packageDirectoryPath, "main.js")
-                );
+            for (const invalidFile of invalidFiles) {
+                await test(invalidFile, async () => {
+                    const schema = await import(
+                        path.join(packageDirectoryPath, "main.js")
+                    );
 
-                const data = fs.readFileSync(
-                    path.join(badDirectory, badFile),
-                    "utf-8",
-                );
-                const instance = JSON.parse(data);
-                assert.equal(schema[`is${typeName}`](instance), false);
-            });
-        }
+                    const data = fs.readFileSync(
+                        path.join(invalidDirectory, invalidFile),
+                        "utf-8",
+                    );
+                    const instance = JSON.parse(data);
+                    assert.equal(schema[`is${typeName}`](instance), false);
+                });
+            }
+        });
     }
 
 }
