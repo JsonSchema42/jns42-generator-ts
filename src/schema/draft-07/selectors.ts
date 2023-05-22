@@ -35,6 +35,14 @@ export function selectNodeDescription(
     }
 }
 
+export function selectNodeExamples(
+    node: Schema,
+) {
+    if (typeof node === "object") {
+        return node.examples;
+    }
+}
+
 //#endregion
 
 //#region schema

@@ -3,9 +3,5 @@
   "type": [
     "string",
     "boolean"
-  ],
-  "examples": [
-    "hi!",
-    false
   ]
 }
