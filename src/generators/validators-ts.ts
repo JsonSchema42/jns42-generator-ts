@@ -984,15 +984,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        /*
-        We might want this back one day!
-        */
-        // yield f.createDefaultClause([
-        //     f.createReturnStatement(
-        //         f.createFalse(),
-        //     ),
-        // ]);
-        /* */
+        yield f.createDefaultClause([
+            f.createReturnStatement(
+                f.createFalse(),
+            ),
+        ]);
+
     }
 
     protected *generateRecordTypeValidationStatements(
