@@ -145,8 +145,7 @@ export class SchemaContext implements SchemaStrategyInterface {
         metaSchemaId: string,
         baseName = "",
     ): Iterable<readonly [string, string]> {
-        const reReplace = /[^A-Za-z0-9-_]/gu;
-        const reFilter = /^[A-Za-z-_]/u;
+        const reReplace = /[^A-Za-z0-9-_.,]/gu;
 
         const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
@@ -162,7 +161,7 @@ export class SchemaContext implements SchemaStrategyInterface {
             split("/").
             map(decodeURI).
             map(value => value.replace(reReplace, "")).
-            filter(value => reFilter.test(value));
+            filter(value => value !== "");
         const pointerParts = nodePointer.
             split("/").
             map(decodeURI).

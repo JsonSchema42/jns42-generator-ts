@@ -121,7 +121,7 @@ async function runTest(
         });
     });
 
-    const typeName = camelcase(packageName, { pascalCase: true });
+    const typeName = camelcase(`${packageName}.json`, { pascalCase: true });
 
     const goodDirectory = path.join(
         projectRoot,
