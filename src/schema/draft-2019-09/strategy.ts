@@ -61,7 +61,10 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             return nodeUrl;
         }
 
-        nodeUrl = new URL(`#${nodePointer}`, nodeRootUrl);
+        nodeUrl = new URL(
+            nodePointer === "" ? "" : `#${nodePointer}`,
+            nodeRootUrl,
+        );
         return nodeUrl;
     }
 
