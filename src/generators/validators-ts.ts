@@ -1011,7 +1011,11 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                                 f.createIdentifier("propertiesAccepted"),
                                 f.createIdentifier("propertyName"),
                             ),
+                            /*
+                            need to cast to any or it won't compile. Smells like a ts bug
+                            */
                             f.createToken(ts.SyntaxKind.QuestionQuestionEqualsToken as any),
+                            /* */
                             f.createFalse(),
                         )),
                         f.createVariableStatement(
