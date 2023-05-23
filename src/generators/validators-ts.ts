@@ -18,6 +18,31 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createStringLiteral("./types.js"),
         );
 
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("propertiesAcceptedMap"),
+                    undefined,
+                    undefined,
+                    f.createNewExpression(
+                        f.createIdentifier("WeakMap"),
+                        [
+                            f.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword),
+                            f.createTypeReferenceNode(
+                                f.createIdentifier("Record"),
+                                [
+                                    f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                                    f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+                                ],
+                            ),
+                        ],
+                        undefined,
+                    ),
+                ),
+            ], ts.NodeFlags.Const),
+        );
+
         for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
             yield* this.generateValidatorFunctionDeclarationStatements(
                 nodeDescriptor,
@@ -907,51 +932,144 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        yield f.createForInStatement(
+        yield f.createVariableStatement(
+            undefined,
             f.createVariableDeclarationList([
                 f.createVariableDeclaration(
-                    f.createIdentifier("propertyName"),
-                ),
-            ], ts.NodeFlags.Const),
-            f.createIdentifier("value"),
-            f.createBlock([
-                f.createVariableStatement(
+                    f.createIdentifier("propertiesAccepted"),
                     undefined,
+                    undefined,
+                    f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createIdentifier("propertiesAcceptedMap"),
+                            f.createIdentifier("get"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("isLocalPropertiesAccepted"),
+                    undefined,
+                    undefined,
+                    f.createFalse(),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createIdentifier("propertiesAccepted"),
+                f.createToken(ts.SyntaxKind.EqualsEqualsToken),
+                f.createNull(),
+            ),
+            f.createBlock([
+                f.createExpressionStatement(f.createBinaryExpression(
+                    f.createIdentifier("propertiesAccepted"),
+                    f.createToken(ts.SyntaxKind.EqualsToken),
+                    f.createObjectLiteralExpression(
+                        [],
+                        false,
+                    ),
+                )),
+                f.createExpressionStatement(f.createCallExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("propertiesAcceptedMap"),
+                        f.createIdentifier("set"),
+                    ),
+                    undefined,
+                    [
+                        f.createIdentifier("value"),
+                        f.createIdentifier("propertiesAccepted"),
+                    ],
+                )),
+                f.createExpressionStatement(f.createBinaryExpression(
+                    f.createIdentifier("isLocalPropertiesAccepted"),
+                    f.createToken(ts.SyntaxKind.EqualsToken),
+                    f.createTrue(),
+                )),
+            ], true),
+            undefined,
+        );
+
+        yield f.createTryStatement(
+            f.createBlock([
+                f.createForInStatement(
                     f.createVariableDeclarationList([
                         f.createVariableDeclaration(
-                            f.createIdentifier("propertyValue"),
-                            undefined,
-                            undefined,
+                            f.createIdentifier("propertyName"),
+                        ),
+                    ], ts.NodeFlags.Const),
+                    f.createIdentifier("value"),
+                    f.createBlock([
+                        f.createExpressionStatement(f.createBinaryExpression(
                             f.createElementAccessExpression(
-                                f.createIdentifier("value"),
-                                f.createAsExpression(
-                                    f.createIdentifier("propertyName"),
-                                    f.createTypeOperatorNode(
-                                        ts.SyntaxKind.KeyOfKeyword,
-                                        f.createTypeQueryNode(
-                                            f.createIdentifier("value"),
+                                f.createIdentifier("propertiesAccepted"),
+                                f.createIdentifier("propertyName"),
+                            ),
+                            f.createToken(ts.SyntaxKind.QuestionQuestionEqualsToken as any),
+                            f.createFalse(),
+                        )),
+                        f.createVariableStatement(
+                            undefined,
+                            f.createVariableDeclarationList([
+                                f.createVariableDeclaration(
+                                    f.createIdentifier("propertyValue"),
+                                    undefined,
+                                    undefined,
+                                    f.createElementAccessExpression(
+                                        f.createIdentifier("value"),
+                                        f.createAsExpression(
+                                            f.createIdentifier("propertyName"),
+                                            f.createTypeOperatorNode(
+                                                ts.SyntaxKind.KeyOfKeyword,
+                                                f.createTypeQueryNode(
+                                                    f.createIdentifier("value"),
+                                                ),
+                                            ),
                                         ),
                                     ),
                                 ),
-                            ),
+                            ], ts.NodeFlags.Const),
                         ),
-                    ], ts.NodeFlags.Const),
+                        f.createSwitchStatement(
+                            f.createIdentifier("propertyName"),
+                            f.createCaseBlock([
+                                ...this.generateInterfaceTypeCaseClausesValidationStatements(
+                                    typeDescriptor,
+                                ),
+                            ]),
+                        ),
+                    ], true),
                 ),
-                f.createSwitchStatement(
-                    f.createIdentifier("propertyName"),
-                    f.createCaseBlock([
-                        ...this.generateInterfaceTypeCaseClausesValidationStatements(
-                            typeDescriptor,
-                        ),
-                    ]),
+                f.createReturnStatement(
+                    f.createTrue(),
+                ),
+            ], true),
+            undefined,
+            f.createBlock([
+                f.createIfStatement(
+                    f.createIdentifier("isLocalPropertiesAccepted"),
+                    f.createBlock([
+                        f.createExpressionStatement(f.createCallExpression(
+                            f.createPropertyAccessExpression(
+                                f.createIdentifier("propertiesAcceptedMap"),
+                                f.createIdentifier("delete"),
+                            ),
+                            undefined,
+                            [f.createIdentifier("value")],
+                        )),
+                    ], true),
                 ),
             ], true),
         );
 
-        yield f.createReturnStatement(
-            f.createTrue(),
-        );
     }
+
     private * generateInterfaceTypeCaseClausesValidationStatements(
         typeDescriptor: InterfaceTypeDescriptor,
     ): Iterable<ts.CaseOrDefaultClause> {
@@ -964,6 +1082,15 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             yield f.createCaseClause(
                 f.createStringLiteral(propertyName),
                 [
+                    f.createExpressionStatement(f.createBinaryExpression(
+                        f.createElementAccessExpression(
+                            f.createIdentifier("propertiesAccepted"),
+                            f.createIdentifier("propertyName"),
+                        ),
+                        f.createToken(ts.SyntaxKind.EqualsToken),
+                        f.createTrue(),
+                    )),
+
                     f.createIfStatement(
                         f.createPrefixUnaryExpression(
                             ts.SyntaxKind.ExclamationToken,
@@ -985,8 +1112,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         }
 
         yield f.createDefaultClause([
-            f.createReturnStatement(
-                f.createFalse(),
+            f.createIfStatement(
+                f.createIdentifier("isLocalPropertiesAccepted"),
+                f.createBlock([
+                    f.createReturnStatement(
+                        f.createFalse(),
+                    ),
+                ], true),
             ),
         ]);
 
@@ -1188,6 +1320,70 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("propertiesAccepted"),
+                    undefined,
+                    undefined,
+                    f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createIdentifier("propertiesAcceptedMap"),
+                            f.createIdentifier("get"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("isLocalPropertiesAccepted"),
+                    undefined,
+                    undefined,
+                    f.createFalse(),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createIdentifier("propertiesAccepted"),
+                f.createToken(ts.SyntaxKind.EqualsEqualsToken),
+                f.createNull(),
+            ),
+            f.createBlock([
+                f.createExpressionStatement(f.createBinaryExpression(
+                    f.createIdentifier("propertiesAccepted"),
+                    f.createToken(ts.SyntaxKind.EqualsToken),
+                    f.createObjectLiteralExpression(
+                        [],
+                        false,
+                    ),
+                )),
+                f.createExpressionStatement(f.createCallExpression(
+                    f.createPropertyAccessExpression(
+                        f.createIdentifier("propertiesAcceptedMap"),
+                        f.createIdentifier("set"),
+                    ),
+                    undefined,
+                    [
+                        f.createIdentifier("value"),
+                        f.createIdentifier("propertiesAccepted"),
+                    ],
+                )),
+                f.createExpressionStatement(f.createBinaryExpression(
+                    f.createIdentifier("isLocalPropertiesAccepted"),
+                    f.createToken(ts.SyntaxKind.EqualsToken),
+                    f.createTrue(),
+                )),
+            ], true),
+            undefined,
+        );
+
         for (const typeNodeId of typeNodeIds) {
             const typeName = this.getTypeName(typeNodeId);
 
@@ -1212,27 +1408,204 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const typeNodeId of typeNodeIds) {
-            const typeName = this.getTypeName(typeNodeId);
-
-            yield f.createIfStatement(
-                f.createPrefixUnaryExpression(
-                    ts.SyntaxKind.ExclamationToken,
-                    f.createCallExpression(
-                        f.createIdentifier(`is${typeName}`),
-                        undefined,
-                        [
-                            f.createIdentifier("value"),
-                        ],
-                    ),
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("propertiesAccepted"),
+                    undefined,
+                    f.createUnionTypeNode([
+                        f.createTypeReferenceNode(
+                            f.createIdentifier("Record"),
+                            [
+                                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                                f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+                            ],
+                        ),
+                        f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
+                    ]),
+                    f.createIdentifier("undefined"),
                 ),
-                f.createBlock([
-                    f.createReturnStatement(f.createFalse()),
-                ], true),
-            );
-        }
+            ], ts.NodeFlags.Let),
+        );
+        yield f.createVariableStatement(
+            undefined,
+            f.createVariableDeclarationList([
+                f.createVariableDeclaration(
+                    f.createIdentifier("isLocalPropertiesAccepted"),
+                    undefined,
+                    undefined,
+                    f.createFalse(),
+                ),
+            ], ts.NodeFlags.Let),
+        );
+        yield f.createIfStatement(
+            f.createBinaryExpression(
+                f.createBinaryExpression(
+                    f.createTypeOfExpression(f.createIdentifier("value")),
+                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                    f.createStringLiteral("object"),
+                ),
+                f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                f.createBinaryExpression(
+                    f.createIdentifier("value"),
+                    f.createToken(ts.SyntaxKind.ExclamationEqualsToken),
+                    f.createNull(),
+                ),
+            ),
+            f.createBlock([
+                f.createExpressionStatement(f.createBinaryExpression(
+                    f.createIdentifier("propertiesAccepted"),
+                    f.createToken(ts.SyntaxKind.EqualsToken),
+                    f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                            f.createIdentifier("propertiesAcceptedMap"),
+                            f.createIdentifier("get"),
+                        ),
+                        undefined,
+                        [f.createIdentifier("value")],
+                    ),
+                )),
+                f.createIfStatement(
+                    f.createBinaryExpression(
+                        f.createIdentifier("propertiesAccepted"),
+                        f.createToken(ts.SyntaxKind.EqualsEqualsToken),
+                        f.createNull(),
+                    ),
+                    f.createBlock([
+                        f.createExpressionStatement(f.createBinaryExpression(
+                            f.createIdentifier("propertiesAccepted"),
+                            f.createToken(ts.SyntaxKind.EqualsToken),
+                            f.createObjectLiteralExpression(
+                                [],
+                                false,
+                            ),
+                        )),
+                        f.createExpressionStatement(f.createCallExpression(
+                            f.createPropertyAccessExpression(
+                                f.createIdentifier("propertiesAcceptedMap"),
+                                f.createIdentifier("set"),
+                            ),
+                            undefined,
+                            [
+                                f.createIdentifier("value"),
+                                f.createIdentifier("propertiesAccepted"),
+                            ],
+                        )),
+                        f.createExpressionStatement(f.createBinaryExpression(
+                            f.createIdentifier("isLocalPropertiesAccepted"),
+                            f.createToken(ts.SyntaxKind.EqualsToken),
+                            f.createTrue(),
+                        )),
+                    ], true),
+                ),
+            ], true),
+        );
 
-        yield f.createReturnStatement(f.createTrue());
+        yield f.createTryStatement(
+            f.createBlock([
+                ...typeNodeIds.map(typeNodeId => {
+                    const typeName = this.getTypeName(typeNodeId);
+
+                    return f.createIfStatement(
+                        f.createPrefixUnaryExpression(
+                            ts.SyntaxKind.ExclamationToken,
+                            f.createCallExpression(
+                                f.createIdentifier(`is${typeName}`),
+                                undefined,
+                                [
+                                    f.createIdentifier("value"),
+                                ],
+                            ),
+                        ),
+                        f.createBlock([
+                            f.createReturnStatement(f.createFalse()),
+                        ], true),
+                    );
+                }),
+
+                f.createIfStatement(
+                    f.createPrefixUnaryExpression(
+                        ts.SyntaxKind.ExclamationToken,
+                        f.createCallExpression(
+                            f.createPropertyAccessExpression(
+                                f.createCallExpression(
+                                    f.createPropertyAccessExpression(
+                                        f.createIdentifier("Object"),
+                                        f.createIdentifier("values"),
+                                    ),
+                                    undefined,
+                                    [f.createBinaryExpression(
+                                        f.createIdentifier("propertiesAccepted"),
+                                        f.createToken(ts.SyntaxKind.QuestionQuestionToken),
+                                        f.createObjectLiteralExpression(
+                                            [],
+                                            false,
+                                        ),
+                                    )],
+                                ),
+                                f.createIdentifier("every"),
+                            ),
+                            undefined,
+                            [f.createArrowFunction(
+                                undefined,
+                                undefined,
+                                [f.createParameterDeclaration(
+                                    undefined,
+                                    undefined,
+                                    f.createIdentifier("accepted"),
+                                )],
+                                undefined,
+                                f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                                f.createBinaryExpression(
+                                    f.createIdentifier("accepted"),
+                                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                                    f.createTrue(),
+                                ),
+                            )],
+                        ),
+                    ),
+                    f.createBlock([
+                        f.createReturnStatement(f.createFalse()),
+                    ], true),
+                ),
+                f.createReturnStatement(f.createTrue()),
+            ], true),
+            undefined,
+            f.createBlock([
+                f.createIfStatement(
+                    f.createBinaryExpression(
+                        f.createBinaryExpression(
+                            f.createTypeOfExpression(f.createIdentifier("value")),
+                            f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                            f.createStringLiteral("object"),
+                        ),
+                        f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+                        f.createBinaryExpression(
+                            f.createIdentifier("value"),
+                            f.createToken(ts.SyntaxKind.ExclamationEqualsToken),
+                            f.createNull(),
+                        ),
+                    ),
+                    f.createBlock([
+                        f.createIfStatement(
+                            f.createIdentifier("isLocalPropertiesAccepted"),
+                            f.createBlock([
+                                f.createExpressionStatement(f.createCallExpression(
+                                    f.createPropertyAccessExpression(
+                                        f.createIdentifier("propertiesAcceptedMap"),
+                                        f.createIdentifier("delete"),
+                                    ),
+                                    undefined,
+                                    [f.createIdentifier("value")],
+                                )),
+                            ], true),
+                        ),
+                    ], true),
+                ),
+            ], true),
+        );
+
     }
 
     protected getTypeName(
