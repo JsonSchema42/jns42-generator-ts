@@ -110,7 +110,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#region strategy implementation
 
-    public selectNodes(
+    public getNodes(
     ): Record<string, Node> {
         return Object.fromEntries(this.selectNodeEntries());
     }

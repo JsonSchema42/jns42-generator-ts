@@ -195,10 +195,10 @@ export class SchemaContext implements SchemaStrategyInterface {
         }
     }
 
-    public selectNodes(): Record<string, Node> {
+    public getNodes(): Record<string, Node> {
         const result = {} as Record<string, Node>;
         for (const strategy of Object.values(this.strategies)) {
-            Object.assign(result, strategy.selectNodes());
+            Object.assign(result, strategy.getNodes());
         }
         return result;
     }

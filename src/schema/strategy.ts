@@ -3,7 +3,7 @@ import { SchemaContext } from "./context.js";
 import { Node } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    selectNodes(): Record<string, Node>
+    getNodes(): Record<string, Node>
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -67,7 +67,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         node: N
     ): URL | undefined
 
-    public abstract selectNodes(): Record<string, Node>
+    public abstract getNodes(): Record<string, Node>
 
     private maybeContext?: SchemaContext;
     protected get context() {

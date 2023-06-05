@@ -96,7 +96,7 @@ async function main(options: MainOptions) {
         defaultMetaSchemaId,
     );
 
-    const nodes = context.selectNodes();
+    const nodes = context.getNodes();
 
     const namer = new Namer(options.uniqueNameSeed);
     for (const [nodeId, typeName] of context.getTypeNames()) {

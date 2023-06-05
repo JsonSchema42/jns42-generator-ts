@@ -96,7 +96,7 @@ async function runTest(
             null,
             schema202012.metaSchemaId,
         );
-        const nodes = context.selectNodes();
+        const nodes = context.getNodes();
 
         const namer = new Namer(new Date().valueOf());
         for (const [nodeId, typeName] of context.getTypeNames()) {
