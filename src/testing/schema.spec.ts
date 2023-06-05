@@ -19,7 +19,7 @@ const packageNames = [
     "simple-object",
     "array-with-ref",
     "all-of-object",
-    // "any-of-object",
+    "any-of-object",
     "one-of-object",
 ];
 
