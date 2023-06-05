@@ -17,8 +17,10 @@ import { Namer, projectRoot } from "../utils/index.js";
 const packageNames = [
     "string-or-boolean",
     "simple-object",
-    "specialized-object",
     "array-with-ref",
+    "all-of-object",
+    // "any-of-object",
+    "one-of-object",
 ];
 
 const schemaNames = [
