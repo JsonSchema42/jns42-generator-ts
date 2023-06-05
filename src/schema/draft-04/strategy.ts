@@ -1,4 +1,4 @@
-import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../intermediate.js";
+import { CompoundUnion, Node, TypeUnion } from "../intermediate.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeDescription, selectNodeEnum, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalItemsEntries, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsManyEntries, selectSubNodeItemsOneEntries, selectSubNodeOneOfEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
@@ -112,7 +112,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
     //#region strategy implementation
 
     public * selectNodeDescriptors(
-    ): Iterable<NodeDescriptor> {
+    ): Iterable<Node> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
             const description = selectNodeDescription(node) ?? "";
             const deprecated = false;
@@ -143,7 +143,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     public *selectNodeTypeDescriptors(
         nodeId: string,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<TypeUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         if (nodeItem.node === true) {
@@ -215,7 +215,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     public *selectNodeCompoundDescriptors(
         nodeId: string,
-    ): Iterable<CompoundDescriptorUnion> {
+    ): Iterable<CompoundUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         yield* this.makeNodeCompoundDescriptorFromAllOf(
@@ -236,7 +236,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     }
 
-    private * makeNodeTypeDescriptorFromNull(): Iterable<TypeDescriptorUnion> {
+    private * makeNodeTypeDescriptorFromNull(): Iterable<TypeUnion> {
         yield {
             type: "null",
         };
@@ -244,7 +244,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     private * makeNodeTypeDescriptorFromBoolean(
         node: Schema | boolean,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
 
         let options: Array<boolean> | undefined;
@@ -262,7 +262,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
     private * makeNodeTypeDescriptorFromNumber(
         node: Schema | boolean,
         numberType: "integer" | "float",
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
 
         let options: Array<number> | undefined;
@@ -291,7 +291,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     private * makeNodeTypeDescriptorFromString(
         node: Schema | boolean,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
 
         let options: Array<string> | undefined;
@@ -317,7 +317,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<TypeUnion> {
         const itemsOne = [...selectSubNodeItemsOneEntries(nodePointer, node)];
         const itemsMany = [...selectSubNodeItemsManyEntries(nodePointer, node)];
         const additionalItems = [...selectSubNodeAdditionalItemsEntries(nodePointer, node)];
@@ -388,7 +388,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<TypeDescriptorUnion> {
+    ): Iterable<TypeUnion> {
         const propertyNames = [...selectNodePropertyNamesEntries(nodePointer, node)];
         const additionalProperties =
             [...selectSubNodeAdditionalPropertiesEntries(nodePointer, node)];
@@ -442,7 +442,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<CompoundDescriptorUnion> {
+    ): Iterable<CompoundUnion> {
         const allOf = [...selectSubNodeAllOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
@@ -465,7 +465,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<CompoundDescriptorUnion> {
+    ): Iterable<CompoundUnion> {
         const allOf = [...selectSubNodeAnyOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
@@ -488,7 +488,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
-    ): Iterable<CompoundDescriptorUnion> {
+    ): Iterable<CompoundUnion> {
         const allOf = [...selectSubNodeOneOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {

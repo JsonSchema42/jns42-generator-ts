@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "../schema/intermediate.js";
+import { CompoundUnion, Node, TypeUnion } from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
@@ -13,7 +13,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateTypeDeclarationStatement(
-        nodeDescriptor: NodeDescriptor,
+        nodeDescriptor: Node,
     ) {
         const typeDefinition = this.generateTypeDefinition(
             nodeDescriptor,
@@ -51,7 +51,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateTypeDefinition(
-        nodeDescriptor: NodeDescriptor,
+        nodeDescriptor: Node,
     ): ts.TypeNode {
         const { factory: f } = this;
 
@@ -115,7 +115,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateTypeDefinitionElement(
-        typeDescriptor: TypeDescriptorUnion,
+        typeDescriptor: TypeUnion,
     ): ts.TypeNode {
         switch (typeDescriptor.type) {
             case "never":
@@ -163,7 +163,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateCompoundDefinitionElement(
-        compoundDescriptor: CompoundDescriptorUnion,
+        compoundDescriptor: CompoundUnion,
     ): ts.TypeNode {
         switch (compoundDescriptor.type) {
             case "one-of":

@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { NodeDescriptor } from "../schema/intermediate.js";
+import { Node } from "../schema/intermediate.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
@@ -76,7 +76,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateAssertStatementsForNode(
-        nodeDescriptor: NodeDescriptor,
+        nodeDescriptor: Node,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 

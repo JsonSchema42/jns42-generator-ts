@@ -1,11 +1,11 @@
 import assert from "assert";
 import { SchemaContext } from "./context.js";
-import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./intermediate.js";
+import { CompoundUnion, Node, TypeUnion } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    selectNodeDescriptors(): Iterable<NodeDescriptor>
-    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeDescriptorUnion>
-    selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundDescriptorUnion>
+    selectNodeDescriptors(): Iterable<Node>
+    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeUnion>
+    selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundUnion>
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -69,15 +69,15 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         node: N
     ): URL | undefined
 
-    public abstract selectNodeDescriptors(): Iterable<NodeDescriptor>
+    public abstract selectNodeDescriptors(): Iterable<Node>
 
     public abstract selectNodeTypeDescriptors(
         nodeId: string
-    ): Iterable<TypeDescriptorUnion>
+    ): Iterable<TypeUnion>
 
     public abstract selectNodeCompoundDescriptors(
         nodeId: string
-    ): Iterable<CompoundDescriptorUnion>
+    ): Iterable<CompoundUnion>
 
     private maybeContext?: SchemaContext;
     protected get context() {

@@ -1,4 +1,4 @@
-export interface NodeDescriptor {
+export interface Node {
     nodeId: string
     superNodeId?: string
     deprecated: boolean
@@ -6,36 +6,36 @@ export interface NodeDescriptor {
     examples: unknown[]
 }
 
-export type TypeDescriptorUnion =
-    NullTypeDescriptor |
-    AnyTypeDescriptor |
-    NeverTypeDescriptor |
-    BooleanTypeDescriptor |
-    NumberTypeDescriptor |
-    StringTypeDescriptor |
-    TupleTypeDescriptor |
-    ArrayTypeDescriptor |
-    InterfaceTypeDescriptor |
-    RecordTypeDescriptor;
+export type TypeUnion =
+    NullType |
+    AnyType |
+    NeverType |
+    BooleanType |
+    NumberType |
+    StringType |
+    TupleType |
+    ArrayType |
+    InterfaceType |
+    RecordType;
 
-export interface NullTypeDescriptor {
+export interface NullType {
     type: "null"
 }
 
-export interface AnyTypeDescriptor {
+export interface AnyType {
     type: "any"
 }
 
-export interface NeverTypeDescriptor {
+export interface NeverType {
     type: "never"
 }
 
-export interface BooleanTypeDescriptor {
+export interface BooleanType {
     type: "boolean"
     options?: boolean[]
 }
 
-export interface NumberTypeDescriptor {
+export interface NumberType {
     type: "number"
     numberType: "integer" | "float"
     options?: number[]
@@ -46,7 +46,7 @@ export interface NumberTypeDescriptor {
     multipleOf?: number
 }
 
-export interface StringTypeDescriptor {
+export interface StringType {
     type: "string"
     options?: string[]
     minimumLength?: number
@@ -54,12 +54,12 @@ export interface StringTypeDescriptor {
     valuePattern?: string
 }
 
-export interface TupleTypeDescriptor {
+export interface TupleType {
     type: "tuple"
     itemTypeNodeIds: Array<string>
 }
 
-export interface ArrayTypeDescriptor {
+export interface ArrayType {
     type: "array"
     minimumItems?: number
     maximumItems?: number
@@ -67,13 +67,13 @@ export interface ArrayTypeDescriptor {
     itemTypeNodeId: string
 }
 
-export interface InterfaceTypeDescriptor {
+export interface InterfaceType {
     type: "interface"
     requiredProperties: string[]
     propertyTypeNodeIds: Record<string, string>
 }
 
-export interface RecordTypeDescriptor {
+export interface RecordType {
     type: "record"
     requiredProperties: string[]
     minimumProperties?: number
@@ -81,22 +81,22 @@ export interface RecordTypeDescriptor {
     propertyTypeNodeId: string
 }
 
-export type CompoundDescriptorUnion =
-    OneOfCompoundDescriptor |
-    AnyOfCompoundDescriptor |
-    AllOfCompoundDescriptor;
+export type CompoundUnion =
+    OneOfCompound |
+    AnyOfCompound |
+    AllOfCompound;
 
-export interface OneOfCompoundDescriptor {
+export interface OneOfCompound {
     type: "one-of"
     typeNodeIds: string[]
 }
 
-export interface AnyOfCompoundDescriptor {
+export interface AnyOfCompound {
     type: "any-of"
     typeNodeIds: string[]
 }
 
-export interface AllOfCompoundDescriptor {
+export interface AllOfCompound {
     type: "all-of"
     typeNodeIds: string[]
 }

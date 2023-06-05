@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import ts from "typescript";
-import { ArrayTypeDescriptor, BooleanTypeDescriptor, CompoundDescriptorUnion, InterfaceTypeDescriptor, NodeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/intermediate.js";
+import { ArrayType, BooleanType, CompoundUnion, InterfaceType, Node, NumberType, RecordType, StringType, TupleType, TypeUnion } from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -26,7 +26,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected * generateValidatorFunctionDeclarationStatements(
-        nodeDescriptor: NodeDescriptor,
+        nodeDescriptor: Node,
     ): Iterable<ts.FunctionDeclaration> {
         const { factory: f } = this;
 
@@ -122,7 +122,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateValidatorFunctionBodyStatements(
-        nodeDescriptor: NodeDescriptor,
+        nodeDescriptor: Node,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -205,7 +205,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     protected generateTypeValidationStatements(
         nodeId: string,
-        typeDescriptor: TypeDescriptorUnion,
+        typeDescriptor: TypeUnion,
     ) {
         switch (typeDescriptor.type) {
             case "never":
@@ -259,7 +259,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     protected generateCompoundValidationStatements(
         nodeId: string,
-        compoundDescriptor: CompoundDescriptorUnion,
+        compoundDescriptor: CompoundUnion,
     ) {
         switch (compoundDescriptor.type) {
             case "one-of":
@@ -321,7 +321,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateBooleanTypeValidationStatements(
-        typeDescriptor: BooleanTypeDescriptor,
+        typeDescriptor: BooleanType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -363,7 +363,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateNumberTypeValidationStatements(
-        typeDescriptor: NumberTypeDescriptor,
+        typeDescriptor: NumberType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -510,7 +510,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateStringTypeValidationStatements(
-        typeDescriptor: StringTypeDescriptor,
+        typeDescriptor: StringType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -599,7 +599,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateTupleTypeValidationStatements(
-        typeDescriptor: TupleTypeDescriptor,
+        typeDescriptor: TupleType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -672,7 +672,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     private *generateTupleTypeCaseClausesValidationStatements(
-        typeDescriptor: TupleTypeDescriptor,
+        typeDescriptor: TupleType,
     ): Iterable<ts.CaseOrDefaultClause> {
         const { factory: f } = this;
 
@@ -712,7 +712,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateArrayTypeValidationStatements(
-        typeDescriptor: ArrayTypeDescriptor,
+        typeDescriptor: ArrayType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
         const typeName = this.getTypeName(typeDescriptor.itemTypeNodeId);
@@ -857,7 +857,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateInterfaceTypeValidationStatements(
-        typeDescriptor: InterfaceTypeDescriptor,
+        typeDescriptor: InterfaceType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -953,7 +953,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     private * generateInterfaceTypeCaseClausesValidationStatements(
-        typeDescriptor: InterfaceTypeDescriptor,
+        typeDescriptor: InterfaceType,
     ): Iterable<ts.CaseOrDefaultClause> {
         const { factory: f } = this;
 
@@ -996,7 +996,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateRecordTypeValidationStatements(
-        typeDescriptor: RecordTypeDescriptor,
+        typeDescriptor: RecordType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
         const typeName = this.getTypeName(typeDescriptor.propertyTypeNodeId);
