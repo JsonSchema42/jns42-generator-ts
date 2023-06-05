@@ -19,28 +19,18 @@ export class SchemaContext implements SchemaStrategyInterface {
         this.strategies[metaSchemaId] = strategy;
     }
 
-    public async loadRootNode(
-        rootNode: unknown,
-        rootNodeUrl: URL,
-        referencingNodeUrl: URL | null,
-        defaultMetaSchemaId: string,
-    ) {
-        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ??
-            defaultMetaSchemaId;
-
-        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
-
-        await strategy.loadRootNode(
-            rootNode,
-            rootNodeUrl,
-            referencingNodeUrl,
-        );
-
-        for (const nodeUrl of strategy.indexRootNode(rootNodeUrl)) {
-            const nodeId = String(nodeUrl);
-            this.nodeMetaMap.set(nodeId, metaSchemaId);
+    public * getTypeNames() {
+        for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
+            yield* this.getNodeTypeNames(rootNodeId, metaSchemaId);
         }
+    }
 
+    public getNodes(): Record<string, Node> {
+        const result = {} as Record<string, Node>;
+        for (const strategy of Object.values(this.strategies)) {
+            Object.assign(result, strategy.getNodes());
+        }
+        return result;
     }
 
     public async loadFromUrl(
@@ -93,6 +83,38 @@ export class SchemaContext implements SchemaStrategyInterface {
         return rootNodeUrl;
     }
 
+    public getNodeRetrievalUrl(nodeRootId: string) {
+        return this.rootNodeRetrievalMap.get(nodeRootId);
+    }
+
+    public getNodeRootUrl(nodeRetrievalId: string) {
+        return this.retrievalRootNodeMap.get(nodeRetrievalId);
+    }
+
+    private async loadRootNode(
+        rootNode: unknown,
+        rootNodeUrl: URL,
+        referencingNodeUrl: URL | null,
+        defaultMetaSchemaId: string,
+    ) {
+        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ??
+            defaultMetaSchemaId;
+
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+
+        await strategy.loadRootNode(
+            rootNode,
+            rootNodeUrl,
+            referencingNodeUrl,
+        );
+
+        for (const nodeUrl of strategy.indexRootNode(rootNodeUrl)) {
+            const nodeId = String(nodeUrl);
+            this.nodeMetaMap.set(nodeId, metaSchemaId);
+        }
+
+    }
+
     private async fetchJsonFromUrl(
         url: URL,
     ) {
@@ -122,20 +144,6 @@ export class SchemaContext implements SchemaStrategyInterface {
             if (strategy.isSchemaRootNode(node)) {
                 return metaSchemaId;
             }
-        }
-    }
-
-    public getNodeRetrievalUrl(nodeRootId: string) {
-        return this.rootNodeRetrievalMap.get(nodeRootId);
-    }
-
-    public getNodeRootUrl(nodeRetrievalId: string) {
-        return this.retrievalRootNodeMap.get(nodeRetrievalId);
-    }
-
-    public * getTypeNames() {
-        for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
-            yield* this.getNodeTypeNames(rootNodeId, metaSchemaId);
         }
     }
 
@@ -193,14 +201,6 @@ export class SchemaContext implements SchemaStrategyInterface {
                 name,
             );
         }
-    }
-
-    public getNodes(): Record<string, Node> {
-        const result = {} as Record<string, Node>;
-        for (const strategy of Object.values(this.strategies)) {
-            Object.assign(result, strategy.getNodes());
-        }
-        return result;
     }
 
 }
