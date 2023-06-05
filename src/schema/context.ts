@@ -106,7 +106,6 @@ export class SchemaContext implements SchemaStrategyInterface {
             }
 
             case "file:": {
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const content = fs.readFileSync(url.pathname, "utf-8");
 
                 const schemaRootNode = JSON.parse(content) as unknown;
