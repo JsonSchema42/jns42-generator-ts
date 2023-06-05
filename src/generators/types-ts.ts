@@ -58,15 +58,15 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         const typeNodes = [...this.generateTypeDefinitionElements(nodeDescriptor.nodeId)];
         const compoundNodes = [...this.generateCompoundDefinitionElements(nodeDescriptor.nodeId)];
 
-        let node: ts.TypeNode | undefined;
+        let typeDefinitionNode: ts.TypeNode | undefined;
         if (compoundNodes.length > 0) {
             const typeNode = f.createParenthesizedType(f.createIntersectionTypeNode(
                 compoundNodes,
             ));
-            node = node == null ?
+            typeDefinitionNode = typeDefinitionNode == null ?
                 typeNode :
                 f.createParenthesizedType(f.createIntersectionTypeNode([
-                    node,
+                    typeDefinitionNode,
                     typeNode,
                 ]));
         }
@@ -74,28 +74,28 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             const typeNode = f.createParenthesizedType(f.createUnionTypeNode(
                 typeNodes,
             ));
-            node = node == null ?
+            typeDefinitionNode = typeDefinitionNode == null ?
                 typeNode :
                 f.createParenthesizedType(f.createIntersectionTypeNode([
-                    node,
+                    typeDefinitionNode,
                     typeNode,
                 ]));
         }
         if (nodeDescriptor.superNodeId != null) {
             const typeNode = this.generateTypeReference(nodeDescriptor.superNodeId);
-            node = node == null ?
+            typeDefinitionNode = typeDefinitionNode == null ?
                 typeNode :
                 f.createParenthesizedType(f.createIntersectionTypeNode([
-                    node,
+                    typeDefinitionNode,
                     typeNode,
                 ]));
         }
 
-        if (node == null) {
-            node = f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+        if (typeDefinitionNode == null) {
+            typeDefinitionNode = f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
         }
 
-        return node;
+        return typeDefinitionNode;
     }
 
     protected *generateCompoundDefinitionElements(
