@@ -286,7 +286,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected getTypeName(
         nodeId: string,
     ) {
-        const typeName = this.namer.getName(nodeId).join("_");
+        const typeName = this.names[nodeId].join("_");
         return typeName;
     }
 

@@ -74,6 +74,16 @@ export class Namer {
         return name;
     }
 
+    public getNames() {
+        return Object.fromEntries(this.getNameEntries());
+    }
+
+    private * getNameEntries() {
+        for (const [id, name] of this.idNameMap) {
+            yield [id, name] as const;
+        }
+    }
+
     protected createSuffix(id: string) {
         return String(crc32(id, this.seed) % 1000000).padStart(6, "0");
     }

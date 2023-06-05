@@ -103,8 +103,10 @@ async function runTest(
             namer.registerName(nodeId, typeName);
         }
 
+        const names = namer.getNames();
+
         const factory = ts.factory;
-        generatePackage(factory, nodes, namer, {
+        generatePackage(factory, nodes, names, {
             directoryPath: packageDirectoryPath,
             name: packageName,
             version: "v0.0.0",

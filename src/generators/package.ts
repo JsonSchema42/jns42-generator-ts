@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
 import { Node } from "../schema/intermediate.js";
-import { Namer, formatData, formatStatements } from "../utils/index.js";
+import { formatData, formatStatements } from "../utils/index.js";
 import { ExamplesSpecsTsCodeGenerator } from "./examples-specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
@@ -19,7 +19,7 @@ export interface PackageOptions {
 export function generatePackage(
     factory: ts.NodeFactory,
     nodes: Record<string, Node>,
-    namer: Namer,
+    names: Record<string, string[]>,
     options: PackageOptions,
 ) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -42,7 +42,7 @@ export function generatePackage(
     {
         const codeGenerator = new MainTsCodeGenerator(
             factory,
-            namer,
+            names,
             nodes,
         );
         const statements = codeGenerator.getStatements();
@@ -54,7 +54,7 @@ export function generatePackage(
     {
         const codeGenerator = new TypesTsCodeGenerator(
             factory,
-            namer,
+            names,
             nodes,
         );
         const statements = codeGenerator.getStatements();
@@ -66,7 +66,7 @@ export function generatePackage(
     {
         const codeGenerator = new ValidatorsTsCodeGenerator(
             factory,
-            namer,
+            names,
             nodes,
         );
         const statements = codeGenerator.getStatements();
@@ -78,7 +78,7 @@ export function generatePackage(
     {
         const codeGenerator = new ExamplesSpecsTsCodeGenerator(
             factory,
-            namer,
+            names,
             nodes,
         );
         const statements = codeGenerator.getStatements();
