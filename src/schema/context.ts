@@ -196,30 +196,30 @@ export class SchemaContext implements SchemaStrategyInterface {
         }
     }
 
-    public *selectNodeDescriptors(): Iterable<Node> {
+    public *selectNodes(): Iterable<Node> {
         for (const strategy of Object.values(this.strategies)) {
-            yield* strategy.selectNodeDescriptors();
+            yield* strategy.selectNodes();
         }
     }
 
-    public selectNodeTypeDescriptors(nodeId: string): Iterable<TypeUnion> {
+    public selectNodeTypes(nodeId: string): Iterable<TypeUnion> {
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
             throw new Error("meta schema id not found");
         }
 
         const strategy = this.strategies[metaSchemaId];
-        return strategy.selectNodeTypeDescriptors(nodeId);
+        return strategy.selectNodeTypes(nodeId);
     }
 
-    public selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundUnion> {
+    public selectNodeCompounds(nodeId: string): Iterable<CompoundUnion> {
         const metaSchemaId = this.nodeMetaMap.get(nodeId);
         if (metaSchemaId == null) {
             throw new Error("meta schema id not found");
         }
 
         const strategy = this.strategies[metaSchemaId];
-        return strategy.selectNodeCompoundDescriptors(nodeId);
+        return strategy.selectNodeCompounds(nodeId);
     }
 
 }

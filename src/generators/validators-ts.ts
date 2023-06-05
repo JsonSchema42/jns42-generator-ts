@@ -18,7 +18,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createStringLiteral("./types.js"),
         );
 
-        for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
+        for (const nodeDescriptor of this.context.selectNodes()) {
             yield* this.generateValidatorFunctionDeclarationStatements(
                 nodeDescriptor,
             );
@@ -60,7 +60,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
         for (
             const typeDescriptor of
-            this.context.selectNodeTypeDescriptors(nodeDescriptor.nodeId)
+            this.context.selectNodeTypes(nodeDescriptor.nodeId)
         ) {
             yield f.createFunctionDeclaration(
                 undefined,
@@ -89,7 +89,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
         for (
             const compoundDescriptor of
-            this.context.selectNodeCompoundDescriptors(nodeDescriptor.nodeId)
+            this.context.selectNodeCompounds(nodeDescriptor.nodeId)
         ) {
             yield f.createFunctionDeclaration(
                 undefined,
@@ -128,10 +128,10 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
         const typeName = this.getTypeName(nodeDescriptor.nodeId);
         const typeDescriptors = [
-            ...this.context.selectNodeTypeDescriptors(nodeDescriptor.nodeId),
+            ...this.context.selectNodeTypes(nodeDescriptor.nodeId),
         ];
         const compoundDescriptors = [
-            ...this.context.selectNodeCompoundDescriptors(nodeDescriptor.nodeId),
+            ...this.context.selectNodeCompounds(nodeDescriptor.nodeId),
         ];
 
         if (nodeDescriptor.superNodeId != null) {

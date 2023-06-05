@@ -3,9 +3,9 @@ import { SchemaContext } from "./context.js";
 import { CompoundUnion, Node, TypeUnion } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    selectNodeDescriptors(): Iterable<Node>
-    selectNodeTypeDescriptors(nodeId: string): Iterable<TypeUnion>
-    selectNodeCompoundDescriptors(nodeId: string): Iterable<CompoundUnion>
+    selectNodes(): Iterable<Node>
+    selectNodeTypes(nodeId: string): Iterable<TypeUnion>
+    selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -69,13 +69,13 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         node: N
     ): URL | undefined
 
-    public abstract selectNodeDescriptors(): Iterable<Node>
+    public abstract selectNodes(): Iterable<Node>
 
-    public abstract selectNodeTypeDescriptors(
+    public abstract selectNodeTypes(
         nodeId: string
     ): Iterable<TypeUnion>
 
-    public abstract selectNodeCompoundDescriptors(
+    public abstract selectNodeCompounds(
         nodeId: string
     ): Iterable<CompoundUnion>
 

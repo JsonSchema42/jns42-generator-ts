@@ -5,7 +5,7 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
+        for (const nodeDescriptor of this.context.selectNodes()) {
             yield this.generateTypeDeclarationStatement(
                 nodeDescriptor,
             );
@@ -101,7 +101,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected *generateCompoundDefinitionElements(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        for (const compoundDescriptor of this.context.selectNodeCompoundDescriptors(nodeId)) {
+        for (const compoundDescriptor of this.context.selectNodeCompounds(nodeId)) {
             yield this.generateCompoundDefinitionElement(compoundDescriptor);
         }
     }
@@ -109,7 +109,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected *generateTypeDefinitionElements(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        for (const typeDescriptor of this.context.selectNodeTypeDescriptors(nodeId)) {
+        for (const typeDescriptor of this.context.selectNodeTypes(nodeId)) {
             yield this.generateTypeDefinitionElement(typeDescriptor);
         }
     }

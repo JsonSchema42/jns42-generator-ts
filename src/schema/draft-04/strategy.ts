@@ -111,7 +111,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     //#region strategy implementation
 
-    public * selectNodeDescriptors(
+    public * selectNodes(
     ): Iterable<Node> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
             const description = selectNodeDescription(node) ?? "";
@@ -141,7 +141,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    public *selectNodeTypeDescriptors(
+    public *selectNodeTypes(
         nodeId: string,
     ): Iterable<TypeUnion> {
         const nodeItem = this.getNodeItem(nodeId);
@@ -213,7 +213,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    public *selectNodeCompoundDescriptors(
+    public *selectNodeCompounds(
         nodeId: string,
     ): Iterable<CompoundUnion> {
         const nodeItem = this.getNodeItem(nodeId);

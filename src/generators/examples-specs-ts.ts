@@ -68,7 +68,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const nodeDescriptor of this.context.selectNodeDescriptors()) {
+        for (const nodeDescriptor of this.context.selectNodes()) {
             yield* this.generateAssertStatementsForNode(
                 nodeDescriptor,
             );
