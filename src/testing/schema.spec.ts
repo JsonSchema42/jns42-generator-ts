@@ -96,6 +96,7 @@ async function runTest(
             null,
             schema202012.metaSchemaId,
         );
+        const nodes = context.selectNodes();
 
         const namer = new Namer(new Date().valueOf());
         for (const [nodeId, typeName] of context.getTypeNames()) {
@@ -103,7 +104,7 @@ async function runTest(
         }
 
         const factory = ts.factory;
-        generatePackage(factory, context, namer, {
+        generatePackage(factory, nodes, namer, {
             directoryPath: packageDirectoryPath,
             name: packageName,
             version: "v0.0.0",

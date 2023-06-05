@@ -1,5 +1,4 @@
 import ts from "typescript";
-import { Node } from "../schema/intermediate.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
@@ -68,19 +67,20 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const node of this.context.selectNodes()) {
+        for (const nodeId in this.nodes) {
             yield* this.generateAssertStatementsForNode(
-                node,
+                nodeId,
             );
         }
     }
 
     protected *generateAssertStatementsForNode(
-        node: Node,
+        nodeId: string,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+        const node = this.nodes[nodeId];
 
-        const typeName = this.getTypeName(node.nodeId);
+        const typeName = this.getTypeName(nodeId);
 
         for (const example of node.examples) {
             yield f.createExpressionStatement(f.createCallExpression(

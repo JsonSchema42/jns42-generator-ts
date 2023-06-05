@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
-import { CompoundUnion, Node, TypeUnion } from "./intermediate.js";
+import { Node } from "./intermediate.js";
 import { SchemaStrategyBase, SchemaStrategyInterface } from "./strategy.js";
 
 export class SchemaContext implements SchemaStrategyInterface {
@@ -196,30 +196,12 @@ export class SchemaContext implements SchemaStrategyInterface {
         }
     }
 
-    public *selectNodes(): Iterable<Node> {
+    public selectNodes(): Record<string, Node> {
+        const result = {} as Record<string, Node>;
         for (const strategy of Object.values(this.strategies)) {
-            yield* strategy.selectNodes();
+            Object.assign(result, strategy.selectNodes());
         }
-    }
-
-    public selectNodeTypes(nodeId: string): Iterable<TypeUnion> {
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("meta schema id not found");
-        }
-
-        const strategy = this.strategies[metaSchemaId];
-        return strategy.selectNodeTypes(nodeId);
-    }
-
-    public selectNodeCompounds(nodeId: string): Iterable<CompoundUnion> {
-        const metaSchemaId = this.nodeMetaMap.get(nodeId);
-        if (metaSchemaId == null) {
-            throw new Error("meta schema id not found");
-        }
-
-        const strategy = this.strategies[metaSchemaId];
-        return strategy.selectNodeCompounds(nodeId);
+        return result;
     }
 
 }

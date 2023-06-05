@@ -114,8 +114,13 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#region strategy implementation
 
-    public * selectNodes(
-    ): Iterable<Node> {
+    public selectNodes(
+    ): Record<string, Node> {
+        return Object.fromEntries(this.selectNodeEntries());
+    }
+
+    private * selectNodeEntries(
+    ): Iterable<[string, Node]> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
             const description = selectNodeDescription(node) ?? "";
             const deprecated = selectNodeDeprecated(node) ?? false;
@@ -144,17 +149,21 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                 superNodeId = resolvedNodeId;
             }
 
-            yield {
-                nodeId,
+            const types = [...this.selectNodeTypes(nodeId)];
+            const compounds = [...this.selectNodeCompounds(nodeId)];
+
+            yield [nodeId, {
                 superNodeId,
                 deprecated,
                 description,
                 examples,
-            };
+                types,
+                compounds,
+            }];
         }
     }
 
-    public *selectNodeTypes(
+    private *selectNodeTypes(
         nodeId: string,
     ): Iterable<TypeUnion> {
         const nodeItem = this.getNodeItem(nodeId);
@@ -226,7 +235,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
     }
 
-    public *selectNodeCompounds(
+    private *selectNodeCompounds(
         nodeId: string,
     ): Iterable<CompoundUnion> {
         const nodeItem = this.getNodeItem(nodeId);

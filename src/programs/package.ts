@@ -96,13 +96,15 @@ async function main(options: MainOptions) {
         defaultMetaSchemaId,
     );
 
+    const nodes = context.selectNodes();
+
     const namer = new Namer(options.uniqueNameSeed);
     for (const [nodeId, typeName] of context.getTypeNames()) {
         namer.registerName(nodeId, typeName);
     }
 
     const factory = ts.factory;
-    generatePackage(factory, context, namer, {
+    generatePackage(factory, nodes, namer, {
         directoryPath: packageDirectoryPath,
         name: packageName,
         version: packageVersion,

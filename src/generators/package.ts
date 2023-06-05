@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
-import { SchemaContext } from "../schema/context.js";
+import { Node } from "../schema/intermediate.js";
 import { Namer, formatData, formatStatements } from "../utils/index.js";
 import { ExamplesSpecsTsCodeGenerator } from "./examples-specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
@@ -18,7 +18,7 @@ export interface PackageOptions {
 
 export function generatePackage(
     factory: ts.NodeFactory,
-    context: SchemaContext,
+    nodes: Record<string, Node>,
     namer: Namer,
     options: PackageOptions,
 ) {
@@ -43,7 +43,7 @@ export function generatePackage(
         const codeGenerator = new MainTsCodeGenerator(
             factory,
             namer,
-            context,
+            nodes,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.ts");
@@ -55,7 +55,7 @@ export function generatePackage(
         const codeGenerator = new TypesTsCodeGenerator(
             factory,
             namer,
-            context,
+            nodes,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "types.ts");
@@ -67,7 +67,7 @@ export function generatePackage(
         const codeGenerator = new ValidatorsTsCodeGenerator(
             factory,
             namer,
-            context,
+            nodes,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
@@ -79,7 +79,7 @@ export function generatePackage(
         const codeGenerator = new ExamplesSpecsTsCodeGenerator(
             factory,
             namer,
-            context,
+            nodes,
         );
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "examples.spec.ts");

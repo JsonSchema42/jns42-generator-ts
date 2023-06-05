@@ -1,9 +1,10 @@
 export interface Node {
-    nodeId: string
     superNodeId?: string
     deprecated: boolean
     description: string
     examples: unknown[]
+    types: TypeUnion[]
+    compounds: CompoundUnion[]
 }
 
 export type TypeUnion =

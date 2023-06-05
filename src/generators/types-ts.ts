@@ -1,25 +1,27 @@
 import ts from "typescript";
-import { CompoundUnion, Node, TypeUnion } from "../schema/intermediate.js";
+import { CompoundUnion, TypeUnion } from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     public * getStatements() {
-        for (const node of this.context.selectNodes()) {
+        for (const nodeId in this.nodes) {
             yield this.generateTypeDeclarationStatement(
-                node,
+                nodeId,
             );
         }
     }
 
     protected generateTypeDeclarationStatement(
-        node: Node,
+        nodeId: string,
     ) {
+        const node = this.nodes[nodeId];
+
         const typeDefinition = this.generateTypeDefinition(
-            node,
+            nodeId,
         );
 
-        const typeName = this.getTypeName(node.nodeId);
+        const typeName = this.getTypeName(nodeId);
         const declaration = this.factory.createTypeAliasDeclaration(
             [
                 this.factory.createToken(ts.SyntaxKind.ExportKeyword),
@@ -51,12 +53,13 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateTypeDefinition(
-        node: Node,
+        nodeId: string,
     ): ts.TypeNode {
         const { factory: f } = this;
+        const node = this.nodes[nodeId];
 
-        const typeNodes = [...this.generateTypeDefinitionElements(node.nodeId)];
-        const compoundNodes = [...this.generateCompoundDefinitionElements(node.nodeId)];
+        const typeNodes = [...this.generateTypeDefinitionElements(nodeId)];
+        const compoundNodes = [...this.generateCompoundDefinitionElements(nodeId)];
 
         let typeDefinitionNode: ts.TypeNode | undefined;
         if (compoundNodes.length > 0) {
@@ -101,7 +104,8 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected *generateCompoundDefinitionElements(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        for (const compound of this.context.selectNodeCompounds(nodeId)) {
+        const node = this.nodes[nodeId];
+        for (const compound of node.compounds) {
             yield this.generateCompoundDefinitionElement(compound);
         }
     }
@@ -109,7 +113,8 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected *generateTypeDefinitionElements(
         nodeId: string,
     ): Iterable<ts.TypeNode> {
-        for (const type of this.context.selectNodeTypes(nodeId)) {
+        const node = this.nodes[nodeId];
+        for (const type of node.types) {
             yield this.generateTypeDefinitionElement(type);
         }
     }

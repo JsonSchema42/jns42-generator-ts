@@ -1,11 +1,9 @@
 import assert from "assert";
 import { SchemaContext } from "./context.js";
-import { CompoundUnion, Node, TypeUnion } from "./intermediate.js";
+import { Node } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    selectNodes(): Iterable<Node>
-    selectNodeTypes(nodeId: string): Iterable<TypeUnion>
-    selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>
+    selectNodes(): Record<string, Node>
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -69,15 +67,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         node: N
     ): URL | undefined
 
-    public abstract selectNodes(): Iterable<Node>
-
-    public abstract selectNodeTypes(
-        nodeId: string
-    ): Iterable<TypeUnion>
-
-    public abstract selectNodeCompounds(
-        nodeId: string
-    ): Iterable<CompoundUnion>
+    public abstract selectNodes(): Record<string, Node>
 
     private maybeContext?: SchemaContext;
     protected get context() {

@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import ts from "typescript";
-import { ArrayType, BooleanType, CompoundUnion, InterfaceType, Node, NumberType, RecordType, StringType, TupleType, TypeUnion } from "../schema/intermediate.js";
+import { ArrayType, BooleanType, CompoundUnion, InterfaceType, NumberType, RecordType, StringType, TupleType, TypeUnion } from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -18,19 +18,20 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createStringLiteral("./types.js"),
         );
 
-        for (const node of this.context.selectNodes()) {
+        for (const nodeId in this.nodes) {
             yield* this.generateValidatorFunctionDeclarationStatements(
-                node,
+                nodeId,
             );
         }
     }
 
     protected * generateValidatorFunctionDeclarationStatements(
-        node: Node,
+        nodeId: string,
     ): Iterable<ts.FunctionDeclaration> {
         const { factory: f } = this;
+        const node = this.nodes[nodeId];
 
-        const typeName = this.getTypeName(node.nodeId);
+        const typeName = this.getTypeName(nodeId);
 
         yield f.createFunctionDeclaration(
             [
@@ -51,21 +52,18 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createTypePredicateNode(
                 undefined,
                 f.createIdentifier("value"),
-                this.generateTypeReference(node.nodeId),
+                this.generateTypeReference(nodeId),
             ),
             f.createBlock([
-                ...this.generateValidatorFunctionBodyStatements(node),
+                ...this.generateValidatorFunctionBodyStatements(nodeId),
             ], true),
         );
 
-        for (
-            const type of
-            this.context.selectNodeTypes(node.nodeId)
-        ) {
+        for (const typeNode of node.types) {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
-                `is${camelcase(type.type, { pascalCase: true })}${typeName}`,
+                `is${camelcase(typeNode.type, { pascalCase: true })}${typeName}`,
                 undefined,
                 [
                     f.createParameterDeclaration(
@@ -82,19 +80,16 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
                 f.createBlock([
-                    ...this.generateTypeValidationStatements(node.nodeId, type),
+                    ...this.generateTypeValidationStatements(nodeId, typeNode),
                 ], true),
             );
         }
 
-        for (
-            const compound of
-            this.context.selectNodeCompounds(node.nodeId)
-        ) {
+        for (const compoundNode of node.compounds) {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
-                `is${camelcase(compound.type, { pascalCase: true })}${typeName}`,
+                `is${camelcase(compoundNode.type, { pascalCase: true })}${typeName}`,
                 undefined,
                 [
                     f.createParameterDeclaration(
@@ -112,8 +107,8 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
                 f.createBlock([
                     ...this.generateCompoundValidationStatements(
-                        node.nodeId,
-                        compound,
+                        nodeId,
+                        compoundNode,
                     ),
                 ], true),
             );
@@ -122,17 +117,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateValidatorFunctionBodyStatements(
-        node: Node,
+        nodeId: string,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
+        const node = this.nodes[nodeId];
 
-        const typeName = this.getTypeName(node.nodeId);
-        const types = [
-            ...this.context.selectNodeTypes(node.nodeId),
-        ];
-        const compounds = [
-            ...this.context.selectNodeCompounds(node.nodeId),
-        ];
+        const typeName = this.getTypeName(nodeId);
 
         if (node.superNodeId != null) {
             const referencingTypeName = this.getTypeName(node.superNodeId);
@@ -152,12 +142,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (types.length > 0) {
+        if (node.types.length > 0) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createParenthesizedExpression(
-                        types.
+                        node.types.
                             map(type => f.createCallExpression(
                                 f.createIdentifier(`is${camelcase(type.type, { pascalCase: true })}${typeName}`),
                                 undefined,
@@ -175,12 +165,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (compounds.length > 0) {
+        if (node.compounds.length > 0) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createParenthesizedExpression(
-                        compounds.
+                        node.compounds.
                             map(compound => f.createCallExpression(
                                 f.createIdentifier(`is${camelcase(compound.type, { pascalCase: true })}${typeName}`),
                                 undefined,
