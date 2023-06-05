@@ -1,6 +1,6 @@
 import assert from "assert";
 import { SchemaContext } from "./context.js";
-import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
     selectNodeDescriptors(): Iterable<NodeDescriptor>

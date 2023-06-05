@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import * as fs from "fs";
-import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./descriptors.js";
+import { CompoundDescriptorUnion, NodeDescriptor, TypeDescriptorUnion } from "./intermediate.js";
 import { SchemaStrategyBase, SchemaStrategyInterface } from "./strategy.js";
 
 export class SchemaContext implements SchemaStrategyInterface {

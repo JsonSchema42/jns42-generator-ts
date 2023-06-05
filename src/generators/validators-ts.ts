@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 import ts from "typescript";
-import { ArrayTypeDescriptor, BooleanTypeDescriptor, CompoundDescriptorUnion, InterfaceTypeDescriptor, NodeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/descriptors.js";
+import { ArrayTypeDescriptor, BooleanTypeDescriptor, CompoundDescriptorUnion, InterfaceTypeDescriptor, NodeDescriptor, NumberTypeDescriptor, RecordTypeDescriptor, StringTypeDescriptor, TupleTypeDescriptor, TypeDescriptorUnion } from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {

@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { NodeDescriptor } from "../schema/descriptors.js";
+import { NodeDescriptor } from "../schema/intermediate.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
