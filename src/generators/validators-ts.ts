@@ -18,19 +18,19 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createStringLiteral("./types.js"),
         );
 
-        for (const nodeDescriptor of this.context.selectNodes()) {
+        for (const node of this.context.selectNodes()) {
             yield* this.generateValidatorFunctionDeclarationStatements(
-                nodeDescriptor,
+                node,
             );
         }
     }
 
     protected * generateValidatorFunctionDeclarationStatements(
-        nodeDescriptor: Node,
+        node: Node,
     ): Iterable<ts.FunctionDeclaration> {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeDescriptor.nodeId);
+        const typeName = this.getTypeName(node.nodeId);
 
         yield f.createFunctionDeclaration(
             [
@@ -51,21 +51,21 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             f.createTypePredicateNode(
                 undefined,
                 f.createIdentifier("value"),
-                this.generateTypeReference(nodeDescriptor.nodeId),
+                this.generateTypeReference(node.nodeId),
             ),
             f.createBlock([
-                ...this.generateValidatorFunctionBodyStatements(nodeDescriptor),
+                ...this.generateValidatorFunctionBodyStatements(node),
             ], true),
         );
 
         for (
-            const typeDescriptor of
-            this.context.selectNodeTypes(nodeDescriptor.nodeId)
+            const type of
+            this.context.selectNodeTypes(node.nodeId)
         ) {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
-                `is${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`,
+                `is${camelcase(type.type, { pascalCase: true })}${typeName}`,
                 undefined,
                 [
                     f.createParameterDeclaration(
@@ -82,19 +82,19 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
                 ),
                 f.createBlock([
-                    ...this.generateTypeValidationStatements(nodeDescriptor.nodeId, typeDescriptor),
+                    ...this.generateTypeValidationStatements(node.nodeId, type),
                 ], true),
             );
         }
 
         for (
-            const compoundDescriptor of
-            this.context.selectNodeCompounds(nodeDescriptor.nodeId)
+            const compound of
+            this.context.selectNodeCompounds(node.nodeId)
         ) {
             yield f.createFunctionDeclaration(
                 undefined,
                 undefined,
-                `is${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`,
+                `is${camelcase(compound.type, { pascalCase: true })}${typeName}`,
                 undefined,
                 [
                     f.createParameterDeclaration(
@@ -112,8 +112,8 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 ),
                 f.createBlock([
                     ...this.generateCompoundValidationStatements(
-                        nodeDescriptor.nodeId,
-                        compoundDescriptor,
+                        node.nodeId,
+                        compound,
                     ),
                 ], true),
             );
@@ -122,20 +122,20 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateValidatorFunctionBodyStatements(
-        nodeDescriptor: Node,
+        node: Node,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeDescriptor.nodeId);
-        const typeDescriptors = [
-            ...this.context.selectNodeTypes(nodeDescriptor.nodeId),
+        const typeName = this.getTypeName(node.nodeId);
+        const types = [
+            ...this.context.selectNodeTypes(node.nodeId),
         ];
-        const compoundDescriptors = [
-            ...this.context.selectNodeCompounds(nodeDescriptor.nodeId),
+        const compounds = [
+            ...this.context.selectNodeCompounds(node.nodeId),
         ];
 
-        if (nodeDescriptor.superNodeId != null) {
-            const referencingTypeName = this.getTypeName(nodeDescriptor.superNodeId);
+        if (node.superNodeId != null) {
+            const referencingTypeName = this.getTypeName(node.superNodeId);
 
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
@@ -152,14 +152,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptors.length > 0) {
+        if (types.length > 0) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createParenthesizedExpression(
-                        typeDescriptors.
-                            map(typeDescriptor => f.createCallExpression(
-                                f.createIdentifier(`is${camelcase(typeDescriptor.type, { pascalCase: true })}${typeName}`),
+                        types.
+                            map(type => f.createCallExpression(
+                                f.createIdentifier(`is${camelcase(type.type, { pascalCase: true })}${typeName}`),
                                 undefined,
                                 [f.createIdentifier("value")],
                             ) as ts.Expression).
@@ -175,14 +175,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (compoundDescriptors.length > 0) {
+        if (compounds.length > 0) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createParenthesizedExpression(
-                        compoundDescriptors.
-                            map(compoundDescriptor => f.createCallExpression(
-                                f.createIdentifier(`is${camelcase(compoundDescriptor.type, { pascalCase: true })}${typeName}`),
+                        compounds.
+                            map(compound => f.createCallExpression(
+                                f.createIdentifier(`is${camelcase(compound.type, { pascalCase: true })}${typeName}`),
                                 undefined,
                                 [f.createIdentifier("value")],
                             ) as ts.Expression).
@@ -205,9 +205,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     protected generateTypeValidationStatements(
         nodeId: string,
-        typeDescriptor: TypeUnion,
+        type: TypeUnion,
     ) {
-        switch (typeDescriptor.type) {
+        switch (type.type) {
             case "never":
                 return this.generateNeverTypeValidationStatements();
 
@@ -219,37 +219,37 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
             case "boolean":
                 return this.generateBooleanTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             case "number":
                 return this.generateNumberTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             case "string":
                 return this.generateStringTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             case "tuple":
                 return this.generateTupleTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             case "array":
                 return this.generateArrayTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             case "interface":
                 return this.generateInterfaceTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             case "record":
                 return this.generateRecordTypeValidationStatements(
-                    typeDescriptor,
+                    type,
                 );
 
             default:
@@ -259,22 +259,22 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     protected generateCompoundValidationStatements(
         nodeId: string,
-        compoundDescriptor: CompoundUnion,
+        compound: CompoundUnion,
     ) {
-        switch (compoundDescriptor.type) {
+        switch (compound.type) {
             case "one-of":
                 return this.generateOneOfCompoundValidationStatements(
-                    compoundDescriptor.typeNodeIds,
+                    compound.typeNodeIds,
                 );
 
             case "any-of":
                 return this.generateAnyOfCompoundValidationStatements(
-                    compoundDescriptor.typeNodeIds,
+                    compound.typeNodeIds,
                 );
 
             case "all-of":
                 return this.generateAllOfCompoundValidationStatements(
-                    compoundDescriptor.typeNodeIds,
+                    compound.typeNodeIds,
                 );
 
             default:
@@ -321,7 +321,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateBooleanTypeValidationStatements(
-        typeDescriptor: BooleanType,
+        type: BooleanType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -338,9 +338,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
 
-        if (typeDescriptor.options != null) {
+        if (type.options != null) {
             yield f.createIfStatement(
-                typeDescriptor.options
+                type.options
                     .map(option => f.createBinaryExpression(
                         f.createIdentifier("value"),
                         f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
@@ -363,7 +363,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateNumberTypeValidationStatements(
-        typeDescriptor: NumberType,
+        type: NumberType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -388,7 +388,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
 
-        switch (typeDescriptor.numberType) {
+        switch (type.numberType) {
             case "integer": {
                 yield f.createIfStatement(
                     f.createBinaryExpression(
@@ -413,17 +413,17 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
             default:
                 throw new TypeError(
-                    `unexpected numberType (${typeDescriptor.numberType})`,
+                    `unexpected numberType (${type.numberType})`,
                 );
 
         }
 
-        if (typeDescriptor.minimumInclusive != null) {
+        if (type.minimumInclusive != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createIdentifier("value"),
                     f.createToken(ts.SyntaxKind.LessThanToken),
-                    f.createNumericLiteral(typeDescriptor.minimumInclusive),
+                    f.createNumericLiteral(type.minimumInclusive),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -431,12 +431,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.minimumExclusive != null) {
+        if (type.minimumExclusive != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createIdentifier("value"),
                     f.createToken(ts.SyntaxKind.LessThanEqualsToken),
-                    f.createNumericLiteral(typeDescriptor.minimumExclusive),
+                    f.createNumericLiteral(type.minimumExclusive),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -444,12 +444,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.maximumInclusive != null) {
+        if (type.maximumInclusive != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createIdentifier("value"),
                     f.createToken(ts.SyntaxKind.GreaterThanToken),
-                    f.createNumericLiteral(typeDescriptor.maximumInclusive),
+                    f.createNumericLiteral(type.maximumInclusive),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -457,12 +457,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.maximumExclusive != null) {
+        if (type.maximumExclusive != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createIdentifier("value"),
                     f.createToken(ts.SyntaxKind.GreaterThanEqualsToken),
-                    f.createNumericLiteral(typeDescriptor.maximumExclusive),
+                    f.createNumericLiteral(type.maximumExclusive),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -470,13 +470,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.multipleOf != null) {
+        if (type.multipleOf != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createBinaryExpression(
                         f.createIdentifier("value"),
                         f.createToken(ts.SyntaxKind.PercentToken),
-                        f.createNumericLiteral(typeDescriptor.multipleOf),
+                        f.createNumericLiteral(type.multipleOf),
                     ),
                     f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                     f.createNumericLiteral(0),
@@ -487,9 +487,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.options != null) {
+        if (type.options != null) {
             yield f.createIfStatement(
-                typeDescriptor.options.map(option => f.createBinaryExpression(
+                type.options.map(option => f.createBinaryExpression(
                     f.createIdentifier("value"),
                     f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                     f.createNumericLiteral(option),
@@ -510,7 +510,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateStringTypeValidationStatements(
-        typeDescriptor: StringType,
+        type: StringType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -525,7 +525,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
 
-        if (typeDescriptor.minimumLength != null) {
+        if (type.minimumLength != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createPropertyAccessExpression(
@@ -533,7 +533,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createIdentifier("length"),
                     ),
                     f.createToken(ts.SyntaxKind.LessThanToken),
-                    f.createNumericLiteral(typeDescriptor.minimumLength),
+                    f.createNumericLiteral(type.minimumLength),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -541,7 +541,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.maximumLength != null) {
+        if (type.maximumLength != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createPropertyAccessExpression(
@@ -549,7 +549,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createIdentifier("length"),
                     ),
                     f.createToken(ts.SyntaxKind.GreaterThanToken),
-                    f.createNumericLiteral(typeDescriptor.maximumLength),
+                    f.createNumericLiteral(type.maximumLength),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -557,13 +557,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.valuePattern != null) {
+        if (type.valuePattern != null) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createCallExpression(
                         f.createPropertyAccessExpression(
-                            f.createRegularExpressionLiteral(`/${typeDescriptor.valuePattern}/`),
+                            f.createRegularExpressionLiteral(`/${type.valuePattern}/`),
                             f.createIdentifier("test"),
                         ),
                         undefined,
@@ -576,9 +576,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.options != null) {
+        if (type.options != null) {
             yield f.createIfStatement(
-                typeDescriptor.options.map(option => f.createBinaryExpression(
+                type.options.map(option => f.createBinaryExpression(
                     f.createIdentifier("value"),
                     f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
                     f.createStringLiteral(option),
@@ -599,7 +599,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateTupleTypeValidationStatements(
-        typeDescriptor: TupleType,
+        type: TupleType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -627,7 +627,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createIdentifier("length"),
                 ),
                 f.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
-                f.createNumericLiteral(typeDescriptor.itemTypeNodeIds.length),
+                f.createNumericLiteral(type.itemTypeNodeIds.length),
             ),
             f.createBlock([
                 f.createReturnStatement(f.createFalse()),
@@ -660,7 +660,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createIdentifier("elementIndex"),
                     f.createCaseBlock([
                         ...this.generateTupleTypeCaseClausesValidationStatements(
-                            typeDescriptor,
+                            type,
                         ),
                     ]),
                 ),
@@ -672,12 +672,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     private *generateTupleTypeCaseClausesValidationStatements(
-        typeDescriptor: TupleType,
+        type: TupleType,
     ): Iterable<ts.CaseOrDefaultClause> {
         const { factory: f } = this;
 
-        for (const elementIndex in typeDescriptor.itemTypeNodeIds) {
-            const itemTypeNodeId = typeDescriptor.itemTypeNodeIds[elementIndex];
+        for (const elementIndex in type.itemTypeNodeIds) {
+            const itemTypeNodeId = type.itemTypeNodeIds[elementIndex];
             const typeName = this.getTypeName(itemTypeNodeId);
 
             yield f.createCaseClause(
@@ -712,11 +712,11 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateArrayTypeValidationStatements(
-        typeDescriptor: ArrayType,
+        type: ArrayType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
-        const typeName = this.getTypeName(typeDescriptor.itemTypeNodeId);
-        const hasSeenSet = typeDescriptor.uniqueItems ?? false;
+        const typeName = this.getTypeName(type.itemTypeNodeId);
+        const hasSeenSet = type.uniqueItems ?? false;
 
         yield f.createIfStatement(
             f.createPrefixUnaryExpression(
@@ -735,7 +735,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
 
-        if (typeDescriptor.minimumItems != null) {
+        if (type.minimumItems != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createPropertyAccessExpression(
@@ -743,7 +743,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createIdentifier("length"),
                     ),
                     f.createToken(ts.SyntaxKind.LessThanToken),
-                    f.createNumericLiteral(typeDescriptor.minimumItems),
+                    f.createNumericLiteral(type.minimumItems),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -751,7 +751,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
 
-        if (typeDescriptor.maximumItems != null) {
+        if (type.maximumItems != null) {
             yield f.createIfStatement(
                 f.createBinaryExpression(
                     f.createPropertyAccessExpression(
@@ -759,7 +759,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createIdentifier("length"),
                     ),
                     f.createToken(ts.SyntaxKind.GreaterThanToken),
-                    f.createNumericLiteral(typeDescriptor.maximumItems),
+                    f.createNumericLiteral(type.maximumItems),
                 ),
                 f.createBlock([
                     f.createReturnStatement(f.createFalse()),
@@ -778,7 +778,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                         f.createNewExpression(
                             f.createIdentifier("Set"),
                             [
-                                this.generateTypeReference(typeDescriptor.itemTypeNodeId),
+                                this.generateTypeReference(type.itemTypeNodeId),
                             ],
                             [],
                         ),
@@ -857,7 +857,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     protected *generateInterfaceTypeValidationStatements(
-        typeDescriptor: InterfaceType,
+        type: InterfaceType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
@@ -891,7 +891,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
             ], true),
         );
 
-        for (const propertyName of typeDescriptor.requiredProperties) {
+        for (const propertyName of type.requiredProperties) {
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
@@ -941,7 +941,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createIdentifier("propertyName"),
                     f.createCaseBlock([
                         ...this.generateInterfaceTypeCaseClausesValidationStatements(
-                            typeDescriptor,
+                            type,
                         ),
                     ]),
                 ),
@@ -953,12 +953,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
     }
     private * generateInterfaceTypeCaseClausesValidationStatements(
-        typeDescriptor: InterfaceType,
+        type: InterfaceType,
     ): Iterable<ts.CaseOrDefaultClause> {
         const { factory: f } = this;
 
-        for (const propertyName in typeDescriptor.propertyTypeNodeIds) {
-            const propertyTypeNodeId = typeDescriptor.propertyTypeNodeIds[propertyName];
+        for (const propertyName in type.propertyTypeNodeIds) {
+            const propertyTypeNodeId = type.propertyTypeNodeIds[propertyName];
             const typeName = this.getTypeName(propertyTypeNodeId);
 
             yield f.createCaseClause(
@@ -996,14 +996,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateRecordTypeValidationStatements(
-        typeDescriptor: RecordType,
+        type: RecordType,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
-        const typeName = this.getTypeName(typeDescriptor.propertyTypeNodeId);
+        const typeName = this.getTypeName(type.propertyTypeNodeId);
 
         const hasPropertyCounter =
-            typeDescriptor.minimumProperties != null ||
-            typeDescriptor.maximumProperties != null;
+            type.minimumProperties != null ||
+            type.maximumProperties != null;
 
         yield f.createIfStatement(
             f.createBinaryExpression(
@@ -1104,12 +1104,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
 
         if (hasPropertyCounter) {
-            if (typeDescriptor.minimumProperties != null) {
+            if (type.minimumProperties != null) {
                 yield f.createIfStatement(
                     f.createBinaryExpression(
                         f.createIdentifier("propertyCount"),
                         f.createToken(ts.SyntaxKind.LessThanToken),
-                        f.createNumericLiteral(typeDescriptor.minimumProperties),
+                        f.createNumericLiteral(type.minimumProperties),
                     ),
                     f.createBlock([
                         f.createReturnStatement(f.createFalse()),
@@ -1117,12 +1117,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                 );
             }
 
-            if (typeDescriptor.maximumProperties != null) {
+            if (type.maximumProperties != null) {
                 yield f.createIfStatement(
                     f.createBinaryExpression(
                         f.createIdentifier("propertyCount"),
                         f.createToken(ts.SyntaxKind.GreaterThanToken),
-                        f.createNumericLiteral(typeDescriptor.maximumProperties),
+                        f.createNumericLiteral(type.maximumProperties),
                     ),
                     f.createBlock([
                         f.createReturnStatement(f.createFalse()),

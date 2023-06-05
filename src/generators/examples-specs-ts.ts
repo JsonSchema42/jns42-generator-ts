@@ -68,21 +68,21 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        for (const nodeDescriptor of this.context.selectNodes()) {
+        for (const node of this.context.selectNodes()) {
             yield* this.generateAssertStatementsForNode(
-                nodeDescriptor,
+                node,
             );
         }
     }
 
     protected *generateAssertStatementsForNode(
-        nodeDescriptor: Node,
+        node: Node,
     ): Iterable<ts.Statement> {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeDescriptor.nodeId);
+        const typeName = this.getTypeName(node.nodeId);
 
-        for (const example of nodeDescriptor.examples) {
+        for (const example of node.examples) {
             yield f.createExpressionStatement(f.createCallExpression(
                 f.createPropertyAccessExpression(
                     f.createIdentifier("assert"),

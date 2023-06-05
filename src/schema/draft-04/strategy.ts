@@ -163,37 +163,37 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
             for (const type of types) {
                 switch (type) {
                     case "null":
-                        yield* this.makeNodeTypeDescriptorFromNull();
+                        yield* this.makeNodeTypeFromNull();
                         break;
 
                     case "boolean":
-                        yield* this.makeNodeTypeDescriptorFromBoolean(
+                        yield* this.makeNodeTypeFromBoolean(
                             nodeItem.node,
                         );
                         break;
 
                     case "integer":
-                        yield* this.makeNodeTypeDescriptorFromNumber(
+                        yield* this.makeNodeTypeFromNumber(
                             nodeItem.node,
                             "integer",
                         );
                         break;
 
                     case "number":
-                        yield* this.makeNodeTypeDescriptorFromNumber(
+                        yield* this.makeNodeTypeFromNumber(
                             nodeItem.node,
                             "float",
                         );
                         break;
 
                     case "string":
-                        yield* this.makeNodeTypeDescriptorFromString(
+                        yield* this.makeNodeTypeFromString(
                             nodeItem.node,
                         );
                         break;
 
                     case "array":
-                        yield* this.makeNodeTypeDescriptorFromArray(
+                        yield* this.makeNodeTypeFromArray(
                             nodeItem.node,
                             nodeItem.nodeRootUrl,
                             nodeItem.nodePointer,
@@ -201,7 +201,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
                         break;
 
                     case "object":
-                        yield* this.makeNodeTypeDescriptorFromObject(
+                        yield* this.makeNodeTypeFromObject(
                             nodeItem.node,
                             nodeItem.nodeRootUrl,
                             nodeItem.nodePointer,
@@ -218,17 +218,17 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
     ): Iterable<CompoundUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
-        yield* this.makeNodeCompoundDescriptorFromAllOf(
+        yield* this.makeNodeCompoundFromAllOf(
             nodeItem.node,
             nodeItem.nodeRootUrl,
             nodeItem.nodePointer,
         );
-        yield* this.makeNodeCompoundDescriptorFromAnyOf(
+        yield* this.makeNodeCompoundFromAnyOf(
             nodeItem.node,
             nodeItem.nodeRootUrl,
             nodeItem.nodePointer,
         );
-        yield* this.makeNodeCompoundDescriptorFromOneOf(
+        yield* this.makeNodeCompoundFromOneOf(
             nodeItem.node,
             nodeItem.nodeRootUrl,
             nodeItem.nodePointer,
@@ -236,13 +236,13 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     }
 
-    private * makeNodeTypeDescriptorFromNull(): Iterable<TypeUnion> {
+    private * makeNodeTypeFromNull(): Iterable<TypeUnion> {
         yield {
             type: "null",
         };
     }
 
-    private * makeNodeTypeDescriptorFromBoolean(
+    private * makeNodeTypeFromBoolean(
         node: Schema | boolean,
     ): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
@@ -259,7 +259,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         };
     }
 
-    private * makeNodeTypeDescriptorFromNumber(
+    private * makeNodeTypeFromNumber(
         node: Schema | boolean,
         numberType: "integer" | "float",
     ): Iterable<TypeUnion> {
@@ -289,7 +289,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         };
     }
 
-    private * makeNodeTypeDescriptorFromString(
+    private * makeNodeTypeFromString(
         node: Schema | boolean,
     ): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node) as unknown[];
@@ -313,7 +313,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         };
     }
 
-    private * makeNodeTypeDescriptorFromArray(
+    private * makeNodeTypeFromArray(
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
@@ -384,7 +384,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    private * makeNodeTypeDescriptorFromObject(
+    private * makeNodeTypeFromObject(
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
@@ -438,7 +438,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    private * makeNodeCompoundDescriptorFromAllOf(
+    private * makeNodeCompoundFromAllOf(
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
@@ -461,7 +461,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    private * makeNodeCompoundDescriptorFromAnyOf(
+    private * makeNodeCompoundFromAnyOf(
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
@@ -484,7 +484,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    private * makeNodeCompoundDescriptorFromOneOf(
+    private * makeNodeCompoundFromOneOf(
         node: Schema | boolean,
         nodeRootUrl: URL,
         nodePointer: string,
