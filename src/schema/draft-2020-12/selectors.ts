@@ -1,5 +1,4 @@
-
-import { Applicator, Core, MetaData, Validation } from "./types.js";
+import { Applicator, Core, MetaData, Validation } from "@jns42/jns42-schema-draft-2020-12";
 
 //#region core
 

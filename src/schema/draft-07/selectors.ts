@@ -1,5 +1,4 @@
-
-import { Schema } from "./types.js";
+import { Schema } from "@jns42/jns42-schema-draft-07";
 
 //#region core
 
