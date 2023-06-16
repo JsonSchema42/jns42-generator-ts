@@ -41,6 +41,7 @@
     "eslint": "^8.42.0",
     "eslint-plugin-deprecation": "^1.4.1",
     "eslint-plugin-security": "^1.7.1",
+    "prettier": "^2.8.8",
     "typedoc": "^0.23.28"
   },
   "dependencies": {

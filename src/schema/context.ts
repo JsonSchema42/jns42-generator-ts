@@ -13,13 +13,13 @@ export class SchemaContext implements SchemaStrategyInterface {
 
     public registerStrategy(
         metaSchemaId: string,
-        strategy: SchemaStrategyBase<unknown>,
+        strategy: SchemaStrategyBase<unknown>
     ) {
         strategy.registerContext(this);
         this.strategies[metaSchemaId] = strategy;
     }
 
-    public * getTypeNames() {
+    public *getTypeNames() {
         for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
             yield* this.getNodeTypeNames(rootNodeId, metaSchemaId);
         }
@@ -37,7 +37,7 @@ export class SchemaContext implements SchemaStrategyInterface {
         rootNodeUrl: URL,
         retrievalUrl: URL,
         referencingUrl: URL | null,
-        defaultMetaSchemaId: string,
+        defaultMetaSchemaId: string
     ) {
         const retrievalId = String(retrievalUrl);
 
@@ -46,13 +46,13 @@ export class SchemaContext implements SchemaStrategyInterface {
             return maybeRootNodeUrl;
         }
 
-        const rootNode = await this.fetchJsonFromUrl(
-            retrievalUrl,
-        );
+        const rootNode = await this.fetchJsonFromUrl(retrievalUrl);
 
-        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
+        const metaSchemaId =
+            this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
-        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> =
+            this.strategies[metaSchemaId];
 
         if (!strategy.isSchema(rootNode)) {
             throw new TypeError("invalid schema");
@@ -66,18 +66,27 @@ export class SchemaContext implements SchemaStrategyInterface {
         this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
         this.rootNodeMetaMap.set(rootNodeId, metaSchemaId);
 
-        for (
-            const [subNodeUrl, subRetrievalUrl] of
-            strategy.selectAllReferencedNodeUrls(rootNode, rootNodeUrl, retrievalUrl)
-        ) {
-            await this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
+        for (const [
+            subNodeUrl,
+            subRetrievalUrl,
+        ] of strategy.selectAllReferencedNodeUrls(
+            rootNode,
+            rootNodeUrl,
+            retrievalUrl
+        )) {
+            await this.loadFromUrl(
+                subNodeUrl,
+                subRetrievalUrl,
+                rootNodeUrl,
+                metaSchemaId
+            );
         }
 
         await this.loadRootNode(
             rootNode,
             rootNodeUrl,
             referencingUrl,
-            defaultMetaSchemaId,
+            defaultMetaSchemaId
         );
 
         return rootNodeUrl;
@@ -95,34 +104,28 @@ export class SchemaContext implements SchemaStrategyInterface {
         rootNode: unknown,
         rootNodeUrl: URL,
         referencingNodeUrl: URL | null,
-        defaultMetaSchemaId: string,
+        defaultMetaSchemaId: string
     ) {
-        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ??
-            defaultMetaSchemaId;
+        const metaSchemaId =
+            this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
-        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> =
+            this.strategies[metaSchemaId];
 
-        await strategy.loadRootNode(
-            rootNode,
-            rootNodeUrl,
-            referencingNodeUrl,
-        );
+        await strategy.loadRootNode(rootNode, rootNodeUrl, referencingNodeUrl);
 
         for (const nodeUrl of strategy.indexRootNode(rootNodeUrl)) {
             const nodeId = String(nodeUrl);
             this.nodeMetaMap.set(nodeId, metaSchemaId);
         }
-
     }
 
-    private async fetchJsonFromUrl(
-        url: URL,
-    ) {
+    private async fetchJsonFromUrl(url: URL) {
         switch (url.protocol) {
             case "http:":
             case "http2:": {
                 const result = await fetch(url);
-                const schemaRootNode = await result.json() as unknown;
+                const schemaRootNode = (await result.json()) as unknown;
 
                 return schemaRootNode;
             }
@@ -137,70 +140,59 @@ export class SchemaContext implements SchemaStrategyInterface {
         }
     }
 
-    private discoverMetaSchemaId(
-        node: unknown,
-    ) {
-        for (const [metaSchemaId, strategy] of Object.entries(this.strategies)) {
+    private discoverMetaSchemaId(node: unknown) {
+        for (const [metaSchemaId, strategy] of Object.entries(
+            this.strategies
+        )) {
             if (strategy.isSchemaRootNode(node)) {
                 return metaSchemaId;
             }
         }
     }
 
-    private * getNodeTypeNames(
+    private *getNodeTypeNames(
         nodeId: string,
         metaSchemaId: string,
-        baseName = "",
+        baseName = ""
     ): Iterable<readonly [string, string]> {
         const reReplace = /[^A-Za-z0-9-_.,]/gu;
 
-        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> =
+            this.strategies[metaSchemaId];
 
         const item = strategy.getNodeItem(nodeId);
 
-        const {
-            node,
-            nodeRootUrl,
-            nodePointer,
-        } = item;
+        const { node, nodeRootUrl, nodePointer } = item;
 
-        const pathParts = nodeRootUrl.pathname.
-            split("/").
-            map(decodeURI).
-            map(value => value.replace(reReplace, "")).
-            filter(value => value !== "");
-        const pointerParts = nodePointer.
-            split("/").
-            map(decodeURI).
-            map(value => value.replace(reReplace, ""));
+        const pathParts = nodeRootUrl.pathname
+            .split("/")
+            .map(decodeURI)
+            .map((value) => value.replace(reReplace, ""))
+            .filter((value) => value !== "");
+        const pointerParts = nodePointer
+            .split("/")
+            .map(decodeURI)
+            .map((value) => value.replace(reReplace, ""));
 
         if (nodePointer === "") {
             baseName = pathParts[pathParts.length - 1] ?? "Schema";
         }
 
-        const nameParts = [
-            baseName,
-            pointerParts[pointerParts.length - 1],
-        ].
-            filter(value => value != null).
-            filter(value => value != "");
+        const nameParts = [baseName, pointerParts[pointerParts.length - 1]]
+            .filter((value) => value != null)
+            .filter((value) => value != "");
 
         const name = camelcase(nameParts, { pascalCase: true });
 
         yield [nodeId, name] as const;
 
-        for (
-            const [subNodePointer] of
-            strategy.selectSubNodeEntries(nodePointer, node)
-        ) {
+        for (const [subNodePointer] of strategy.selectSubNodeEntries(
+            nodePointer,
+            node
+        )) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
             const subNodeId = String(subNodeUrl);
-            yield* this.getNodeTypeNames(
-                subNodeId,
-                metaSchemaId,
-                name,
-            );
+            yield* this.getNodeTypeNames(subNodeId, metaSchemaId, name);
         }
     }
-
 }

@@ -3,7 +3,7 @@ import { SchemaContext } from "./context.js";
 import { Node } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    getNodes(): Record<string, Node>
+    getNodes(): Record<string, Node>;
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -19,55 +19,55 @@ export interface SchemaStrategyNodeItem<N> {
 }
 
 export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
-    protected abstract readonly metaSchemaId: string
+    protected abstract readonly metaSchemaId: string;
 
     public abstract isSchemaRootNode(node: unknown): node is N;
 
-    public abstract isSchema(node: unknown): node is N
+    public abstract isSchema(node: unknown): node is N;
 
     protected abstract loadFromNode(
         node: N,
         nodeUrl: URL,
-        retrievalUrl: URL,
-    ): Promise<void>
+        retrievalUrl: URL
+    ): Promise<void>;
 
     protected abstract makeNodeUrl(
         node: N,
         nodeRootUrl: URL,
-        nodePointer: string,
-    ): URL
+        nodePointer: string
+    ): URL;
 
     public selectRootNodeEntries(): Iterable<[URL, N]> {
-        return [...this.getRootNodeItems()].
-            map(({ nodeUrl, node }) => [nodeUrl, node]);
+        return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [
+            nodeUrl,
+            node,
+        ]);
     }
 
     public abstract selectSubNodeEntries(
         nodePointer: string,
         node: N
-    ): Iterable<readonly [string, N]>
+    ): Iterable<readonly [string, N]>;
 
     public abstract selectAllSubNodeEntries(
         nodePointer: string,
         node: N
-    ): Iterable<readonly [string, N]>
+    ): Iterable<readonly [string, N]>;
 
     public abstract selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
         node: N
-    ): Iterable<readonly [string, N]>
+    ): Iterable<readonly [string, N]>;
 
     public abstract selectAllReferencedNodeUrls(
         rootNode: N,
         rootNodeUrl: URL,
-        retrievalUrl: URL,
-    ): Iterable<readonly [URL, URL]>
+        retrievalUrl: URL
+    ): Iterable<readonly [URL, URL]>;
 
-    public abstract selectNodeUrl(
-        node: N
-    ): URL | undefined
+    public abstract selectNodeUrl(node: N): URL | undefined;
 
-    public abstract getNodes(): Record<string, Node>
+    public abstract getNodes(): Record<string, Node>;
 
     private maybeContext?: SchemaContext;
     protected get context() {
@@ -78,7 +78,10 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         this.maybeContext = context;
     }
 
-    private readonly rootNodeMap = new Map<string, SchemaStrategyRootNodeItem<N>>();
+    private readonly rootNodeMap = new Map<
+        string,
+        SchemaStrategyRootNodeItem<N>
+    >();
     private readonly nodeMap = new Map<string, SchemaStrategyNodeItem<N>>();
 
     public hasRootNodeItem(nodeId: string) {
@@ -100,7 +103,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
     public async loadRootNode(
         node: N,
         nodeUrl: URL,
-        referencingNodeUrl: URL | null,
+        referencingNodeUrl: URL | null
     ) {
         const nodeId = String(nodeUrl);
 
@@ -117,29 +120,23 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         this.rootNodeMap.set(nodeId, item);
     }
 
-    public * indexRootNode(rootNodeUrl: URL): Iterable<URL> {
+    public *indexRootNode(rootNodeUrl: URL): Iterable<URL> {
         const rootNodeId = String(rootNodeUrl);
         const rootItem = this.rootNodeMap.get(rootNodeId);
         if (rootItem == null) {
             throw new Error("rootItem not found");
         }
 
-        for (const [subPointer, subNode] of this.selectAllSubNodeEntriesAndSelf("", rootItem.node)) {
+        for (const [subPointer, subNode] of this.selectAllSubNodeEntriesAndSelf(
+            "",
+            rootItem.node
+        )) {
             yield* this.indexNode(subNode, rootNodeUrl, subPointer);
-
         }
     }
 
-    protected *indexNode(
-        node: N,
-        nodeRootUrl: URL,
-        nodePointer: string,
-    ) {
-        const nodeUrl = this.makeNodeUrl(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
+    protected *indexNode(node: N, nodeRootUrl: URL, nodePointer: string) {
+        const nodeUrl = this.makeNodeUrl(node, nodeRootUrl, nodePointer);
         const nodeId = String(nodeUrl);
 
         const item: SchemaStrategyNodeItem<N> = {
@@ -170,4 +167,3 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return this.nodeMap.entries();
     }
 }
-

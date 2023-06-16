@@ -1,12 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft-04/schema#",
   "description": "A very simple object",
-  "type": [
-    "object"
-  ],
-  "required": [
-    "id"
-  ],
+  "type": ["object"],
+  "required": ["id"],
   "properties": {
     "id": {
       "description": "An identity",

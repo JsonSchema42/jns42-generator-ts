@@ -2,59 +2,60 @@ import ts from "typescript";
 
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: null,
-): ts.NullLiteral
+    value: null
+): ts.NullLiteral;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: true,
-): ts.TrueLiteral
+    value: true
+): ts.TrueLiteral;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: false,
-): ts.FalseLiteral
+    value: false
+): ts.FalseLiteral;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: string,
-): ts.StringLiteral
+    value: string
+): ts.StringLiteral;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: number,
-): ts.NumericLiteral
+    value: number
+): ts.NumericLiteral;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: object,
-): ts.ObjectLiteralExpression
+    value: object
+): ts.ObjectLiteralExpression;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: Array<unknown>,
-): ts.ArrayLiteralExpression
+    value: Array<unknown>
+): ts.ArrayLiteralExpression;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: unknown,
+    value: unknown
 ):
-    ts.NullLiteral |
-    ts.BooleanLiteral |
-    ts.LiteralExpression |
-    ts.ObjectLiteralExpression |
-    ts.ArrayLiteralExpression
+    | ts.NullLiteral
+    | ts.BooleanLiteral
+    | ts.LiteralExpression
+    | ts.ObjectLiteralExpression
+    | ts.ArrayLiteralExpression;
 export function generateLiteral(
     factory: ts.NodeFactory,
-    value: unknown,
+    value: unknown
 ): ts.Expression {
     if (value != null && typeof value === "object") {
-        if (Array.isArray(value)) return factory.createArrayLiteralExpression(
-            value.map(value => generateLiteral(factory, value)),
-            true,
-        );
+        if (Array.isArray(value))
+            return factory.createArrayLiteralExpression(
+                value.map((value) => generateLiteral(factory, value)),
+                true
+            );
 
         return factory.createObjectLiteralExpression(
-            Object.entries(value).map(
-                ([key, value]) => factory.createPropertyAssignment(
+            Object.entries(value).map(([key, value]) =>
+                factory.createPropertyAssignment(
                     factory.createStringLiteral(key),
-                    generateLiteral(factory, value),
-                ),
+                    generateLiteral(factory, value)
+                )
             ),
-            true,
+            true
         );
     }
 
@@ -63,34 +64,31 @@ export function generateLiteral(
 
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: null,
-): ts.NullLiteral
+    value: null
+): ts.NullLiteral;
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: true,
-): ts.TrueLiteral
+    value: true
+): ts.TrueLiteral;
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: false,
-): ts.FalseLiteral
+    value: false
+): ts.FalseLiteral;
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: string,
-): ts.StringLiteral
+    value: string
+): ts.StringLiteral;
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: number,
-): ts.NumericLiteral
+    value: number
+): ts.NumericLiteral;
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: unknown,
-):
-    ts.NullLiteral |
-    ts.BooleanLiteral |
-    ts.LiteralExpression;
+    value: unknown
+): ts.NullLiteral | ts.BooleanLiteral | ts.LiteralExpression;
 export function generatePrimitiveLiteral(
     factory: ts.NodeFactory,
-    value: unknown,
+    value: unknown
 ): ts.Expression {
     if (value === null) return factory.createNull();
 
@@ -108,4 +106,3 @@ export function generatePrimitiveLiteral(
             throw new Error("type not supported");
     }
 }
-

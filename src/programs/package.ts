@@ -11,16 +11,16 @@ import { SchemaContext } from "../schema/index.js";
 import { Namer } from "../utils/index.js";
 
 export function configureLabProgram(argv: yargs.Argv) {
-    return argv.
-        command(
-            "package [schema-url]",
-            "create package from schema-url",
-            yargs => yargs
+    return argv.command(
+        "package [schema-url]",
+        "create package from schema-url",
+        (yargs) =>
+            yargs
                 .positional("schema-url", {
                     describe: "url to download schema from",
                     type: "string",
-                }).
-                option("default-meta-schema-url", {
+                })
+                .option("default-meta-schema-url", {
                     describe: "the default meta schema to use",
                     type: "string",
                     choices: [
@@ -31,35 +31,36 @@ export function configureLabProgram(argv: yargs.Argv) {
                         schemaDraft04.metaSchemaId,
                     ] as const,
                     default: schema202012.metaSchemaId,
-                }).
-                option("package-directory", {
+                })
+                .option("package-directory", {
                     describe: "where to output the package",
                     type: "string",
-                }).
-                option("package-name", {
+                })
+                .option("package-name", {
                     describe: "name of the package",
                     type: "string",
-                }).
-                option("package-version", {
+                })
+                .option("package-version", {
                     describe: "version of the package",
                     type: "string",
-                }).
-                option("unique-name-seed", {
-                    describe: "seed to use when generating unique hashes, change if you ever have a naming collision (this should be very rare)",
+                })
+                .option("unique-name-seed", {
+                    describe:
+                        "seed to use when generating unique hashes, change if you ever have a naming collision (this should be very rare)",
                     type: "number",
                     default: 0,
                 }),
-            argv => main(argv as MainOptions),
-        );
+        (argv) => main(argv as MainOptions)
+    );
 }
 
 interface MainOptions {
-    schemaUrl: string
-    defaultMetaSchemaUrl: string
-    packageDirectory: string
-    packageName: string
-    packageVersion: string
-    uniqueNameSeed: number
+    schemaUrl: string;
+    defaultMetaSchemaUrl: string;
+    packageDirectory: string;
+    packageName: string;
+    packageVersion: string;
+    uniqueNameSeed: number;
 }
 
 async function main(options: MainOptions) {
@@ -71,30 +72,25 @@ async function main(options: MainOptions) {
     const context = new SchemaContext();
     context.registerStrategy(
         schema202012.metaSchemaId,
-        new schema202012.SchemaStrategy(),
+        new schema202012.SchemaStrategy()
     );
     context.registerStrategy(
         schema201909.metaSchemaId,
-        new schema201909.SchemaStrategy(),
+        new schema201909.SchemaStrategy()
     );
     context.registerStrategy(
         schemaDraft07.metaSchemaId,
-        new schemaDraft07.SchemaStrategy(),
+        new schemaDraft07.SchemaStrategy()
     );
     context.registerStrategy(
         schemaDraft06.metaSchemaId,
-        new schemaDraft06.SchemaStrategy(),
+        new schemaDraft06.SchemaStrategy()
     );
     context.registerStrategy(
         schemaDraft04.metaSchemaId,
-        new schemaDraft04.SchemaStrategy(),
+        new schemaDraft04.SchemaStrategy()
     );
-    await context.loadFromUrl(
-        schemaUrl,
-        schemaUrl,
-        null,
-        defaultMetaSchemaId,
-    );
+    await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
     const nodes = context.getNodes();
 
@@ -111,6 +107,4 @@ async function main(options: MainOptions) {
         name: packageName,
         version: packageVersion,
     });
-
 }
-

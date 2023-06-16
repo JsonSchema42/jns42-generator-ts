@@ -5,9 +5,6 @@ export abstract class CodeGeneratorBase {
     constructor(
         protected readonly factory: ts.NodeFactory,
         protected readonly names: Record<string, string[]>,
-        protected readonly nodes: Record<string, Node>,
-    ) {
-
-    }
-
+        protected readonly nodes: Record<string, Node>
+    ) {}
 }
