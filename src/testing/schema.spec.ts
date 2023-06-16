@@ -43,16 +43,13 @@ await test("testing fixtures", async () => {
     }
 });
 
-async function runTest(
-    schemaName: string,
-    packageName: string,
-) {
+async function runTest(schemaName: string, packageName: string) {
     const packageDirectoryPath = path.join(
         projectRoot,
         ".package",
         "testing",
         schemaName,
-        packageName,
+        packageName
     );
     const schemaPath = path.join(
         projectRoot,
@@ -60,7 +57,7 @@ async function runTest(
         "testing",
         "schema",
         schemaName,
-        `${packageName}.json`,
+        `${packageName}.json`
     );
     const schemaUrl = new URL(`file://${schemaPath}`);
 
@@ -72,29 +69,29 @@ async function runTest(
         const context = new SchemaContext();
         context.registerStrategy(
             schema202012.metaSchemaId,
-            new schema202012.SchemaStrategy(),
+            new schema202012.SchemaStrategy()
         );
         context.registerStrategy(
             schema201909.metaSchemaId,
-            new schema201909.SchemaStrategy(),
+            new schema201909.SchemaStrategy()
         );
         context.registerStrategy(
             schemaDraft07.metaSchemaId,
-            new schemaDraft07.SchemaStrategy(),
+            new schemaDraft07.SchemaStrategy()
         );
         context.registerStrategy(
             schemaDraft06.metaSchemaId,
-            new schemaDraft06.SchemaStrategy(),
+            new schemaDraft06.SchemaStrategy()
         );
         context.registerStrategy(
             schemaDraft04.metaSchemaId,
-            new schemaDraft04.SchemaStrategy(),
+            new schemaDraft04.SchemaStrategy()
         );
         await context.loadFromUrl(
             schemaUrl,
             schemaUrl,
             null,
-            schema202012.metaSchemaId,
+            schema202012.metaSchemaId
         );
 
         const namer = new Namer(new Date().valueOf());
@@ -131,12 +128,13 @@ async function runTest(
         "fixtures",
         "testing",
         "valid",
-        packageName,
+        packageName
     );
     if (fs.existsSync(validDirectory)) {
         await test("valid", async () => {
-            const validFiles = fs.readdirSync(validDirectory).
-                filter(file => /\.json$/.test(file));
+            const validFiles = fs
+                .readdirSync(validDirectory)
+                .filter((file) => /\.json$/.test(file));
 
             for (const validFile of validFiles) {
                 await test(validFile, async () => {
@@ -146,7 +144,7 @@ async function runTest(
 
                     const data = fs.readFileSync(
                         path.join(validDirectory, validFile),
-                        "utf-8",
+                        "utf-8"
                     );
                     const instance = JSON.parse(data);
                     assert.equal(schema[`is${typeName}`](instance), true);
@@ -160,12 +158,13 @@ async function runTest(
         "fixtures",
         "testing",
         "invalid",
-        packageName,
+        packageName
     );
     if (fs.existsSync(invalidDirectory)) {
         await test("invalid", async () => {
-            const invalidFiles = fs.readdirSync(invalidDirectory).
-                filter(file => /\.json$/.test(file));
+            const invalidFiles = fs
+                .readdirSync(invalidDirectory)
+                .filter((file) => /\.json$/.test(file));
 
             for (const invalidFile of invalidFiles) {
                 await test(invalidFile, async () => {
@@ -175,7 +174,7 @@ async function runTest(
 
                     const data = fs.readFileSync(
                         path.join(invalidDirectory, invalidFile),
-                        "utf-8",
+                        "utf-8"
                     );
                     const instance = JSON.parse(data);
                     assert.equal(schema[`is${typeName}`](instance), false);
@@ -183,5 +182,4 @@ async function runTest(
             }
         });
     }
-
 }

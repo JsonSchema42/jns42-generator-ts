@@ -2,10 +2,46 @@ import { Schema, isSchema } from "@jns42/jns42-schema-draft-2020-12";
 import { CompoundUnion, Node, TypeUnion } from "../intermediate.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
-import { selectAllSubNodes, selectAllSubNodesAndSelf, selectNodeAnchor, selectNodeConst, selectNodeDeprecated, selectNodeDescription, selectNodeDynamicAnchor, selectNodeDynamicRef, selectNodeEnum, selectNodeExamples, selectNodeId, selectNodePropertyNamesEntries, selectNodeRef, selectNodeSchema, selectNodeTypes, selectSubNodeAdditionalPropertiesEntries, selectSubNodeAllOfEntries, selectSubNodeAnyOfEntries, selectSubNodeItemsEntries, selectSubNodeOneOfEntries, selectSubNodePrefixItemsEntries, selectSubNodes, selectValidationMaximumExclusive, selectValidationMaximumInclusive, selectValidationMaximumItems, selectValidationMaximumLength, selectValidationMaximumProperties, selectValidationMinimumExclusive, selectValidationMinimumInclusive, selectValidationMinimumItems, selectValidationMinimumLength, selectValidationMinimumProperties, selectValidationMultipleOf, selectValidationRequired, selectValidationUniqueItems, selectValidationValuePattern } from "./selectors.js";
+import {
+    selectAllSubNodes,
+    selectAllSubNodesAndSelf,
+    selectNodeAnchor,
+    selectNodeConst,
+    selectNodeDeprecated,
+    selectNodeDescription,
+    selectNodeDynamicAnchor,
+    selectNodeDynamicRef,
+    selectNodeEnum,
+    selectNodeExamples,
+    selectNodeId,
+    selectNodePropertyNamesEntries,
+    selectNodeRef,
+    selectNodeSchema,
+    selectNodeTypes,
+    selectSubNodeAdditionalPropertiesEntries,
+    selectSubNodeAllOfEntries,
+    selectSubNodeAnyOfEntries,
+    selectSubNodeItemsEntries,
+    selectSubNodeOneOfEntries,
+    selectSubNodePrefixItemsEntries,
+    selectSubNodes,
+    selectValidationMaximumExclusive,
+    selectValidationMaximumInclusive,
+    selectValidationMaximumItems,
+    selectValidationMaximumLength,
+    selectValidationMaximumProperties,
+    selectValidationMinimumExclusive,
+    selectValidationMinimumInclusive,
+    selectValidationMinimumItems,
+    selectValidationMinimumLength,
+    selectValidationMinimumProperties,
+    selectValidationMultipleOf,
+    selectValidationRequired,
+    selectValidationUniqueItems,
+    selectValidationValuePattern,
+} from "./selectors.js";
 
 export class SchemaStrategy extends SchemaStrategyBase<Schema> {
-
     //#region super implementation
 
     protected readonly metaSchemaId = metaSchemaId;
@@ -25,7 +61,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     protected async loadFromNode(
         node: Schema,
         nodeUrl: URL,
-        retrievalUrl: URL,
+        retrievalUrl: URL
     ) {
         const nodeRef = selectNodeRef(node);
 
@@ -37,16 +73,15 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                 nodeRefUrl,
                 retrievalRefUrl,
                 nodeUrl,
-                this.metaSchemaId,
+                this.metaSchemaId
             );
         }
-
     }
 
     protected makeNodeUrl(
         node: Schema,
         nodeRootUrl: URL,
-        nodePointer: string,
+        nodePointer: string
     ): URL {
         let nodeUrl = this.selectNodeUrl(node);
         if (nodeUrl != null) {
@@ -55,28 +90,28 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
         nodeUrl = new URL(
             nodePointer === "" ? "" : `#${nodePointer}`,
-            nodeRootUrl,
+            nodeRootUrl
         );
         return nodeUrl;
     }
 
     public selectSubNodeEntries(
         nodePointer: string,
-        node: Schema,
+        node: Schema
     ): Iterable<readonly [string, Schema]> {
         return selectSubNodes(nodePointer, node);
     }
 
     public selectAllSubNodeEntries(
         nodePointer: string,
-        node: Schema,
+        node: Schema
     ): Iterable<readonly [string, Schema]> {
         return selectAllSubNodes(nodePointer, node);
     }
 
     public selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
-        node: Schema,
+        node: Schema
     ): Iterable<readonly [string, Schema]> {
         return selectAllSubNodesAndSelf(nodePointer, node);
     }
@@ -84,7 +119,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     public *selectAllReferencedNodeUrls(
         rootNode: Schema,
         rootNodeUrl: URL,
-        retrievalUrl: URL,
+        retrievalUrl: URL
     ): Iterable<readonly [URL, URL]> {
         for (const [pointer, node] of selectAllSubNodesAndSelf("", rootNode)) {
             const nodeRef = selectNodeRef(node);
@@ -97,7 +132,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             refRetrievalUrl.hash = "";
 
             yield [refNodeUrl, refRetrievalUrl] as const;
-
         }
     }
 
@@ -113,8 +147,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#region strategy implementation
 
-    public * selectNodes(
-    ): Iterable<Node> {
+    public *selectNodes(): Iterable<Node> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
             const description = selectNodeDescription(node) ?? "";
             const deprecated = selectNodeDeprecated(node) ?? false;
@@ -127,7 +160,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             if (nodeRef != null) {
                 const resolvedNodeId = this.resolveReferenceNodeId(
                     nodeId,
-                    nodeRef,
+                    nodeRef
                 );
 
                 superNodeId = resolvedNodeId;
@@ -137,7 +170,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             if (nodeDynamicRef != null) {
                 const resolvedNodeId = this.resolveDynamicReferenceNodeId(
                     nodeId,
-                    nodeDynamicRef,
+                    nodeDynamicRef
                 );
 
                 superNodeId = resolvedNodeId;
@@ -153,9 +186,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
     }
 
-    public *selectNodeTypes(
-        nodeId: string,
-    ): Iterable<TypeUnion> {
+    public *selectNodeTypes(nodeId: string): Iterable<TypeUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         if (nodeItem.node === true) {
@@ -179,36 +210,32 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                         break;
 
                     case "boolean":
-                        yield* this.makeNodeTypeFromBoolean(
-                            nodeItem.node,
-                        );
+                        yield* this.makeNodeTypeFromBoolean(nodeItem.node);
                         break;
 
                     case "integer":
                         yield* this.makeNodeTypeFromNumber(
                             nodeItem.node,
-                            "integer",
+                            "integer"
                         );
                         break;
 
                     case "number":
                         yield* this.makeNodeTypeFromNumber(
                             nodeItem.node,
-                            "float",
+                            "float"
                         );
                         break;
 
                     case "string":
-                        yield* this.makeNodeTypeFromString(
-                            nodeItem.node,
-                        );
+                        yield* this.makeNodeTypeFromString(nodeItem.node);
                         break;
 
                     case "array":
                         yield* this.makeNodeTypeFromArray(
                             nodeItem.node,
                             nodeItem.nodeRootUrl,
-                            nodeItem.nodePointer,
+                            nodeItem.nodePointer
                         );
                         break;
 
@@ -216,47 +243,41 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                         yield* this.makeNodeTypeFromObject(
                             nodeItem.node,
                             nodeItem.nodeRootUrl,
-                            nodeItem.nodePointer,
+                            nodeItem.nodePointer
                         );
                         break;
-
                 }
             }
         }
     }
 
-    public *selectNodeCompounds(
-        nodeId: string,
-    ): Iterable<CompoundUnion> {
+    public *selectNodeCompounds(nodeId: string): Iterable<CompoundUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         yield* this.makeNodeCompoundFromAllOf(
             nodeItem.node,
             nodeItem.nodeRootUrl,
-            nodeItem.nodePointer,
+            nodeItem.nodePointer
         );
         yield* this.makeNodeCompoundFromAnyOf(
             nodeItem.node,
             nodeItem.nodeRootUrl,
-            nodeItem.nodePointer,
+            nodeItem.nodePointer
         );
         yield* this.makeNodeCompoundFromOneOf(
             nodeItem.node,
             nodeItem.nodeRootUrl,
-            nodeItem.nodePointer,
+            nodeItem.nodePointer
         );
-
     }
 
-    private * makeNodeTypeFromNull(): Iterable<TypeUnion> {
+    private *makeNodeTypeFromNull(): Iterable<TypeUnion> {
         yield {
             type: "null",
         };
     }
 
-    private * makeNodeTypeFromBoolean(
-        node: Schema,
-    ): Iterable<TypeUnion> {
+    private *makeNodeTypeFromBoolean(node: Schema): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node);
         const constValue = selectNodeConst(node);
 
@@ -264,8 +285,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
         if (constValue != null) {
             options = [constValue];
-        }
-        else if (enumValues != null) {
+        } else if (enumValues != null) {
             options = [...enumValues];
         }
 
@@ -275,9 +295,9 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         };
     }
 
-    private * makeNodeTypeFromNumber(
+    private *makeNodeTypeFromNumber(
         node: Schema,
-        numberType: "integer" | "float",
+        numberType: "integer" | "float"
     ): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node);
         const constValue = selectNodeConst(node);
@@ -286,8 +306,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
         if (constValue != null) {
             options = [constValue];
-        }
-        else if (enumValues != null) {
+        } else if (enumValues != null) {
             options = [...enumValues];
         }
 
@@ -309,9 +328,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         };
     }
 
-    private * makeNodeTypeFromString(
-        node: Schema,
-    ): Iterable<TypeUnion> {
+    private *makeNodeTypeFromString(node: Schema): Iterable<TypeUnion> {
         const enumValues = selectNodeEnum(node);
         const constValue = selectNodeConst(node);
 
@@ -319,8 +336,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
         if (constValue != null) {
             options = [constValue];
-        }
-        else if (enumValues != null) {
+        } else if (enumValues != null) {
             options = [...enumValues];
         }
 
@@ -337,23 +353,22 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         };
     }
 
-    private * makeNodeTypeFromArray(
+    private *makeNodeTypeFromArray(
         node: Schema,
         nodeRootUrl: URL,
-        nodePointer: string,
+        nodePointer: string
     ): Iterable<TypeUnion> {
         const items = [...selectSubNodeItemsEntries(nodePointer, node)];
-        const prefixItems = [...selectSubNodePrefixItemsEntries(nodePointer, node)];
+        const prefixItems = [
+            ...selectSubNodePrefixItemsEntries(nodePointer, node),
+        ];
         const minimumItems = selectValidationMinimumItems(node);
         const maximumItems = selectValidationMaximumItems(node);
         const uniqueItems = selectValidationUniqueItems(node) ?? false;
 
         if (prefixItems.length > 0) {
             const itemTypeNodeIds = prefixItems.map(([itemNodePointer]) => {
-                const itemNodeUrl = new URL(
-                    `#${itemNodePointer}`,
-                    nodeRootUrl,
-                );
+                const itemNodeUrl = new URL(`#${itemNodePointer}`, nodeRootUrl);
                 const itemNodeId = String(itemNodeUrl);
                 return itemNodeId;
             });
@@ -366,10 +381,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
         if (items.length > 0) {
             const itemTypeNodeIds = items.map(([itemNodePointer]) => {
-                const itemNodeUrl = new URL(
-                    `#${itemNodePointer}`,
-                    nodeRootUrl,
-                );
+                const itemNodeUrl = new URL(`#${itemNodePointer}`, nodeRootUrl);
                 const itemNodeId = String(itemNodeUrl);
                 return itemNodeId;
             });
@@ -386,14 +398,17 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
     }
 
-    private * makeNodeTypeFromObject(
+    private *makeNodeTypeFromObject(
         node: Schema,
         nodeRootUrl: URL,
-        nodePointer: string,
+        nodePointer: string
     ): Iterable<TypeUnion> {
-        const propertyNames = [...selectNodePropertyNamesEntries(nodePointer, node)];
-        const additionalProperties =
-            [...selectSubNodeAdditionalPropertiesEntries(nodePointer, node)];
+        const propertyNames = [
+            ...selectNodePropertyNamesEntries(nodePointer, node),
+        ];
+        const additionalProperties = [
+            ...selectSubNodeAdditionalPropertiesEntries(nodePointer, node),
+        ];
         const minimumProperties = selectValidationMinimumProperties(node);
         const maximumProperties = selectValidationMaximumProperties(node);
 
@@ -404,11 +419,11 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                 propertyNames.map(([propertyNodePointer, propertyName]) => {
                     const propertyNodeUrl = new URL(
                         `#${propertyNodePointer}`,
-                        nodeRootUrl,
+                        nodeRootUrl
                     );
                     const propertyNodeId = String(propertyNodeUrl);
                     return [propertyName, propertyNodeId];
-                }),
+                })
             );
 
             yield {
@@ -419,14 +434,16 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
 
         if (additionalProperties.length > 0) {
-            const propertyTypeNodeIds = additionalProperties.map(([propertyNodePointer]) => {
-                const propertyNodeUrl = new URL(
-                    `#${propertyNodePointer}`,
-                    nodeRootUrl,
-                );
-                const propertyNodeId = String(propertyNodeUrl);
-                return propertyNodeId;
-            });
+            const propertyTypeNodeIds = additionalProperties.map(
+                ([propertyNodePointer]) => {
+                    const propertyNodeUrl = new URL(
+                        `#${propertyNodePointer}`,
+                        nodeRootUrl
+                    );
+                    const propertyNodeId = String(propertyNodeUrl);
+                    return propertyNodeId;
+                }
+            );
 
             for (const propertyTypeNodeId of propertyTypeNodeIds) {
                 yield {
@@ -440,18 +457,15 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
     }
 
-    private * makeNodeCompoundFromAllOf(
+    private *makeNodeCompoundFromAllOf(
         node: Schema,
         nodeRootUrl: URL,
-        nodePointer: string,
+        nodePointer: string
     ): Iterable<CompoundUnion> {
         const allOf = [...selectSubNodeAllOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
-                const typeNodeUrl = new URL(
-                    `#${typeNodePointer}`,
-                    nodeRootUrl,
-                );
+                const typeNodeUrl = new URL(`#${typeNodePointer}`, nodeRootUrl);
                 const typeNodeId = String(typeNodeUrl);
                 return typeNodeId;
             });
@@ -463,18 +477,15 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
     }
 
-    private * makeNodeCompoundFromAnyOf(
+    private *makeNodeCompoundFromAnyOf(
         node: Schema,
         nodeRootUrl: URL,
-        nodePointer: string,
+        nodePointer: string
     ): Iterable<CompoundUnion> {
         const allOf = [...selectSubNodeAnyOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
-                const typeNodeUrl = new URL(
-                    `#${typeNodePointer}`,
-                    nodeRootUrl,
-                );
+                const typeNodeUrl = new URL(`#${typeNodePointer}`, nodeRootUrl);
                 const typeNodeId = String(typeNodeUrl);
                 return typeNodeId;
             });
@@ -486,18 +497,15 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
     }
 
-    private * makeNodeCompoundFromOneOf(
+    private *makeNodeCompoundFromOneOf(
         node: Schema,
         nodeRootUrl: URL,
-        nodePointer: string,
+        nodePointer: string
     ): Iterable<CompoundUnion> {
         const allOf = [...selectSubNodeOneOfEntries(nodePointer, node)];
         if (allOf.length > 0) {
             const typeNodeIds = allOf.map(([typeNodePointer]) => {
-                const typeNodeUrl = new URL(
-                    `#${typeNodePointer}`,
-                    nodeRootUrl,
-                );
+                const typeNodeUrl = new URL(`#${typeNodePointer}`, nodeRootUrl);
                 const typeNodeId = String(typeNodeUrl);
                 return typeNodeId;
             });
@@ -546,10 +554,12 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
         }
 
         return resolvedNodeId;
-
     }
 
-    private resolveDynamicReferenceNodeId(nodeId: string, nodeDynamicRef: string) {
+    private resolveDynamicReferenceNodeId(
+        nodeId: string,
+        nodeDynamicRef: string
+    ) {
         const nodeItem = this.getNodeItem(nodeId);
 
         const nodeRootId = String(nodeItem.nodeRootUrl);
@@ -569,14 +579,10 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             const currentRootNodeId = String(currentRootNodeUrl);
             const currentRootNode = this.getRootNodeItem(currentRootNodeId);
 
-            const currentNodeUrl = new URL(
-                hash,
-                currentRootNode.nodeUrl,
-            );
+            const currentNodeUrl = new URL(hash, currentRootNode.nodeUrl);
             const currentNodeId = String(currentNodeUrl);
-            const dynamicAnchorNodeId = this.getDynamicAnchorNodeId(
-                currentNodeId,
-            );
+            const dynamicAnchorNodeId =
+                this.getDynamicAnchorNodeId(currentNodeId);
             if (dynamicAnchorNodeId != null) {
                 resolvedNodeId = dynamicAnchorNodeId;
             }
@@ -590,16 +596,8 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
     /*
     override the super function to load dynamic anchors
     */
-    protected * indexNode(
-        node: Schema,
-        nodeRootUrl: URL,
-        nodePointer: string,
-    ) {
-        const nodeUrl = this.makeNodeUrl(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
+    protected *indexNode(node: Schema, nodeRootUrl: URL, nodePointer: string) {
+        const nodeUrl = this.makeNodeUrl(node, nodeRootUrl, nodePointer);
         const nodeId = String(nodeUrl);
 
         const nodeAnchor = selectNodeAnchor(node);
@@ -616,7 +614,10 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
         const nodeDynamicAnchor = selectNodeDynamicAnchor(node);
         if (nodeDynamicAnchor != null) {
-            const dynamicAnchorUrl = new URL(`#${nodeDynamicAnchor}`, nodeRootUrl);
+            const dynamicAnchorUrl = new URL(
+                `#${nodeDynamicAnchor}`,
+                nodeRootUrl
+            );
             const dynamicAnchorId = String(dynamicAnchorUrl);
             if (this.dynamicAnchorMap.has(dynamicAnchorId)) {
                 throw new Error("duplicate dynamicAnchorId");
@@ -627,13 +628,8 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
             // yield dynamicAnchorUrl;
         }
 
-        yield* super.indexNode(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
+        yield* super.indexNode(node, nodeRootUrl, nodePointer);
     }
 
     //#endregion
-
 }
