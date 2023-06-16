@@ -1,7 +1,4 @@
 {
   "$schema": "https://json-schema.org/draft-04/schema#",
-  "type": [
-    "string",
-    "boolean"
-  ]
+  "type": ["string", "boolean"]
 }

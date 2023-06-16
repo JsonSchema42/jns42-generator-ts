@@ -15,7 +15,7 @@
     "compile": "tsc",
     "clean": "rm -rf out",
     "test": "npm run spec-all",
-    "lint": "prettier \"src/**/*.ts\"",
+    "lint": "prettier --check *",
     "spec-all": "node --test ./out/**/*.spec.js",
     "coverage": "c8 --reporter lcov npm test",
     "docs": "typedoc"

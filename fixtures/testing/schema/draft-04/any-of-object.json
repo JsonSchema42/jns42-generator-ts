@@ -4,10 +4,7 @@
   "anyOf": [
     {
       "type": "object",
-      "required": [
-        "a",
-        "b"
-      ],
+      "required": ["a", "b"],
       "properties": {
         "a": {
           "type": "string"
@@ -19,10 +16,7 @@
     },
     {
       "type": "object",
-      "required": [
-        "c",
-        "d"
-      ],
+      "required": ["c", "d"],
       "properties": {
         "c": {
           "type": "string"

@@ -3,9 +3,7 @@
   "language": "en",
   "useGitignore": true,
   "enableGlobDot": true,
-  "ignorePaths": [
-    "fixtures/"
-  ],
+  "ignorePaths": ["fixtures/"],
   "words": [
     "camelcase",
     "cobertura",
@@ -21,7 +19,5 @@
     "ryanluker",
     "unflattened"
   ],
-  "enableFiletypes": [
-    "makefile"
-  ]
+  "enableFiletypes": ["makefile"]
 }
