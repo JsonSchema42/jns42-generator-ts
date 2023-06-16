@@ -15,7 +15,7 @@
       "type": "string",
       "minLength": 2,
       "maxLength": 20,
-      "examples": ["aap", "noot", "mies"]
+      "examples": ["Jack", "John", "Elmer"]
     }
   },
   "examples": [

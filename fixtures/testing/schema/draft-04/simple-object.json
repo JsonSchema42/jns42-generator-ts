@@ -7,7 +7,8 @@
     "id": {
       "description": "An identity",
       "type": "integer",
-      "exclusiveMinimum": 0
+      "minimum": 0,
+      "exclusiveMinimum": true
     },
     "name": {
       "description": "A name",
