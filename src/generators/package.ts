@@ -56,11 +56,7 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new ValidatorsTsCodeGenerator(
-            factory,
-            namer,
-            context
-        );
+        const codeGenerator = new ValidatorsTsCodeGenerator(factory, namer, context);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -68,11 +64,7 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new ExamplesSpecsTsCodeGenerator(
-            factory,
-            namer,
-            context
-        );
+        const codeGenerator = new ExamplesSpecsTsCodeGenerator(factory, namer, context);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "examples.spec.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename

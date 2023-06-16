@@ -11,10 +11,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 
     private strategies: Record<string, SchemaStrategyBase<unknown>> = {};
 
-    public registerStrategy(
-        metaSchemaId: string,
-        strategy: SchemaStrategyBase<unknown>
-    ) {
+    public registerStrategy(metaSchemaId: string, strategy: SchemaStrategyBase<unknown>) {
         strategy.registerContext(this);
         this.strategies[metaSchemaId] = strategy;
     }
@@ -25,11 +22,9 @@ export class SchemaContext implements SchemaStrategyInterface {
         referencingNodeUrl: URL | null,
         defaultMetaSchemaId: string
     ) {
-        const metaSchemaId =
-            this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
+        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
-        const strategy: SchemaStrategyBase<unknown> =
-            this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
         await strategy.loadRootNode(rootNode, rootNodeUrl, referencingNodeUrl);
 
@@ -54,11 +49,9 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         const rootNode = await this.fetchJsonFromUrl(retrievalUrl);
 
-        const metaSchemaId =
-            this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
+        const metaSchemaId = this.discoverMetaSchemaId(rootNode) ?? defaultMetaSchemaId;
 
-        const strategy: SchemaStrategyBase<unknown> =
-            this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
         if (!strategy.isSchema(rootNode)) {
             throw new TypeError("invalid schema");
@@ -72,28 +65,15 @@ export class SchemaContext implements SchemaStrategyInterface {
         this.rootNodeRetrievalMap.set(rootNodeId, retrievalUrl);
         this.rootNodeMetaMap.set(rootNodeId, metaSchemaId);
 
-        for (const [
-            subNodeUrl,
-            subRetrievalUrl,
-        ] of strategy.selectAllReferencedNodeUrls(
+        for (const [subNodeUrl, subRetrievalUrl] of strategy.selectAllReferencedNodeUrls(
             rootNode,
             rootNodeUrl,
             retrievalUrl
         )) {
-            await this.loadFromUrl(
-                subNodeUrl,
-                subRetrievalUrl,
-                rootNodeUrl,
-                metaSchemaId
-            );
+            await this.loadFromUrl(subNodeUrl, subRetrievalUrl, rootNodeUrl, metaSchemaId);
         }
 
-        await this.loadRootNode(
-            rootNode,
-            rootNodeUrl,
-            referencingUrl,
-            defaultMetaSchemaId
-        );
+        await this.loadRootNode(rootNode, rootNodeUrl, referencingUrl, defaultMetaSchemaId);
 
         return rootNodeUrl;
     }
@@ -120,9 +100,7 @@ export class SchemaContext implements SchemaStrategyInterface {
     }
 
     private discoverMetaSchemaId(node: unknown) {
-        for (const [metaSchemaId, strategy] of Object.entries(
-            this.strategies
-        )) {
+        for (const [metaSchemaId, strategy] of Object.entries(this.strategies)) {
             if (strategy.isSchemaRootNode(node)) {
                 return metaSchemaId;
             }
@@ -150,8 +128,7 @@ export class SchemaContext implements SchemaStrategyInterface {
     ): Iterable<readonly [string, string]> {
         const reReplace = /[^A-Za-z0-9-_.,]/gu;
 
-        const strategy: SchemaStrategyBase<unknown> =
-            this.strategies[metaSchemaId];
+        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
 
         const item = strategy.getNodeItem(nodeId);
 
@@ -179,10 +156,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         yield [nodeId, name] as const;
 
-        for (const [subNodePointer] of strategy.selectSubNodeEntries(
-            nodePointer,
-            node
-        )) {
+        for (const [subNodePointer] of strategy.selectSubNodeEntries(nodePointer, node)) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
             const subNodeId = String(subNodeUrl);
             yield* this.getNodeTypeNames(subNodeId, metaSchemaId, name);

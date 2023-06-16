@@ -9,11 +9,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
 
         yield f.createImportDeclaration(
             undefined,
-            f.createImportClause(
-                false,
-                f.createIdentifier("assert"),
-                undefined
-            ),
+            f.createImportClause(false, f.createIdentifier("assert"), undefined),
             f.createStringLiteral("node:assert/strict")
         );
 
@@ -65,9 +61,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
         }
     }
 
-    protected *generateAssertStatementsForNode(
-        node: Node
-    ): Iterable<ts.Statement> {
+    protected *generateAssertStatementsForNode(node: Node): Iterable<ts.Statement> {
         const { factory: f } = this;
 
         const typeName = this.getTypeName(node.nodeId);

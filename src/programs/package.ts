@@ -70,26 +70,11 @@ async function main(options: MainOptions) {
     const { packageName, packageVersion } = options;
 
     const context = new SchemaContext();
-    context.registerStrategy(
-        schema202012.metaSchemaId,
-        new schema202012.SchemaStrategy()
-    );
-    context.registerStrategy(
-        schema201909.metaSchemaId,
-        new schema201909.SchemaStrategy()
-    );
-    context.registerStrategy(
-        schemaDraft07.metaSchemaId,
-        new schemaDraft07.SchemaStrategy()
-    );
-    context.registerStrategy(
-        schemaDraft06.metaSchemaId,
-        new schemaDraft06.SchemaStrategy()
-    );
-    context.registerStrategy(
-        schemaDraft04.metaSchemaId,
-        new schemaDraft04.SchemaStrategy()
-    );
+    context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
+    context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaStrategy());
+    context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
+    context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
+    context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
     await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
     const namer = new Namer(options.uniqueNameSeed);
