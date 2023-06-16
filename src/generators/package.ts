@@ -51,22 +51,14 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new ValidatorsTsCodeGenerator(
-            factory,
-            names,
-            nodes
-        );
+        const codeGenerator = new ValidatorsTsCodeGenerator(factory, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const codeGenerator = new ExamplesSpecsTsCodeGenerator(
-            factory,
-            names,
-            nodes
-        );
+        const codeGenerator = new ExamplesSpecsTsCodeGenerator(factory, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "examples.spec.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));

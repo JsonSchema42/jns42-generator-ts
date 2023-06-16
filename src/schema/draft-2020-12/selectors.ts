@@ -1,9 +1,4 @@
-import {
-    Applicator,
-    Core,
-    MetaData,
-    Validation,
-} from "@jns42/jns42-schema-draft-2020-12";
+import { Applicator, Core, MetaData, Validation } from "@jns42/jns42-schema-draft-2020-12";
 
 //#region core
 
@@ -78,56 +73,33 @@ export function* selectSubNodeDefEntries(nodePointer: string, node: Core) {
     }
 }
 
-export function* selectSubNodePropertyEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodePropertyEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.properties != null) {
         for (const [key, subNode] of Object.entries(node.properties)) {
-            const subNodePointer = appendJsonPointer(
-                nodePointer,
-                "properties",
-                key
-            );
+            const subNodePointer = appendJsonPointer(nodePointer, "properties", key);
             yield [subNodePointer, subNode] as const;
         }
     }
 }
 
-export function* selectSubNodeAdditionalPropertiesEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodeAdditionalPropertiesEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.additionalProperties != null) {
         const subNode = node.additionalProperties;
-        const subNodePointer = appendJsonPointer(
-            nodePointer,
-            "additionalProperties"
-        );
+        const subNodePointer = appendJsonPointer(nodePointer, "additionalProperties");
         yield [subNodePointer, subNode] as const;
     }
 }
 
-export function* selectSubNodePrefixItemsEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodePrefixItemsEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.prefixItems != null) {
         for (const [key, subNode] of Object.entries(node.prefixItems)) {
-            const subNodePointer = appendJsonPointer(
-                nodePointer,
-                "prefixItems",
-                key
-            );
+            const subNodePointer = appendJsonPointer(nodePointer, "prefixItems", key);
             yield [subNodePointer, subNode] as const;
         }
     }
 }
 
-export function* selectSubNodeItemsEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodeItemsEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.items != null) {
         const subNode = node.items;
         const subNodePointer = appendJsonPointer(nodePointer, "items");
@@ -135,10 +107,7 @@ export function* selectSubNodeItemsEntries(
     }
 }
 
-export function* selectSubNodeAnyOfEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodeAnyOfEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.anyOf != null) {
         for (const [key, subNode] of Object.entries(node.anyOf)) {
             const subNodePointer = appendJsonPointer(nodePointer, "anyOf", key);
@@ -147,10 +116,7 @@ export function* selectSubNodeAnyOfEntries(
     }
 }
 
-export function* selectSubNodeOneOfEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodeOneOfEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.oneOf != null) {
         for (const [key, subNode] of Object.entries(node.oneOf)) {
             const subNodePointer = appendJsonPointer(nodePointer, "oneOf", key);
@@ -159,10 +125,7 @@ export function* selectSubNodeOneOfEntries(
     }
 }
 
-export function* selectSubNodeAllOfEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectSubNodeAllOfEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.allOf != null) {
         for (const [key, subNode] of Object.entries(node.allOf)) {
             const subNodePointer = appendJsonPointer(nodePointer, "allOf", key);
@@ -224,17 +187,10 @@ export function* selectNodeRequiredPropertyNames(node: Validation) {
     }
 }
 
-export function* selectNodePropertyNamesEntries(
-    nodePointer: string,
-    node: Applicator
-) {
+export function* selectNodePropertyNamesEntries(nodePointer: string, node: Applicator) {
     if (typeof node === "object" && node.properties != null) {
         for (const propertyName of Object.keys(node.properties)) {
-            const subNodePointer = appendJsonPointer(
-                nodePointer,
-                "properties",
-                propertyName
-            );
+            const subNodePointer = appendJsonPointer(nodePointer, "properties", propertyName);
             yield [subNodePointer, propertyName] as const;
         }
     }
@@ -357,10 +313,7 @@ export function selectValidationEnum(node: Validation) {
 //#region helpers
 
 function appendJsonPointer(basePointer: string, ...subPointerParts: string[]) {
-    return (
-        basePointer +
-        subPointerParts.map((part) => "/" + encodeURI(part)).join("")
-    );
+    return basePointer + subPointerParts.map((part) => "/" + encodeURI(part)).join("");
 }
 
 //#endregion

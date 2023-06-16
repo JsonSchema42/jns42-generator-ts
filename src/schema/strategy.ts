@@ -25,23 +25,12 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
     public abstract isSchema(node: unknown): node is N;
 
-    protected abstract loadFromNode(
-        node: N,
-        nodeUrl: URL,
-        retrievalUrl: URL
-    ): Promise<void>;
+    protected abstract loadFromNode(node: N, nodeUrl: URL, retrievalUrl: URL): Promise<void>;
 
-    protected abstract makeNodeUrl(
-        node: N,
-        nodeRootUrl: URL,
-        nodePointer: string
-    ): URL;
+    protected abstract makeNodeUrl(node: N, nodeRootUrl: URL, nodePointer: string): URL;
 
     public selectRootNodeEntries(): Iterable<[URL, N]> {
-        return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [
-            nodeUrl,
-            node,
-        ]);
+        return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
 
     public abstract selectSubNodeEntries(
@@ -78,10 +67,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         this.maybeContext = context;
     }
 
-    private readonly rootNodeMap = new Map<
-        string,
-        SchemaStrategyRootNodeItem<N>
-    >();
+    private readonly rootNodeMap = new Map<string, SchemaStrategyRootNodeItem<N>>();
     private readonly nodeMap = new Map<string, SchemaStrategyNodeItem<N>>();
 
     public hasRootNodeItem(nodeId: string) {
@@ -100,11 +86,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return this.rootNodeMap.values();
     }
 
-    public async loadRootNode(
-        node: N,
-        nodeUrl: URL,
-        referencingNodeUrl: URL | null
-    ) {
+    public async loadRootNode(node: N, nodeUrl: URL, referencingNodeUrl: URL | null) {
         const nodeId = String(nodeUrl);
 
         if (this.rootNodeMap.has(nodeId)) {
