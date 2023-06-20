@@ -52,7 +52,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         return isSchema(node);
     }
 
-    protected makeNodeUrl(node: Schema, nodeRootUrl: URL, nodePointer: string): URL {
+    public makeNodeUrl(node: Schema, nodeRootUrl: URL, nodePointer: string): URL {
         let nodeUrl = this.selectNodeUrl(node);
         if (nodeUrl != null) {
             return nodeUrl;

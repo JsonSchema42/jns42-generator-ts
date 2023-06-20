@@ -29,7 +29,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
     protected abstract loadFromNode(node: N, nodeUrl: URL, retrievalUrl: URL): Promise<void>;
 
-    protected abstract makeNodeUrl(node: N, nodeRootUrl: URL, nodePointer: string): URL;
+    public abstract makeNodeUrl(node: N, nodeRootUrl: URL, nodePointer: string): URL;
 
     public selectRootNodeEntries(): Iterable<[URL, N]> {
         return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [nodeUrl, node]);
