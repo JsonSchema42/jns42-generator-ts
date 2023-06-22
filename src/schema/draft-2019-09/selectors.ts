@@ -38,6 +38,12 @@ export function selectNodeRecursiveRef(node: Core) {
     }
 }
 
+export function selectNodeTitle(node: MetaData) {
+    if (typeof node === "object") {
+        return node.title;
+    }
+}
+
 export function selectNodeDescription(node: MetaData) {
     if (typeof node === "object") {
         return node.description;

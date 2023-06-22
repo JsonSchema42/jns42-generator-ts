@@ -26,6 +26,12 @@ export function selectNodeDescription(node: Schema) {
     }
 }
 
+export function selectNodeTitle(node: Schema) {
+    if (typeof node === "object") {
+        return node.title;
+    }
+}
+
 export function selectNodeExamples(node: Schema) {
     if (typeof node === "object") {
         return node.examples;

@@ -21,6 +21,12 @@ export function selectNodeRef(node: Schema | boolean) {
     }
 }
 
+export function selectNodeTitle(node: Schema | boolean) {
+    if (typeof node === "object") {
+        return node.title;
+    }
+}
+
 export function selectNodeDescription(node: Schema | boolean) {
     if (typeof node === "object") {
         return node.description;
