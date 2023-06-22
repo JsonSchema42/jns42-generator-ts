@@ -1,6 +1,7 @@
 export interface Node {
     superNodeId?: string;
     deprecated: boolean;
+    title: string;
     description: string;
     examples: unknown[];
     types: TypeUnion[];

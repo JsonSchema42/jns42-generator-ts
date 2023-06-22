@@ -11,6 +11,7 @@ import {
     selectNodePropertyNamesEntries,
     selectNodeRef,
     selectNodeSchema,
+    selectNodeTitle,
     selectNodeTypes,
     selectSubNodeAdditionalItemsEntries,
     selectSubNodeAdditionalPropertiesEntries,
@@ -130,6 +131,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     private *selectNodeEntries(): Iterable<[string, Node]> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
+            const title = selectNodeTitle(node) ?? "";
             const description = selectNodeDescription(node) ?? "";
             const deprecated = false;
             const examples = new Array<unknown>();
@@ -152,6 +154,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
                 {
                     superNodeId,
                     deprecated,
+                    title,
                     description,
                     examples,
                     types,

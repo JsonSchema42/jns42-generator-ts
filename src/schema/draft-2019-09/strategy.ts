@@ -17,6 +17,7 @@ import {
     selectNodeRecursiveRef,
     selectNodeRef,
     selectNodeSchema,
+    selectNodeTitle,
     selectNodeTypes,
     selectSubNodeAdditionalItemsEntries,
     selectSubNodeAdditionalPropertiesEntries,
@@ -138,6 +139,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     private *selectNodeEntries(): Iterable<[string, Node]> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
+            const title = selectNodeTitle(node) ?? "";
             const description = selectNodeDescription(node) ?? "";
             const deprecated = selectNodeDeprecated(node) ?? false;
             const examples = selectNodeExamples(node) ?? [];
@@ -170,6 +172,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
                 {
                     superNodeId,
                     deprecated,
+                    title,
                     description,
                     examples,
                     types,
