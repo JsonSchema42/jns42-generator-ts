@@ -53,7 +53,7 @@ export class SchemaContext implements SchemaStrategyInterface {
             throw new TypeError("invalid schema");
         }
 
-        rootNodeUrl = strategy.selectNodeUrl(rootNode) ?? rootNodeUrl;
+        rootNodeUrl = strategy.makeNodeUrl(rootNode, retrievalUrl, "");
 
         const rootNodeId = String(rootNodeUrl);
 

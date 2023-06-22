@@ -10,7 +10,7 @@ import * as schema202012 from "../schema/draft-2020-12/index.js";
 import { SchemaContext } from "../schema/index.js";
 import { Namer } from "../utils/index.js";
 
-export function configureLabProgram(argv: yargs.Argv) {
+export function configurePackageProgram(argv: yargs.Argv) {
     return argv.command(
         "package [schema-url]",
         "create package from schema-url",
