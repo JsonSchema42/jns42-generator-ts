@@ -22,7 +22,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             typeDefinition
         );
 
-        const comments = [node.description, node.deprecated ? "@deprecated" : ""]
+        const comments = [node.title, node.description, node.deprecated ? "@deprecated" : ""]
             .map((line) => line.trim())
             .filter((line) => line.length > 0)
             .map((line) => line + "\n")
