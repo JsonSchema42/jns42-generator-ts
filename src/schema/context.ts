@@ -130,8 +130,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 
     private *getNodeTypeNames(
         nodeId: string,
-        metaSchemaId: string,
-        baseName = ""
+        metaSchemaId: string
     ): Iterable<readonly [string, string]> {
         const reReplace = /[^A-Za-z0-9-_.,]/gu;
 
@@ -151,11 +150,12 @@ export class SchemaContext implements SchemaStrategyInterface {
             .map(decodeURI)
             .map((value) => value.replace(reReplace, ""));
 
-        if (nodePointer === "") {
-            baseName = pathParts[pathParts.length - 1] ?? "Schema";
-        }
-
-        const nameParts = [baseName, pointerParts[pointerParts.length - 1]]
+        const nameParts = [
+            pathParts[pathParts.length - 1] ?? "Schema",
+            pointerParts[pointerParts.length - 3],
+            pointerParts[pointerParts.length - 2],
+            pointerParts[pointerParts.length - 1],
+        ]
             .filter((value) => value != null)
             .filter((value) => value != "");
 
@@ -166,7 +166,7 @@ export class SchemaContext implements SchemaStrategyInterface {
         for (const [subNodePointer] of strategy.selectSubNodeEntries(nodePointer, node)) {
             const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
             const subNodeId = String(subNodeUrl);
-            yield* this.getNodeTypeNames(subNodeId, metaSchemaId, name);
+            yield* this.getNodeTypeNames(subNodeId, metaSchemaId);
         }
     }
 }
