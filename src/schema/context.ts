@@ -17,8 +17,10 @@ export class SchemaContext implements SchemaStrategyInterface {
     }
 
     public *getTypeNames() {
-        for (const [rootNodeId, metaSchemaId] of this.rootNodeMetaMap) {
-            yield* this.getNodeTypeNames(rootNodeId, metaSchemaId);
+        for (const [metaSchemaId, strategy] of Object.entries(this.strategies)) {
+            for (const [nodeId] of strategy.getNodeItemEntries()) {
+                yield this.getNodeTypeName(nodeId, metaSchemaId);
+            }
         }
     }
 
@@ -128,10 +130,7 @@ export class SchemaContext implements SchemaStrategyInterface {
         }
     }
 
-    private *getNodeTypeNames(
-        nodeId: string,
-        metaSchemaId: string
-    ): Iterable<readonly [string, string]> {
+    private getNodeTypeName(nodeId: string, metaSchemaId: string): readonly [string, string] {
         const reReplace = /[^A-Za-z0-9-_.,]/gu;
 
         const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
@@ -161,12 +160,6 @@ export class SchemaContext implements SchemaStrategyInterface {
 
         const name = camelcase(nameParts, { pascalCase: true });
 
-        yield [nodeId, name] as const;
-
-        for (const [subNodePointer] of strategy.selectSubNodeEntries(nodePointer, node)) {
-            const subNodeUrl = new URL(`#${subNodePointer}`, nodeRootUrl);
-            const subNodeId = String(subNodeUrl);
-            yield* this.getNodeTypeNames(subNodeId, metaSchemaId);
-        }
+        return [nodeId, name] as const;
     }
 }
