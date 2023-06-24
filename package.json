@@ -36,7 +36,7 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
-    "c8": "^5.0.4",
+    "c8": "^8.0.0",
     "prettier": "^2.8.8",
     "typedoc": "^0.23.28"
   },
