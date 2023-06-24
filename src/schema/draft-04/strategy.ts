@@ -3,7 +3,6 @@ import { CompoundUnion, Node, TypeUnion } from "../intermediate.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import {
-    selectAllSubNodes,
     selectAllSubNodesAndSelf,
     selectNodeDescription,
     selectNodeEnum,
@@ -20,7 +19,6 @@ import {
     selectSubNodeItemsManyEntries,
     selectSubNodeItemsOneEntries,
     selectSubNodeOneOfEntries,
-    selectSubNodes,
     selectValidationMaximumExclusive,
     selectValidationMaximumInclusive,
     selectValidationMaximumItems,
@@ -69,20 +67,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
             const nodeUrl = new URL(nodeId);
             return nodeUrl;
         }
-    }
-
-    public selectSubNodeEntries(
-        nodePointer: string,
-        node: Schema | boolean
-    ): Iterable<readonly [string, Schema | boolean]> {
-        return selectSubNodes(nodePointer, node);
-    }
-
-    public selectAllSubNodeEntries(
-        nodePointer: string,
-        node: Schema
-    ): Iterable<readonly [string, boolean | Schema]> {
-        return selectAllSubNodes(nodePointer, node);
     }
 
     public selectAllSubNodeEntriesAndSelf(

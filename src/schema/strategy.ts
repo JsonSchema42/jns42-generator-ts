@@ -33,16 +33,6 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
 
-    public abstract selectSubNodeEntries(
-        nodePointer: string,
-        node: N
-    ): Iterable<readonly [string, N]>;
-
-    public abstract selectAllSubNodeEntries(
-        nodePointer: string,
-        node: N
-    ): Iterable<readonly [string, N]>;
-
     public abstract selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
         node: N
