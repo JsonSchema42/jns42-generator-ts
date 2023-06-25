@@ -1,4 +1,3 @@
-import camelcase from "camelcase";
 import * as fs from "fs";
 import { Node } from "./intermediate.js";
 import { SchemaStrategyBase, SchemaStrategyInterface } from "./strategy.js";
@@ -14,14 +13,6 @@ export class SchemaContext implements SchemaStrategyInterface {
     public registerStrategy(metaSchemaId: string, strategy: SchemaStrategyBase<unknown>) {
         strategy.registerContext(this);
         this.strategies[metaSchemaId] = strategy;
-    }
-
-    public *getTypeNames() {
-        for (const [metaSchemaId, strategy] of Object.entries(this.strategies)) {
-            for (const [nodeId] of strategy.getNodeItemEntries()) {
-                yield this.getNodeTypeName(nodeId, metaSchemaId);
-            }
-        }
     }
 
     public getNodes(): Record<string, Node> {
@@ -128,38 +119,5 @@ export class SchemaContext implements SchemaStrategyInterface {
                 return metaSchemaId;
             }
         }
-    }
-
-    private getNodeTypeName(nodeId: string, metaSchemaId: string): readonly [string, string] {
-        const reReplace = /[^A-Za-z0-9-_.,]/gu;
-
-        const strategy: SchemaStrategyBase<unknown> = this.strategies[metaSchemaId];
-
-        const item = strategy.getNodeItem(nodeId);
-
-        const { node, nodeRootUrl, nodePointer } = item;
-
-        const pathParts = nodeRootUrl.pathname
-            .split("/")
-            .map(decodeURI)
-            .map((value) => value.replace(reReplace, ""))
-            .filter((value) => value !== "");
-        const pointerParts = nodePointer
-            .split("/")
-            .map(decodeURI)
-            .map((value) => value.replace(reReplace, ""));
-
-        const nameParts = [
-            pathParts[pathParts.length - 1] ?? "Schema",
-            pointerParts[pointerParts.length - 3],
-            pointerParts[pointerParts.length - 2],
-            pointerParts[pointerParts.length - 1],
-        ]
-            .filter((value) => value != null)
-            .filter((value) => value != "");
-
-        const name = camelcase(nameParts, { pascalCase: true });
-
-        return [nodeId, name] as const;
     }
 }
