@@ -1,4 +1,3 @@
-import camelcase from "camelcase";
 import * as path from "node:path";
 import ts from "typescript";
 import * as yargs from "yargs";
@@ -9,7 +8,7 @@ import * as schemaDraft07 from "../schema/draft-07/index.js";
 import * as schema201909 from "../schema/draft-2019-09/index.js";
 import * as schema202012 from "../schema/draft-2020-12/index.js";
 import { SchemaContext } from "../schema/index.js";
-import { Namer } from "../utils/index.js";
+import { Namer, getNodeTypeName } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
     return argv.command(
@@ -95,33 +94,4 @@ async function main(options: MainOptions) {
         name: packageName,
         version: packageVersion,
     });
-}
-
-function getNodeTypeName(nodeUrl: URL): string {
-    const reReplace = /[^A-Za-z0-9-_.,]/gu;
-
-    const pointer = nodeUrl.hash.startsWith("#") ? nodeUrl.hash.substring(1) : "";
-
-    const pathParts = nodeUrl.pathname
-        .split("/")
-        .map(decodeURI)
-        .map((value) => value.replace(reReplace, ""))
-        .filter((value) => value !== "");
-    const pointerParts = pointer
-        .split("/")
-        .map(decodeURI)
-        .map((value) => value.replace(reReplace, ""));
-
-    const nameParts = [
-        pathParts[pathParts.length - 1] ?? "Schema",
-        pointerParts[pointerParts.length - 3],
-        pointerParts[pointerParts.length - 2],
-        pointerParts[pointerParts.length - 1],
-    ]
-        .filter((value) => value != null)
-        .filter((value) => value != "");
-
-    const name = camelcase(nameParts, { pascalCase: true });
-
-    return name;
 }
