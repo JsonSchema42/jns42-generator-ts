@@ -16,8 +16,6 @@ export class Namer {
      */
     constructor(private readonly seed: number) {}
 
-    private nameIdMap = new Map<string, string[]>();
-    private idNameMap = new Map<string, string[]>();
     private rootNameNode: NameNode = {
         children: {},
         ids: [],
@@ -46,60 +44,29 @@ export class Namer {
             node = childNode;
         }
         node.ids.push(id);
-
-        const name = nameParts.join("");
-        if (this.idNameMap.has(id)) {
-            throw new Error("id already used");
-        }
-
-        let ids = this.nameIdMap.get(name);
-        if (ids == null) {
-            ids = [id];
-            this.nameIdMap.set(name, ids);
-            this.idNameMap.set(id, [name]);
-            return;
-        }
-
-        if (ids.length === 1) {
-            for (const id of ids) {
-                const suffix = this.createSuffix(id);
-
-                this.idNameMap.set(id, [name, suffix]);
-            }
-        }
-
-        const suffix = this.createSuffix(id);
-
-        ids.push(id);
-        this.idNameMap.set(id, [name, suffix]);
-    }
-
-    /**
-     * This method will return a unique name for one of the names registered via the
-     * `registerName` method. The name might be the same, but there is a change that the
-     * name is made unique. This is done by suffixing a crc hash of the id to it. This
-     * makes for stable and predictable uniqueness.
-     *
-     * @param id id of the thing you want a name for
-     * @returns unique name as an array of strings, join it to get something printable.
-     */
-    public getName(id: string) {
-        const name = this.idNameMap.get(id);
-
-        if (name == null) {
-            throw new Error("name not registered");
-        }
-
-        return name;
     }
 
     public getNames() {
-        return Object.fromEntries(this.getNameEntries());
+        return Object.fromEntries(this.getNameEntries(this.rootNameNode, ""));
     }
 
-    private *getNameEntries() {
-        for (const [id, name] of this.idNameMap) {
-            yield [id, name] as const;
+    private *getNameEntries(node: NameNode, name: string): Iterable<[string, string[]]> {
+        for (const [namePart, childNode] of Object.entries(node.children)) {
+            const childName = name + namePart;
+
+            if (childNode.ids.length === 1) {
+                const [id] = childNode.ids;
+                yield [id, [childName]];
+            }
+
+            if (childNode.ids.length > 1) {
+                for (const id of childNode.ids) {
+                    const suffix = this.createSuffix(id);
+                    yield [id, [childName, suffix]];
+                }
+            }
+
+            yield* this.getNameEntries(childNode, childName);
         }
     }
 
