@@ -77,6 +77,7 @@ async function runTest(schemaName: string, packageName: string) {
                 .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
                 .filter((part) => part.length > 0)
                 .map((part) => camelcase(part, { pascalCase: true }));
+            nameParts.reverse();
             namer.registerName(nodeId, nameParts);
         }
 
