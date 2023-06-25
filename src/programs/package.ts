@@ -17,11 +17,11 @@ export function configurePackageProgram(argv: yargs.Argv) {
         (yargs) =>
             yargs
                 .positional("schema-url", {
-                    describe: "url to download schema from",
+                    description: "url to download schema from",
                     type: "string",
                 })
                 .option("default-meta-schema-url", {
-                    describe: "the default meta schema to use",
+                    description: "the default meta schema to use",
                     type: "string",
                     choices: [
                         schema202012.metaSchemaId,
@@ -33,22 +33,27 @@ export function configurePackageProgram(argv: yargs.Argv) {
                     default: schema202012.metaSchemaId,
                 })
                 .option("package-directory", {
-                    describe: "where to output the package",
+                    description: "where to output the package",
                     type: "string",
                 })
                 .option("package-name", {
-                    describe: "name of the package",
+                    description: "name of the package",
                     type: "string",
                 })
                 .option("package-version", {
-                    describe: "version of the package",
+                    description: "version of the package",
                     type: "string",
                 })
                 .option("unique-name-seed", {
-                    describe:
+                    description:
                         "seed to use when generating unique hashes, change if you ever have a naming collision (this should be very rare)",
                     type: "number",
                     default: 0,
+                })
+                .option("default-type-name", {
+                    description: "name to use when it cannot be derived",
+                    type: "string",
+                    default: "Default",
                 }),
         (argv) => main(argv as MainOptions)
     );
@@ -61,13 +66,14 @@ interface MainOptions {
     packageName: string;
     packageVersion: string;
     uniqueNameSeed: number;
+    defaultTypeName: string;
 }
 
 async function main(options: MainOptions) {
     const schemaUrl = new URL(options.schemaUrl);
     const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
     const packageDirectoryPath = path.resolve(options.packageDirectory);
-    const { packageName, packageVersion } = options;
+    const { packageName, packageVersion, defaultTypeName } = options;
 
     const context = new SchemaContext();
     context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
@@ -82,7 +88,7 @@ async function main(options: MainOptions) {
     const namer = new Namer(options.uniqueNameSeed);
     for (const nodeId of Object.keys(nodes)) {
         const nodeUrl = new URL(nodeId);
-        const typeName = getNodeTypeName(nodeUrl);
+        const typeName = getNodeTypeName(nodeUrl, defaultTypeName);
         namer.registerName(nodeId, typeName);
     }
 

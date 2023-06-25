@@ -72,7 +72,7 @@ async function runTest(schemaName: string, packageName: string) {
         const namer = new Namer(new Date().valueOf());
         for (const nodeId of Object.keys(nodes)) {
             const nodeUrl = new URL(nodeId);
-            const typeName = getNodeTypeName(nodeUrl);
+            const typeName = getNodeTypeName(nodeUrl, "Default");
             namer.registerName(nodeId, typeName);
         }
 

@@ -1,6 +1,6 @@
 import camelcase from "camelcase";
 
-export function getNodeTypeName(nodeUrl: URL): string {
+export function getNodeTypeName(nodeUrl: URL, defaultTypeName: string): string {
     const reReplace = /[^A-Za-z0-9-_.,]/gu;
 
     const pointer = nodeUrl.hash.startsWith("#") ? nodeUrl.hash.substring(1) : "";
@@ -16,7 +16,7 @@ export function getNodeTypeName(nodeUrl: URL): string {
         .map((value) => value.replace(reReplace, ""));
 
     const nameParts = [
-        pathParts[pathParts.length - 1] ?? "Schema",
+        pathParts[pathParts.length - 1] ?? defaultTypeName,
         pointerParts[pointerParts.length - 3],
         pointerParts[pointerParts.length - 2],
         pointerParts[pointerParts.length - 1],
