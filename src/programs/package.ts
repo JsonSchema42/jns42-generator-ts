@@ -1,3 +1,4 @@
+import camelcase from "camelcase";
 import * as path from "node:path";
 import ts from "typescript";
 import * as yargs from "yargs";
@@ -8,7 +9,7 @@ import * as schemaDraft07 from "../schema/draft-07/index.js";
 import * as schema201909 from "../schema/draft-2019-09/index.js";
 import * as schema202012 from "../schema/draft-2020-12/index.js";
 import { SchemaContext } from "../schema/index.js";
-import { Namer, getNodeTypeName } from "../utils/index.js";
+import { Namer } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
     return argv.command(
@@ -53,7 +54,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
                 .option("default-type-name", {
                     description: "name to use when it cannot be derived",
                     type: "string",
-                    default: "Default",
+                    default: "Schema",
                 }),
         (argv) => main(argv as MainOptions)
     );
@@ -88,8 +89,12 @@ async function main(options: MainOptions) {
     const namer = new Namer(options.uniqueNameSeed);
     for (const nodeId of Object.keys(nodes)) {
         const nodeUrl = new URL(nodeId);
-        const typeName = getNodeTypeName(nodeUrl, defaultTypeName);
-        namer.registerName(nodeId, typeName);
+        const hash = nodeUrl.hash.startsWith("#") ? nodeUrl.hash.substring(1) : nodeUrl.hash;
+        const hashParts = hash
+            .split("/")
+            .map(decodeURI)
+            .map((part) => camelcase(part, { pascalCase: true }));
+        namer.registerName(nodeId, hashParts);
     }
 
     const names = namer.getNames();

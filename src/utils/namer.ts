@@ -23,7 +23,8 @@ export class Namer {
      * @param name name of the thing
      * @returns void
      */
-    public registerName(id: string, name: string) {
+    public registerName(id: string, nameParts: string[]) {
+        const name = nameParts.join("");
         if (this.idNameMap.has(id)) {
             throw new Error("id already used");
         }
