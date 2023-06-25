@@ -51,8 +51,10 @@ export class Namer {
     }
 
     private *getNameEntries(node: NameNode, name: string): Iterable<[string, string[]]> {
-        for (const [namePart, childNode] of Object.entries(node.children)) {
-            const childName = namePart + name;
+        const childrenEntries = Object.entries(node.children);
+        for (const [namePart, childNode] of childrenEntries) {
+            const childName =
+                childrenEntries.length > 1 || /^[^a-zA-Z]/.test(name) ? namePart + name : name;
 
             if (childNode.ids.length === 1) {
                 const [id] = childNode.ids;
