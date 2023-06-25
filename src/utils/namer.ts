@@ -1,5 +1,10 @@
 import { crc32 } from "crc";
 
+interface NameNode {
+    children: Record<string, NameNode>;
+    ids: Array<string>;
+}
+
 /**
  * Namer unique name generator class
  */
@@ -13,6 +18,10 @@ export class Namer {
 
     private nameIdMap = new Map<string, string[]>();
     private idNameMap = new Map<string, string[]>();
+    private rootNameNode: NameNode = {
+        children: {},
+        ids: [],
+    };
 
     /**
      * Register this name with an id of the thing you are naming. After registering all your
@@ -24,6 +33,20 @@ export class Namer {
      * @returns void
      */
     public registerName(id: string, nameParts: string[]) {
+        let node = this.rootNameNode;
+        for (const namePart of nameParts) {
+            let childNode = node.children[namePart];
+            if (childNode == null) {
+                childNode = {
+                    children: {},
+                    ids: [],
+                };
+                node.children[namePart] = childNode;
+            }
+            node = childNode;
+        }
+        node.ids.push(id);
+
         const name = nameParts.join("");
         if (this.idNameMap.has(id)) {
             throw new Error("id already used");

@@ -90,11 +90,11 @@ async function main(options: MainOptions) {
     for (const nodeId of Object.keys(nodes)) {
         const nodeUrl = new URL(nodeId);
         const hash = nodeUrl.hash.startsWith("#") ? nodeUrl.hash.substring(1) : nodeUrl.hash;
-        const hashParts = hash
-            .split("/")
-            .map(decodeURI)
+        const nameParts = [defaultTypeName, ...hash.split("/").map(decodeURI)]
+            .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
+            .filter((part) => part.length > 0)
             .map((part) => camelcase(part, { pascalCase: true }));
-        namer.registerName(nodeId, hashParts);
+        namer.registerName(nodeId, nameParts);
     }
 
     const names = namer.getNames();
