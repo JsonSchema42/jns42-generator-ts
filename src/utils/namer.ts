@@ -1,7 +1,9 @@
 import camelcase from "camelcase";
 import assert from "node:assert";
 
+const startsWithNumberRe = /^[0-9]/gu;
 const startsWithLetterRe = /^[a-zA-Z]/gu;
+const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
 
 interface NameNode {
     part: string;
@@ -20,6 +22,8 @@ export class Namer {
      * this would ever result in a collision then change the seed!
      */
     constructor(rootNamePart: string) {
+        rootNamePart = rootNamePart.replace(nonIdentifierRe, "");
+        rootNamePart = camelcase(rootNamePart, { pascalCase: true });
         this.rootNameNode = {
             part: rootNamePart,
             children: {},
@@ -36,7 +40,7 @@ export class Namer {
         const nameParts = hash
             .split("/")
             .map(decodeURI)
-            .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
+            .map((part) => part.replace(nonIdentifierRe, ""))
             .filter((part) => part.length > 0)
             .map((part) => camelcase(part, { pascalCase: true }));
         this.registerNameParts(id, nameParts);
@@ -68,43 +72,70 @@ export class Namer {
     }
 
     private *getNameEntries(): Iterable<[string, string]> {
-        const nameMap = new Map<string, Array<[NameNode, NameNode]>>();
+        const nameMap = new Map<string, Array<[NameNode | undefined, NameNode]>>();
 
-        let continueCounter = 0;
+        /*
+        Should we continue?
+        */
+        let shouldContinueCounter = 0;
+
+        /*
+        Initially fill nameMap
+        */
         for (const [id, node] of Object.entries(this.leafNodes)) {
             let nodes = nameMap.get(node.part);
             if (nodes == null) {
                 nodes = [];
                 nameMap.set(node.part, nodes);
             } else {
-                continueCounter += 1;
+                shouldContinueCounter += 1;
             }
             nodes.push([node, node]);
         }
 
-        while (continueCounter > 0) {
-            continueCounter = 0;
+        /*
+        De-duping process
+        */
+        while (shouldContinueCounter > 0) {
+            shouldContinueCounter = 0;
+
             for (const [name, nodes] of nameMap) {
                 if (nodes.length === 1) {
                     continue;
                 }
 
+                /*
+                Collect unique parents nameParts. If there are no unique parents, we want
+                to not include the parents namePart in the name.
+                */
                 const uniqueParentNameParts = new Set<string>();
                 for (const [currentNode, targetNode] of nodes) {
+                    if (!currentNode) {
+                        continue;
+                    }
+
                     if (currentNode.parent) {
                         uniqueParentNameParts.add(currentNode.parent.part);
                     }
                 }
 
-                nameMap.delete(name);
+                if (nodes.every(([currentNode]) => currentNode != null)) {
+                    /*
+                    Delete the entry, we are going to put it back later
+                    */
+                    nameMap.delete(name);
+                }
+
                 for (const [currentNode, targetNode] of nodes) {
-                    let newNode = currentNode.parent;
+                    if (currentNode == null) {
+                        continue;
+                    }
+
+                    let parentNode = currentNode.parent;
                     let newName = name;
-                    if (newNode == null) {
-                        newNode = currentNode;
-                    } else {
+                    if (parentNode != null) {
                         if (uniqueParentNameParts.size > 1) {
-                            newName = newNode.part + newName;
+                            newName = parentNode.part + newName;
                         }
                     }
                     let newNodes = nameMap.get(newName);
@@ -112,13 +143,16 @@ export class Namer {
                         newNodes = [];
                         nameMap.set(newName, newNodes);
                     } else {
-                        continueCounter += 1;
+                        shouldContinueCounter += 1;
                     }
-                    newNodes.push([newNode, targetNode]);
+                    newNodes.push([parentNode, targetNode]);
                 }
             }
         }
 
+        /*
+        Output nameMap into an iterable of entries
+        */
         for (const [name, nodes] of nameMap) {
             assert(nodes.length === 1);
             const [[, node]] = nodes;

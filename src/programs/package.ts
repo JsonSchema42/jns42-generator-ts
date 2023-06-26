@@ -47,7 +47,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
                 .option("root-name-part", {
                     description: "root name of the schema",
                     type: "string",
-                    default: "root",
+                    default: "schema",
                 }),
         (argv) => main(argv as MainOptions)
     );
