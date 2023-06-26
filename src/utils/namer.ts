@@ -3,6 +3,7 @@ import { crc32 } from "crc";
 import assert from "node:assert";
 
 interface NameNode {
+    part: string;
     children: Record<string, NameNode>;
     parent?: NameNode;
     ids: Array<string>;
@@ -20,6 +21,7 @@ export class Namer {
     constructor(private readonly seed: number, private readonly defaultTypeName: string) {}
 
     private rootNameNode: NameNode = {
+        part: "",
         children: {},
         ids: [],
     };
@@ -32,7 +34,6 @@ export class Namer {
             .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
             .filter((part) => part.length > 0)
             .map((part) => camelcase(part, { pascalCase: true }));
-        nameParts.reverse();
         this.registerNameParts(id, nameParts);
     }
 
@@ -42,6 +43,7 @@ export class Namer {
             let childNode = node.children[namePart];
             if (childNode == null) {
                 childNode = {
+                    part: namePart,
                     children: {},
                     ids: [],
                 };
@@ -56,30 +58,58 @@ export class Namer {
     }
 
     public getNames() {
-        return Object.fromEntries(this.getNameEntries(this.rootNameNode, ""));
+        return Object.fromEntries(this.getNameEntries());
     }
 
-    private *getNameEntries(node: NameNode, name: string): Iterable<[string, string]> {
-        const childrenEntries = Object.entries(node.children);
-        for (const [namePart, childNode] of childrenEntries) {
-            const childName =
-                childrenEntries.length > 1 || /^[^a-zA-Z]/.test(name) || name.length === 0
-                    ? namePart + name
-                    : name;
+    private *getNameEntries(): Iterable<[string, string]> {
+        const nameMap = new Map<string, NameNode[]>();
 
-            if (childNode.ids.length === 1) {
-                const [id] = childNode.ids;
-                yield [id, childName];
+        let duplicates = 0;
+        for (const [id, node] of Object.entries(this.leafNodes)) {
+            let nodes = nameMap.get(node.part);
+            if (nodes == null) {
+                nodes = [];
+                nameMap.set(node.part, nodes);
+            } else {
+                duplicates += 1;
             }
+            nodes.push(node);
+        }
 
-            if (childNode.ids.length > 1) {
-                for (const id of childNode.ids) {
-                    const suffix = this.createSuffix(id);
-                    yield [id, childName + suffix];
+        while (duplicates > 0) {
+            duplicates = 0;
+            for (const [name, nodes] of nameMap) {
+                if (nodes.length === 1) continue;
+
+                nameMap.delete(name);
+                for (const node of nodes) {
+                    let newName = (node.parent?.part ?? "") + name;
+                    let newNodes = nameMap.get(newName);
+                    if (newNodes == null) {
+                        newNodes = [];
+                        nameMap.set(newName, newNodes);
+                    } else {
+                        duplicates += 1;
+                    }
+                    newNodes.push(node);
                 }
             }
+        }
 
-            yield* this.getNameEntries(childNode, childName);
+        for (const [name, nodes] of nameMap) {
+            assert(nodes.length === 1);
+            const [node] = nodes;
+
+            if (node.ids.length === 1) {
+                const [id] = node.ids;
+                yield [id, name];
+            }
+
+            if (node.ids.length > 1) {
+                for (const id of node.ids) {
+                    yield [id, name + this.createSuffix(id)];
+                }
+            }
         }
     }
 
