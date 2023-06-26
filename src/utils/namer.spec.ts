@@ -3,7 +3,7 @@ import test from "node:test";
 import { Namer } from "./namer.js";
 
 test("namer", () => {
-    const namer = new Namer("");
+    const namer = new Namer("-");
 
     namer.registerId("http://www.com/#/A");
     assert.deepStrictEqual(namer.getNames(), {
@@ -33,7 +33,7 @@ test("namer", () => {
 
     namer.registerId("http://www.com/#/C/A");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
+        "http://www.com/#/A": "-A",
         "http://www.com/#/B": "B",
         "http://www.com/#/B/C": "BC",
         "http://www.com/#/A/C": "AC",
@@ -42,9 +42,9 @@ test("namer", () => {
 
     namer.registerId("http://www.com/#/A/B/C");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
+        "http://www.com/#/A": "-A",
         "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/B/C": "-BC",
         "http://www.com/#/A/C": "AC",
         "http://www.com/#/C/A": "CA",
         "http://www.com/#/A/B/C": "ABC",
@@ -52,9 +52,9 @@ test("namer", () => {
 
     namer.registerId("http://www.com/#/A/B/C/D/E/F");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
+        "http://www.com/#/A": "-A",
         "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/B/C": "-BC",
         "http://www.com/#/A/C": "AC",
         "http://www.com/#/C/A": "CA",
         "http://www.com/#/A/B/C": "ABC",
@@ -63,9 +63,9 @@ test("namer", () => {
 
     namer.registerId("http://www.com/#/X/Y/Z/D/E/F");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
+        "http://www.com/#/A": "-A",
         "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/B/C": "-BC",
         "http://www.com/#/A/C": "AC",
         "http://www.com/#/C/A": "CA",
         "http://www.com/#/A/B/C": "ABC",
@@ -75,9 +75,9 @@ test("namer", () => {
 
     namer.registerId("http://www.com/#/X/Y/Z/D/E/1");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
+        "http://www.com/#/A": "-A",
         "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/B/C": "-BC",
         "http://www.com/#/A/C": "AC",
         "http://www.com/#/C/A": "CA",
         "http://www.com/#/A/B/C": "ABC",

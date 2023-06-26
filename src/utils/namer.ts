@@ -19,19 +19,23 @@ export class Namer {
      * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
      * this would ever result in a collision then change the seed!
      */
-    constructor(private readonly defaultTypeName: string) {}
+    constructor(rootName: string) {
+        this.rootNameNode = {
+            part: rootName,
+            children: {},
+            ids: [],
+        };
+    }
 
-    private rootNameNode: NameNode = {
-        part: "",
-        children: {},
-        ids: [],
-    };
+    private rootNameNode: NameNode;
     private leafNodes: Record<string, NameNode> = {};
 
     public registerId(id: string) {
         const url = new URL(id);
         const hash = url.hash.startsWith("#") ? url.hash.substring(1) : url.hash;
-        const nameParts = [this.defaultTypeName, ...hash.split("/").map(decodeURI)]
+        const nameParts = hash
+            .split("/")
+            .map(decodeURI)
             .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
             .filter((part) => part.length > 0)
             .map((part) => camelcase(part, { pascalCase: true }));
