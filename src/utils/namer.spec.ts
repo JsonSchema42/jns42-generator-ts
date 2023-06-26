@@ -17,27 +17,27 @@ test("namer", () => {
         "2": ["B"],
     });
 
-    namer.registerName("3", ["B, C"]);
+    namer.registerName("3", ["C", "B"]);
     assert.deepStrictEqual(namer.getNames(), {
         "1": ["A"],
         "2": ["B"],
         "3": ["C"],
     });
 
-    namer.registerName("4", ["A, C"]);
+    namer.registerName("4", ["C", "A"]);
     assert.deepStrictEqual(namer.getNames(), {
         "1": ["A"],
         "2": ["B"],
-        "3": ["B", "C"],
-        "4": ["A", "C"],
+        "3": ["BC"],
+        "4": ["AC"],
     });
 
-    namer.registerName("5", ["C, A"]);
+    namer.registerName("5", ["A", "C"]);
     assert.deepStrictEqual(namer.getNames(), {
         "1": ["A"],
         "2": ["B"],
-        "3": ["B", "C"],
-        "4": ["A", "C"],
-        "5": ["C", "A"],
+        "3": ["BC"],
+        "4": ["AC"],
+        "5": ["CA"],
     });
 });
