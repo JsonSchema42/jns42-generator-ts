@@ -44,10 +44,10 @@ export function configurePackageProgram(argv: yargs.Argv) {
                     description: "version of the package",
                     type: "string",
                 })
-                .option("default-type-name", {
-                    description: "name to use when it cannot be derived",
+                .option("root-name-part", {
+                    description: "root name of the schema",
                     type: "string",
-                    default: "Schema",
+                    default: "root",
                 }),
         (argv) => main(argv as MainOptions)
     );
@@ -59,14 +59,14 @@ interface MainOptions {
     packageDirectory: string;
     packageName: string;
     packageVersion: string;
-    defaultTypeName: string;
+    rootNamePart: string;
 }
 
 async function main(options: MainOptions) {
     const schemaUrl = new URL(options.schemaUrl);
     const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
     const packageDirectoryPath = path.resolve(options.packageDirectory);
-    const { packageName, packageVersion, defaultTypeName } = options;
+    const { packageName, packageVersion, rootNamePart: defaultTypeName } = options;
 
     const context = new SchemaContext();
     context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
@@ -78,7 +78,7 @@ async function main(options: MainOptions) {
 
     const nodes = context.getNodes();
 
-    const namer = new Namer(options.defaultTypeName);
+    const namer = new Namer(options.rootNamePart);
     for (const nodeId of Object.keys(nodes)) {
         namer.registerId(nodeId);
     }

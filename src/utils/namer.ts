@@ -19,9 +19,9 @@ export class Namer {
      * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
      * this would ever result in a collision then change the seed!
      */
-    constructor(rootName: string) {
+    constructor(rootNamePart: string) {
         this.rootNameNode = {
-            part: rootName,
+            part: rootNamePart,
             children: {},
             ids: [],
         };

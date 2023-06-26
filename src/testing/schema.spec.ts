@@ -69,7 +69,7 @@ async function runTest(schemaName: string, packageName: string) {
         await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
         const nodes = context.getNodes();
 
-        const namer = new Namer("default");
+        const namer = new Namer("root");
         for (const nodeId of Object.keys(nodes)) {
             namer.registerId(nodeId);
         }
