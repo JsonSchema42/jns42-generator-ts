@@ -115,15 +115,13 @@ export class Namer {
                 Collect unique parents nameParts. If there are no unique parents, we want
                 to not include the parents namePart in the name.
                 */
-                const uniqueParentNameParts = new Set<string>();
+                const uniqueParentNameParts = new Set<string | undefined>();
                 for (const [currentNode] of nodes) {
                     if (!currentNode) {
                         continue;
                     }
 
-                    if (currentNode.parent) {
-                        uniqueParentNameParts.add(currentNode.parent.part);
-                    }
+                    uniqueParentNameParts.add(currentNode?.parent?.part);
                 }
 
                 for (const [currentNode, targetNode] of nodes) {
@@ -168,7 +166,7 @@ export class Namer {
 
             if (targetNode.ids.length > 1) {
                 for (const [index, id] of Object.entries(targetNode.ids)) {
-                    yield [id, name + index];
+                    yield [id, name + Number(index).toString(26).toUpperCase()];
                 }
             }
         }
