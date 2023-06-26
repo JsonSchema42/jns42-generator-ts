@@ -89,9 +89,4 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
             );
         }
     }
-
-    protected getTypeName(nodeId: string) {
-        const typeName = this.names[nodeId].join("_");
-        return typeName;
-    }
 }

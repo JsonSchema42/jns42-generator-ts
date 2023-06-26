@@ -4,7 +4,12 @@ import { Node } from "../schema/intermediate.js";
 export abstract class CodeGeneratorBase {
     constructor(
         protected readonly factory: ts.NodeFactory,
-        protected readonly names: Record<string, string[]>,
+        protected readonly names: Record<string, string>,
         protected readonly nodes: Record<string, Node>
     ) {}
+
+    protected getTypeName(nodeId: string) {
+        const typeName = this.names[nodeId];
+        return typeName;
+    }
 }

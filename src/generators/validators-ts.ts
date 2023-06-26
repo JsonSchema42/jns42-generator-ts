@@ -1105,11 +1105,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         yield f.createReturnStatement(f.createTrue());
     }
 
-    protected getTypeName(nodeId: string) {
-        const typeName = this.names[nodeId].join("_");
-        return typeName;
-    }
-
     protected generateTypeReference(nodeId: string) {
         const { factory: f } = this;
 

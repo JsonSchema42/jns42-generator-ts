@@ -69,16 +69,9 @@ async function runTest(schemaName: string, packageName: string) {
         await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
         const nodes = context.getNodes();
 
-        const namer = new Namer(new Date().valueOf());
+        const namer = new Namer(new Date().valueOf(), "default");
         for (const nodeId of Object.keys(nodes)) {
-            const nodeUrl = new URL(nodeId);
-            const hash = nodeUrl.hash.startsWith("#") ? nodeUrl.hash.substring(1) : nodeUrl.hash;
-            const nameParts = ["default", ...hash.split("/").map(decodeURI)]
-                .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
-                .filter((part) => part.length > 0)
-                .map((part) => camelcase(part, { pascalCase: true }));
-            nameParts.reverse();
-            namer.registerName(nodeId, nameParts);
+            namer.registerId(nodeId);
         }
 
         const names = namer.getNames();

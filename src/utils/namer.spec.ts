@@ -3,41 +3,40 @@ import test from "node:test";
 import { Namer } from "./namer.js";
 
 test("namer", () => {
-    const namer = new Namer(0);
+    const namer = new Namer(0, "");
 
-    namer.registerName("1", ["A"]);
-
+    namer.registerId("http://www.com/#/A");
     assert.deepStrictEqual(namer.getNames(), {
-        "1": ["A"],
+        "http://www.com/#/A": "A",
     });
 
-    namer.registerName("2", ["B"]);
+    namer.registerId("http://www.com/#/B");
     assert.deepStrictEqual(namer.getNames(), {
-        "1": ["A"],
-        "2": ["B"],
+        "http://www.com/#/A": "A",
+        "http://www.com/#/B": "B",
     });
 
-    namer.registerName("3", ["C", "B"]);
+    namer.registerId("http://www.com/#/B/C");
     assert.deepStrictEqual(namer.getNames(), {
-        "1": ["A"],
-        "2": ["B"],
-        "3": ["C"],
+        "http://www.com/#/A": "A",
+        "http://www.com/#/B": "B",
+        "http://www.com/#/B/C": "C",
     });
 
-    namer.registerName("4", ["C", "A"]);
+    namer.registerId("http://www.com/#/A/C");
     assert.deepStrictEqual(namer.getNames(), {
-        "1": ["A"],
-        "2": ["B"],
-        "3": ["BC"],
-        "4": ["AC"],
+        "http://www.com/#/A": "A",
+        "http://www.com/#/B": "B",
+        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/A/C": "AC",
     });
 
-    namer.registerName("5", ["A", "C"]);
+    namer.registerId("http://www.com/#/C/A");
     assert.deepStrictEqual(namer.getNames(), {
-        "1": ["A"],
-        "2": ["B"],
-        "3": ["BC"],
-        "4": ["AC"],
-        "5": ["CA"],
+        "http://www.com/#/A": "A",
+        "http://www.com/#/B": "B",
+        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/A/C": "AC",
+        "http://www.com/#/C/A": "CA",
     });
 });

@@ -19,7 +19,7 @@ export interface PackageOptions {
 export function generatePackage(
     factory: ts.NodeFactory,
     nodes: Record<string, Node>,
-    names: Record<string, string[]>,
+    names: Record<string, string>,
     options: PackageOptions
 ) {
     fs.mkdirSync(options.directoryPath, { recursive: true });

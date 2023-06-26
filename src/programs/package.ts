@@ -1,4 +1,3 @@
-import camelcase from "camelcase";
 import * as path from "node:path";
 import ts from "typescript";
 import * as yargs from "yargs";
@@ -86,16 +85,9 @@ async function main(options: MainOptions) {
 
     const nodes = context.getNodes();
 
-    const namer = new Namer(options.uniqueNameSeed);
+    const namer = new Namer(options.uniqueNameSeed, options.defaultTypeName);
     for (const nodeId of Object.keys(nodes)) {
-        const nodeUrl = new URL(nodeId);
-        const hash = nodeUrl.hash.startsWith("#") ? nodeUrl.hash.substring(1) : nodeUrl.hash;
-        const nameParts = [defaultTypeName, ...hash.split("/").map(decodeURI)]
-            .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
-            .filter((part) => part.length > 0)
-            .map((part) => camelcase(part, { pascalCase: true }));
-        nameParts.reverse();
-        namer.registerName(nodeId, nameParts);
+        namer.registerId(nodeId);
     }
 
     const names = namer.getNames();

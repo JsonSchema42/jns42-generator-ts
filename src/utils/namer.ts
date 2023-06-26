@@ -1,3 +1,4 @@
+import camelcase from "camelcase";
 import { crc32 } from "crc";
 
 interface NameNode {
@@ -15,7 +16,7 @@ export class Namer {
      * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
      * this would ever result in a collision then change the seed!
      */
-    constructor(private readonly seed: number) {}
+    constructor(private readonly seed: number, private readonly defaultTypeName: string) {}
 
     private rootNameNode: NameNode = {
         children: {},
@@ -23,16 +24,18 @@ export class Namer {
     };
     private leafNodes: Record<string, NameNode> = {};
 
-    /**
-     * Register this name with an id of the thing you are naming. After registering all your
-     * names, use the `getName` to get a unique name based on or the same as the one you provide
-     * here.
-     *
-     * @param id identity of the thing you are naming
-     * @param name name of the thing
-     * @returns void
-     */
-    public registerName(id: string, nameParts: string[]) {
+    public registerId(id: string) {
+        const url = new URL(id);
+        const hash = url.hash.startsWith("#") ? url.hash.substring(1) : url.hash;
+        const nameParts = [this.defaultTypeName, ...hash.split("/").map(decodeURI)]
+            .map((part) => part.replace(/[^a-zA-Z0-9]/gu, ""))
+            .filter((part) => part.length > 0)
+            .map((part) => camelcase(part, { pascalCase: true }));
+        nameParts.reverse();
+        this.registerNameParts(id, nameParts);
+    }
+
+    private registerNameParts(id: string, nameParts: string[]) {
         let node = this.rootNameNode;
         for (const namePart of nameParts) {
             let childNode = node.children[namePart];
@@ -54,7 +57,7 @@ export class Namer {
         return Object.fromEntries(this.getNameEntries(this.rootNameNode, ""));
     }
 
-    private *getNameEntries(node: NameNode, name: string): Iterable<[string, string[]]> {
+    private *getNameEntries(node: NameNode, name: string): Iterable<[string, string]> {
         const childrenEntries = Object.entries(node.children);
         for (const [namePart, childNode] of childrenEntries) {
             const childName =
@@ -64,13 +67,13 @@ export class Namer {
 
             if (childNode.ids.length === 1) {
                 const [id] = childNode.ids;
-                yield [id, [childName]];
+                yield [id, childName];
             }
 
             if (childNode.ids.length > 1) {
                 for (const id of childNode.ids) {
                     const suffix = this.createSuffix(id);
-                    yield [id, [childName, suffix]];
+                    yield [id, childName + suffix];
                 }
             }
 
