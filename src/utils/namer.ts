@@ -1,5 +1,4 @@
 import camelcase from "camelcase";
-import { crc32 } from "crc";
 import assert from "node:assert";
 
 const startsWithLetterRe = /^[a-zA-Z]/gu;
@@ -55,6 +54,7 @@ export class Namer {
             node = childNode;
         }
         node.ids.push(id);
+        node.ids.sort();
         assert(this.leafNodes[id] == null);
         this.leafNodes[id] = node;
     }
@@ -125,14 +125,10 @@ export class Namer {
             }
 
             if (node.ids.length > 1) {
-                for (const id of node.ids) {
-                    yield [id, name + this.createSuffix(id)];
+                for (const [index, id] of Object.entries(node.ids)) {
+                    yield [id, name + index];
                 }
             }
         }
-    }
-
-    protected createSuffix(id: string) {
-        return String(crc32(id, this.seed) % 1000000).padStart(6, "0");
     }
 }
