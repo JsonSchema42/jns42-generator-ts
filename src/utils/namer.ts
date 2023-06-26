@@ -1,5 +1,6 @@
 import camelcase from "camelcase";
 import { crc32 } from "crc";
+import assert from "node:assert";
 
 interface NameNode {
     children: Record<string, NameNode>;
@@ -50,6 +51,7 @@ export class Namer {
             node = childNode;
         }
         node.ids.push(id);
+        assert(this.leafNodes[id] == null);
         this.leafNodes[id] = node;
     }
 
