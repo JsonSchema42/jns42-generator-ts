@@ -2,6 +2,7 @@ import { crc32 } from "crc";
 
 interface NameNode {
     children: Record<string, NameNode>;
+    parent?: NameNode;
     ids: Array<string>;
 }
 
@@ -20,6 +21,7 @@ export class Namer {
         children: {},
         ids: [],
     };
+    private leafNodes: Record<string, NameNode> = {};
 
     /**
      * Register this name with an id of the thing you are naming. After registering all your
@@ -40,10 +42,12 @@ export class Namer {
                     ids: [],
                 };
                 node.children[namePart] = childNode;
+                childNode.parent = node;
             }
             node = childNode;
         }
         node.ids.push(id);
+        this.leafNodes[id] = node;
     }
 
     public getNames() {
@@ -54,7 +58,9 @@ export class Namer {
         const childrenEntries = Object.entries(node.children);
         for (const [namePart, childNode] of childrenEntries) {
             const childName =
-                childrenEntries.length > 1 || /^[^a-zA-Z]/.test(name) ? namePart + name : name;
+                childrenEntries.length > 1 || /^[^a-zA-Z]/.test(name) || name.length === 0
+                    ? namePart + name
+                    : name;
 
             if (childNode.ids.length === 1) {
                 const [id] = childNode.ids;
