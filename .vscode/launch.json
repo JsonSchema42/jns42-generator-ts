@@ -16,6 +16,26 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "package file",
+      "program": "${workspaceFolder}/src/program.ts",
+      "args": [
+        "package",
+        "file://${file}",
+        "--package-directory",
+        ".package/file",
+        "--package-name",
+        "file",
+        "--package-version",
+        "0.0.0"
+      ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "watch"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "package draft-2020-12",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [

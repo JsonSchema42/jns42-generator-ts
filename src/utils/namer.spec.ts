@@ -101,3 +101,18 @@ test("namer 2", () => {
         "http://www.com/#/A": "A",
     });
 });
+
+test("namer 3", () => {
+    const namer = new Namer("o");
+
+    namer.registerId("http://www.com/#/");
+    assert.deepStrictEqual(namer.getNames(), {
+        "http://www.com/#/": "O",
+    });
+
+    namer.registerId("http://www.com/#/1");
+    assert.deepStrictEqual(namer.getNames(), {
+        "http://www.com/#/": "O",
+        "http://www.com/#/1": "O1",
+    });
+});

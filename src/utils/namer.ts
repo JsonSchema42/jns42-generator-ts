@@ -76,7 +76,7 @@ export class Namer {
         /*
         Should we continue?
         */
-        let shouldContinueCounter = 0;
+        let shouldContinueCounter = Infinity;
 
         /*
         Initially fill nameMap
