@@ -9,9 +9,7 @@ export class Namer {
      * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
      * this would ever result in a collision then change the seed!
      */
-    constructor(private readonly seed: number) {
-
-    }
+    constructor(private readonly seed: number) {}
 
     private nameIdMap = new Map<string, string[]>();
     private idNameMap = new Map<string, string[]>();
@@ -20,15 +18,12 @@ export class Namer {
      * Register this name with an id of the thing you are naming. After registering all your
      * names, use the `getName` to get a unique name based on or the same as the one you provide
      * here.
-     * 
+     *
      * @param id identity of the thing you are naming
      * @param name name of the thing
      * @returns void
      */
-    public registerName(
-        id: string,
-        name: string,
-    ) {
+    public registerName(id: string, name: string) {
         if (this.idNameMap.has(id)) {
             throw new Error("id already used");
         }
@@ -60,7 +55,7 @@ export class Namer {
      * `registerName` method. The name might be the same, but there is a change that the
      * name is made unique. This is done by suffixing a crc hash of the id to it. This
      * makes for stable and predictable uniqueness.
-     * 
+     *
      * @param id id of the thing you want a name for
      * @returns unique name as an array of strings, join it to get something printable.
      */
@@ -77,5 +72,4 @@ export class Namer {
     protected createSuffix(id: string) {
         return String(crc32(id, this.seed) % 1000000).padStart(6, "0");
     }
-
 }

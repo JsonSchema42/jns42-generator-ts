@@ -3,9 +3,9 @@ import { SchemaContext } from "./context.js";
 import { CompoundUnion, Node, TypeUnion } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    selectNodes(): Iterable<Node>
-    selectNodeTypes(nodeId: string): Iterable<TypeUnion>
-    selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>
+    selectNodes(): Iterable<Node>;
+    selectNodeTypes(nodeId: string): Iterable<TypeUnion>;
+    selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>;
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -21,63 +21,48 @@ export interface SchemaStrategyNodeItem<N> {
 }
 
 export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
-    protected abstract readonly metaSchemaId: string
+    protected abstract readonly metaSchemaId: string;
 
     public abstract isSchemaRootNode(node: unknown): node is N;
 
-    public abstract isSchema(node: unknown): node is N
+    public abstract isSchema(node: unknown): node is N;
 
-    protected abstract loadFromNode(
-        node: N,
-        nodeUrl: URL,
-        retrievalUrl: URL,
-    ): Promise<void>
+    protected abstract loadFromNode(node: N, nodeUrl: URL, retrievalUrl: URL): Promise<void>;
 
-    protected abstract makeNodeUrl(
-        node: N,
-        nodeRootUrl: URL,
-        nodePointer: string,
-    ): URL
+    public abstract makeNodeUrl(node: N, nodeRootUrl: URL, nodePointer: string): URL;
 
     public selectRootNodeEntries(): Iterable<[URL, N]> {
-        return [...this.getRootNodeItems()].
-            map(({ nodeUrl, node }) => [nodeUrl, node]);
+        return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
 
     public abstract selectSubNodeEntries(
         nodePointer: string,
         node: N
-    ): Iterable<readonly [string, N]>
+    ): Iterable<readonly [string, N]>;
 
     public abstract selectAllSubNodeEntries(
         nodePointer: string,
         node: N
-    ): Iterable<readonly [string, N]>
+    ): Iterable<readonly [string, N]>;
 
     public abstract selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
         node: N
-    ): Iterable<readonly [string, N]>
+    ): Iterable<readonly [string, N]>;
 
     public abstract selectAllReferencedNodeUrls(
         rootNode: N,
         rootNodeUrl: URL,
-        retrievalUrl: URL,
-    ): Iterable<readonly [URL, URL]>
+        retrievalUrl: URL
+    ): Iterable<readonly [URL, URL]>;
 
-    public abstract selectNodeUrl(
-        node: N
-    ): URL | undefined
+    public abstract selectNodeUrl(node: N): URL | undefined;
 
-    public abstract selectNodes(): Iterable<Node>
+    public abstract selectNodes(): Iterable<Node>;
 
-    public abstract selectNodeTypes(
-        nodeId: string
-    ): Iterable<TypeUnion>
+    public abstract selectNodeTypes(nodeId: string): Iterable<TypeUnion>;
 
-    public abstract selectNodeCompounds(
-        nodeId: string
-    ): Iterable<CompoundUnion>
+    public abstract selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>;
 
     private maybeContext?: SchemaContext;
     protected get context() {
@@ -107,11 +92,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return this.rootNodeMap.values();
     }
 
-    public async loadRootNode(
-        node: N,
-        nodeUrl: URL,
-        referencingNodeUrl: URL | null,
-    ) {
+    public async loadRootNode(node: N, nodeUrl: URL, referencingNodeUrl: URL | null) {
         const nodeId = String(nodeUrl);
 
         if (this.rootNodeMap.has(nodeId)) {
@@ -127,29 +108,23 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         this.rootNodeMap.set(nodeId, item);
     }
 
-    public * indexRootNode(rootNodeUrl: URL): Iterable<URL> {
+    public *indexRootNode(rootNodeUrl: URL): Iterable<URL> {
         const rootNodeId = String(rootNodeUrl);
         const rootItem = this.rootNodeMap.get(rootNodeId);
         if (rootItem == null) {
             throw new Error("rootItem not found");
         }
 
-        for (const [subPointer, subNode] of this.selectAllSubNodeEntriesAndSelf("", rootItem.node)) {
+        for (const [subPointer, subNode] of this.selectAllSubNodeEntriesAndSelf(
+            "",
+            rootItem.node
+        )) {
             yield* this.indexNode(subNode, rootNodeUrl, subPointer);
-
         }
     }
 
-    protected *indexNode(
-        node: N,
-        nodeRootUrl: URL,
-        nodePointer: string,
-    ) {
-        const nodeUrl = this.makeNodeUrl(
-            node,
-            nodeRootUrl,
-            nodePointer,
-        );
+    protected *indexNode(node: N, nodeRootUrl: URL, nodePointer: string) {
+        const nodeUrl = this.makeNodeUrl(node, nodeRootUrl, nodePointer);
         const nodeId = String(nodeUrl);
 
         const item: SchemaStrategyNodeItem<N> = {
@@ -180,4 +155,3 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return this.nodeMap.entries();
     }
 }
-

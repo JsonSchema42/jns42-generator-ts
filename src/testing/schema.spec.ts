@@ -23,13 +23,7 @@ const packageNames = [
     "one-of-object",
 ];
 
-const schemaNames = [
-    "draft-2020-12",
-    "draft-2019-09",
-    "draft-07",
-    "draft-06",
-    "draft-04",
-];
+const schemaNames = ["draft-2020-12", "draft-2019-09", "draft-07", "draft-06", "draft-04"];
 
 await test("testing fixtures", async () => {
     for (const schemaName of schemaNames) {
@@ -43,16 +37,13 @@ await test("testing fixtures", async () => {
     }
 });
 
-async function runTest(
-    schemaName: string,
-    packageName: string,
-) {
+async function runTest(schemaName: string, packageName: string) {
     const packageDirectoryPath = path.join(
         projectRoot,
         ".package",
         "testing",
         schemaName,
-        packageName,
+        packageName
     );
     const schemaPath = path.join(
         projectRoot,
@@ -60,7 +51,7 @@ async function runTest(
         "testing",
         "schema",
         schemaName,
-        `${packageName}.json`,
+        `${packageName}.json`
     );
     const schemaUrl = new URL(`file://${schemaPath}`);
 
@@ -70,32 +61,12 @@ async function runTest(
 
     await test("generate package", async () => {
         const context = new SchemaContext();
-        context.registerStrategy(
-            schema202012.metaSchemaId,
-            new schema202012.SchemaStrategy(),
-        );
-        context.registerStrategy(
-            schema201909.metaSchemaId,
-            new schema201909.SchemaStrategy(),
-        );
-        context.registerStrategy(
-            schemaDraft07.metaSchemaId,
-            new schemaDraft07.SchemaStrategy(),
-        );
-        context.registerStrategy(
-            schemaDraft06.metaSchemaId,
-            new schemaDraft06.SchemaStrategy(),
-        );
-        context.registerStrategy(
-            schemaDraft04.metaSchemaId,
-            new schemaDraft04.SchemaStrategy(),
-        );
-        await context.loadFromUrl(
-            schemaUrl,
-            schemaUrl,
-            null,
-            schema202012.metaSchemaId,
-        );
+        context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
+        context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaStrategy());
+        context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
+        context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
+        context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
+        await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
 
         const namer = new Namer(new Date().valueOf());
         for (const [nodeId, typeName] of context.getTypeNames()) {
@@ -126,28 +97,18 @@ async function runTest(
 
     const typeName = camelcase(`${packageName}.json`, { pascalCase: true });
 
-    const validDirectory = path.join(
-        projectRoot,
-        "fixtures",
-        "testing",
-        "valid",
-        packageName,
-    );
+    const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
     if (fs.existsSync(validDirectory)) {
         await test("valid", async () => {
-            const validFiles = fs.readdirSync(validDirectory).
-                filter(file => /\.json$/.test(file));
+            const validFiles = fs
+                .readdirSync(validDirectory)
+                .filter((file) => /\.json$/.test(file));
 
             for (const validFile of validFiles) {
                 await test(validFile, async () => {
-                    const schema = await import(
-                        path.join(packageDirectoryPath, "main.js")
-                    );
+                    const schema = await import(path.join(packageDirectoryPath, "main.js"));
 
-                    const data = fs.readFileSync(
-                        path.join(validDirectory, validFile),
-                        "utf-8",
-                    );
+                    const data = fs.readFileSync(path.join(validDirectory, validFile), "utf-8");
                     const instance = JSON.parse(data);
                     assert.equal(schema[`is${typeName}`](instance), true);
                 });
@@ -155,33 +116,22 @@ async function runTest(
         });
     }
 
-    const invalidDirectory = path.join(
-        projectRoot,
-        "fixtures",
-        "testing",
-        "invalid",
-        packageName,
-    );
+    const invalidDirectory = path.join(projectRoot, "fixtures", "testing", "invalid", packageName);
     if (fs.existsSync(invalidDirectory)) {
         await test("invalid", async () => {
-            const invalidFiles = fs.readdirSync(invalidDirectory).
-                filter(file => /\.json$/.test(file));
+            const invalidFiles = fs
+                .readdirSync(invalidDirectory)
+                .filter((file) => /\.json$/.test(file));
 
             for (const invalidFile of invalidFiles) {
                 await test(invalidFile, async () => {
-                    const schema = await import(
-                        path.join(packageDirectoryPath, "main.js")
-                    );
+                    const schema = await import(path.join(packageDirectoryPath, "main.js"));
 
-                    const data = fs.readFileSync(
-                        path.join(invalidDirectory, invalidFile),
-                        "utf-8",
-                    );
+                    const data = fs.readFileSync(path.join(invalidDirectory, invalidFile), "utf-8");
                     const instance = JSON.parse(data);
                     assert.equal(schema[`is${typeName}`](instance), false);
                 });
             }
         });
     }
-
 }

@@ -11,16 +11,16 @@ import { TypesTsCodeGenerator } from "./types-ts.js";
 import { ValidatorsTsCodeGenerator } from "./validators-ts.js";
 
 export interface PackageOptions {
-    name: string
-    version: string
-    directoryPath: string
+    name: string;
+    version: string;
+    directoryPath: string;
 }
 
 export function generatePackage(
     factory: ts.NodeFactory,
     context: SchemaContext,
     namer: Namer,
-    options: PackageOptions,
+    options: PackageOptions
 ) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(options.directoryPath, { recursive: true });
@@ -40,11 +40,7 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new MainTsCodeGenerator(
-            factory,
-            namer,
-            context,
-        );
+        const codeGenerator = new MainTsCodeGenerator(factory, namer, context);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -52,11 +48,7 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new TypesTsCodeGenerator(
-            factory,
-            namer,
-            context,
-        );
+        const codeGenerator = new TypesTsCodeGenerator(factory, namer, context);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "types.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -64,11 +56,7 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new ValidatorsTsCodeGenerator(
-            factory,
-            namer,
-            context,
-        );
+        const codeGenerator = new ValidatorsTsCodeGenerator(factory, namer, context);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -76,15 +64,10 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new ExamplesSpecsTsCodeGenerator(
-            factory,
-            namer,
-            context,
-        );
+        const codeGenerator = new ExamplesSpecsTsCodeGenerator(factory, namer, context);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "examples.spec.ts");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
-
 }

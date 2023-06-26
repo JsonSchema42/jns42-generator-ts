@@ -9,9 +9,7 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     },
     {
@@ -31,9 +29,7 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     },
     {
@@ -53,9 +49,7 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     },
     {
@@ -75,9 +69,7 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     },
     {
@@ -97,9 +89,7 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     },
     {
@@ -119,9 +109,7 @@
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "watch"
     }
   ]

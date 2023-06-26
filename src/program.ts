@@ -9,7 +9,7 @@ main();
 async function main() {
     const program = yargs(hideBin(process.argv));
 
-    programs.configureLabProgram(program);
+    programs.configurePackageProgram(program);
 
     program.parse();
 }

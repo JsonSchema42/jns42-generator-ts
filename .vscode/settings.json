@@ -4,8 +4,6 @@
     "source.fixAll": true,
     "source.organizeImports": true
   },
-  "editor.rulers": [
-    100
-  ],
-  "cSpell.ignorePaths": []
+  "editor.rulers": [100],
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

@@ -1,9 +1,4 @@
 {
-  "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "ryanluker.vscode-coverage-gutters",
-    "editorconfig.editorconfig",
-    "streetsidesoftware.code-spell-checker"
-  ],
+  "recommendations": ["ryanluker.vscode-coverage-gutters", "esbenp.prettier-vscode"],
   "unwantedRecommendations": []
 }
