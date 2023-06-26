@@ -2,6 +2,8 @@ import camelcase from "camelcase";
 import { crc32 } from "crc";
 import assert from "node:assert";
 
+const startsWithLetterRe = /^[a-zA-Z]/gu;
+
 interface NameNode {
     part: string;
     children: Record<string, NameNode>;
@@ -64,22 +66,24 @@ export class Namer {
     private *getNameEntries(): Iterable<[string, string]> {
         const nameMap = new Map<string, Array<[NameNode, NameNode]>>();
 
-        let duplicates = 0;
+        let continueCounter = 0;
         for (const [id, node] of Object.entries(this.leafNodes)) {
             let nodes = nameMap.get(node.part);
             if (nodes == null) {
                 nodes = [];
                 nameMap.set(node.part, nodes);
             } else {
-                duplicates += 1;
+                continueCounter += 1;
             }
             nodes.push([node, node]);
         }
 
-        while (duplicates > 0) {
-            duplicates = 0;
+        while (continueCounter > 0) {
+            continueCounter = 0;
             for (const [name, nodes] of nameMap) {
-                if (nodes.length === 1) continue;
+                if (nodes.length === 1) {
+                    continue;
+                }
 
                 const uniqueParentNameParts = new Set<string>();
                 for (const [currentNode, targetNode] of nodes) {
@@ -104,7 +108,7 @@ export class Namer {
                         newNodes = [];
                         nameMap.set(newName, newNodes);
                     } else {
-                        duplicates += 1;
+                        continueCounter += 1;
                     }
                     newNodes.push([newNode, targetNode]);
                 }
