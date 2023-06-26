@@ -166,7 +166,7 @@ export class Namer {
 
             if (targetNode.ids.length > 1) {
                 for (const [index, id] of Object.entries(targetNode.ids)) {
-                    yield [id, name + Number(index).toString(26).toUpperCase()];
+                    yield [id, name + "$" + index];
                 }
             }
         }
