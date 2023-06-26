@@ -1,7 +1,6 @@
 import camelcase from "camelcase";
 import assert from "node:assert";
 
-const startsWithNumberRe = /^[0-9]/u;
 const startsWithLetterRe = /^[a-zA-Z]/u;
 const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
 
@@ -72,7 +71,7 @@ export class Namer {
     }
 
     private *getNameEntries(): Iterable<[string, string]> {
-        const nameMap = new Map<string, Array<[NameNode | undefined, NameNode]>>();
+        let nameMap = new Map<string, Array<[NameNode | undefined, NameNode]>>();
 
         /*
         Should we continue?
@@ -97,10 +96,18 @@ export class Namer {
         De-duping process
         */
         while (shouldContinueCounter > 0) {
+            const newNameMap = new Map<string, Array<[NameNode | undefined, NameNode]>>();
+
             shouldContinueCounter = 0;
 
             for (const [name, nodes] of nameMap) {
+                /*
+                if nodes.length is one then there are no duplicates. If then name starts
+                with a letter, we can move on to the next name.
+                */
                 if (nodes.length === 1 && startsWithLetterRe.test(name)) {
+                    const [[currentNode, targetNode]] = nodes;
+                    newNameMap.set(name, [[currentNode, targetNode]]);
                     continue;
                 }
 
@@ -109,7 +116,7 @@ export class Namer {
                 to not include the parents namePart in the name.
                 */
                 const uniqueParentNameParts = new Set<string>();
-                for (const [currentNode, targetNode] of nodes) {
+                for (const [currentNode] of nodes) {
                     if (!currentNode) {
                         continue;
                     }
@@ -119,36 +126,32 @@ export class Namer {
                     }
                 }
 
-                if (nodes.every(([currentNode]) => currentNode != null)) {
-                    /*
-                    Delete the entry, we are going to put it back later
-                    */
-                    nameMap.delete(name);
-                }
-
                 for (const [currentNode, targetNode] of nodes) {
                     if (currentNode == null) {
+                        newNameMap.set(name, [[undefined, targetNode]]);
                         continue;
                     }
 
-                    let parentNode = currentNode.parent;
+                    let newCurrentNode = currentNode.parent;
                     let newName = name;
-                    if (parentNode != null) {
+                    if (newCurrentNode != null) {
                         if (uniqueParentNameParts.size > 1 || !startsWithLetterRe.test(newName)) {
-                            newName = parentNode.part + newName;
+                            newName = newCurrentNode.part + newName;
                         }
                     }
 
-                    let newNodes = nameMap.get(newName);
+                    let newNodes = newNameMap.get(newName);
                     if (newNodes == null) {
                         newNodes = [];
-                        nameMap.set(newName, newNodes);
+                        newNameMap.set(newName, newNodes);
                     } else {
                         shouldContinueCounter += 1;
                     }
-                    newNodes.push([parentNode, targetNode]);
+                    newNodes.push([newCurrentNode, targetNode]);
                 }
             }
+
+            nameMap = newNameMap;
         }
 
         /*
@@ -156,15 +159,15 @@ export class Namer {
         */
         for (const [name, nodes] of nameMap) {
             assert(nodes.length === 1);
-            const [[, node]] = nodes;
+            const [[currentNode, targetNode]] = nodes;
 
-            if (node.ids.length === 1) {
-                const [id] = node.ids;
+            if (targetNode.ids.length === 1) {
+                const [id] = targetNode.ids;
                 yield [id, name];
             }
 
-            if (node.ids.length > 1) {
-                for (const [index, id] of Object.entries(node.ids)) {
+            if (targetNode.ids.length > 1) {
+                for (const [index, id] of Object.entries(targetNode.ids)) {
                     yield [id, name + index];
                 }
             }
