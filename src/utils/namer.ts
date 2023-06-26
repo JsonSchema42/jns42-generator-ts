@@ -19,7 +19,7 @@ export class Namer {
      * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
      * this would ever result in a collision then change the seed!
      */
-    constructor(private readonly seed: number, private readonly defaultTypeName: string) {}
+    constructor(private readonly defaultTypeName: string) {}
 
     private rootNameNode: NameNode = {
         part: "",

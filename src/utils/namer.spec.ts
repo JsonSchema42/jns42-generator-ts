@@ -3,7 +3,7 @@ import test from "node:test";
 import { Namer } from "./namer.js";
 
 test("namer", () => {
-    const namer = new Namer(0, "");
+    const namer = new Namer("");
 
     namer.registerId("http://www.com/#/A");
     assert.deepStrictEqual(namer.getNames(), {

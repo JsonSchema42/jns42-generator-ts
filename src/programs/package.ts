@@ -44,12 +44,6 @@ export function configurePackageProgram(argv: yargs.Argv) {
                     description: "version of the package",
                     type: "string",
                 })
-                .option("unique-name-seed", {
-                    description:
-                        "seed to use when generating unique hashes, change if you ever have a naming collision (this should be very rare)",
-                    type: "number",
-                    default: 0,
-                })
                 .option("default-type-name", {
                     description: "name to use when it cannot be derived",
                     type: "string",
@@ -65,7 +59,6 @@ interface MainOptions {
     packageDirectory: string;
     packageName: string;
     packageVersion: string;
-    uniqueNameSeed: number;
     defaultTypeName: string;
 }
 
@@ -85,7 +78,7 @@ async function main(options: MainOptions) {
 
     const nodes = context.getNodes();
 
-    const namer = new Namer(options.uniqueNameSeed, options.defaultTypeName);
+    const namer = new Namer(options.defaultTypeName);
     for (const nodeId of Object.keys(nodes)) {
         namer.registerId(nodeId);
     }
