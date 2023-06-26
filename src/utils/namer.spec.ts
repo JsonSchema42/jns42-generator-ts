@@ -39,4 +39,14 @@ test("namer", () => {
         "http://www.com/#/A/C": "AC",
         "http://www.com/#/C/A": "CA",
     });
+
+    namer.registerId("http://www.com/#/A/B/C");
+    assert.deepStrictEqual(namer.getNames(), {
+        "http://www.com/#/A": "A",
+        "http://www.com/#/B": "B",
+        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/A/C": "AC",
+        "http://www.com/#/C/A": "CA",
+        "http://www.com/#/A/B/C": "ABC",
+    });
 });

@@ -62,7 +62,7 @@ export class Namer {
     }
 
     private *getNameEntries(): Iterable<[string, string]> {
-        const nameMap = new Map<string, NameNode[]>();
+        const nameMap = new Map<string, Array<[NameNode, NameNode]>>();
 
         let duplicates = 0;
         for (const [id, node] of Object.entries(this.leafNodes)) {
@@ -73,7 +73,7 @@ export class Namer {
             } else {
                 duplicates += 1;
             }
-            nodes.push(node);
+            nodes.push([node, node]);
         }
 
         while (duplicates > 0) {
@@ -82,8 +82,14 @@ export class Namer {
                 if (nodes.length === 1) continue;
 
                 nameMap.delete(name);
-                for (const node of nodes) {
-                    let newName = (node.parent?.part ?? "") + name;
+                for (const [currentNode, targetNode] of nodes) {
+                    let newNode = currentNode.parent;
+                    let newName = name;
+                    if (newNode == null) {
+                        newNode = currentNode;
+                    } else {
+                        newName = newNode.part + newName;
+                    }
                     let newNodes = nameMap.get(newName);
                     if (newNodes == null) {
                         newNodes = [];
@@ -91,14 +97,14 @@ export class Namer {
                     } else {
                         duplicates += 1;
                     }
-                    newNodes.push(node);
+                    newNodes.push([newNode, targetNode]);
                 }
             }
         }
 
         for (const [name, nodes] of nameMap) {
             assert(nodes.length === 1);
-            const [node] = nodes;
+            const [[, node]] = nodes;
 
             if (node.ids.length === 1) {
                 const [id] = node.ids;
