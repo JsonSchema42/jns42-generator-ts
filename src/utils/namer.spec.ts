@@ -72,4 +72,17 @@ test("namer", () => {
         "http://www.com/#/A/B/C/D/E/F": "CF",
         "http://www.com/#/X/Y/Z/D/E/F": "ZF",
     });
+
+    namer.registerId("http://www.com/#/X/Y/Z/D/E/1");
+    assert.deepStrictEqual(namer.getNames(), {
+        "http://www.com/#/A": "A",
+        "http://www.com/#/B": "B",
+        "http://www.com/#/B/C": "BC",
+        "http://www.com/#/A/C": "AC",
+        "http://www.com/#/C/A": "CA",
+        "http://www.com/#/A/B/C": "ABC",
+        "http://www.com/#/A/B/C/D/E/F": "CF",
+        "http://www.com/#/X/Y/Z/D/E/F": "ZF",
+        "http://www.com/#/X/Y/Z/D/E/1": "E1",
+    });
 });
