@@ -10,7 +10,8 @@
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
+      "preLaunchTask": "watch",
+      "outputCapture": "std"
     },
     {
       "type": "node",
