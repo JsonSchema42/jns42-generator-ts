@@ -1,8 +1,8 @@
 import camelcase from "camelcase";
 import assert from "node:assert";
 
-const startsWithNumberRe = /^[0-9]/gu;
-const startsWithLetterRe = /^[a-zA-Z]/gu;
+const startsWithNumberRe = /^[0-9]/u;
+const startsWithLetterRe = /^[a-zA-Z]/u;
 const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
 
 interface NameNode {
@@ -100,7 +100,7 @@ export class Namer {
             shouldContinueCounter = 0;
 
             for (const [name, nodes] of nameMap) {
-                if (nodes.length === 1) {
+                if (nodes.length === 1 && startsWithLetterRe.test(name)) {
                     continue;
                 }
 
@@ -134,10 +134,11 @@ export class Namer {
                     let parentNode = currentNode.parent;
                     let newName = name;
                     if (parentNode != null) {
-                        if (uniqueParentNameParts.size > 1) {
+                        if (uniqueParentNameParts.size > 1 || !startsWithLetterRe.test(newName)) {
                             newName = parentNode.part + newName;
                         }
                     }
+
                     let newNodes = nameMap.get(newName);
                     if (newNodes == null) {
                         newNodes = [];
