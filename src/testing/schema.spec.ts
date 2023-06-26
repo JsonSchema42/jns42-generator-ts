@@ -67,10 +67,12 @@ async function runTest(schemaName: string, packageName: string) {
         context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
         context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
         await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
-        const nodes = Object.fromEntries(context.getNodeEntries());
+
+        const nodeEntries = [...context.getNodeEntries()];
+        const nodes = Object.fromEntries(nodeEntries);
 
         const namer = new Namer("schema");
-        for (const nodeId of Object.keys(nodes)) {
+        for (const [nodeId] of nodeEntries) {
             namer.registerId(nodeId);
         }
 
