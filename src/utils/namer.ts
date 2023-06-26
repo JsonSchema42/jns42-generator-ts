@@ -76,7 +76,7 @@ export class Namer {
         /*
         Should we continue?
         */
-        let shouldContinueCounter = Infinity;
+        let shouldContinueCounter = 0;
 
         /*
         Initially fill nameMap
@@ -86,6 +86,9 @@ export class Namer {
             if (nodes == null) {
                 nodes = [];
                 nameMap.set(node.part, nodes);
+                if (!startsWithLetterRe.test(node.part)) {
+                    shouldContinueCounter += 1;
+                }
             } else {
                 shouldContinueCounter += 1;
             }
@@ -127,6 +130,9 @@ export class Namer {
                 for (const [currentNode, targetNode] of nodes) {
                     if (currentNode == null) {
                         newNameMap.set(name, [[undefined, targetNode]]);
+                        if (!startsWithLetterRe.test(name)) {
+                            shouldContinueCounter += 1;
+                        }
                         continue;
                     }
 
@@ -142,6 +148,9 @@ export class Namer {
                     if (newNodes == null) {
                         newNodes = [];
                         newNameMap.set(newName, newNodes);
+                        if (!startsWithLetterRe.test(newName)) {
+                            shouldContinueCounter += 1;
+                        }
                     } else {
                         shouldContinueCounter += 1;
                     }
