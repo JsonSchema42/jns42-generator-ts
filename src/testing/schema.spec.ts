@@ -98,7 +98,7 @@ async function runTest(schemaName: string, packageName: string) {
         });
     });
 
-    const typeName = camelcase(`${packageName}.json`, { pascalCase: true });
+    const typeName = camelcase("schema", { pascalCase: true });
 
     const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
     if (fs.existsSync(validDirectory)) {
