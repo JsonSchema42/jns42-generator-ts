@@ -116,11 +116,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema> {
 
     //#region strategy implementation
 
-    public getNodes(): Record<string, Node> {
-        return Object.fromEntries(this.selectNodeEntries());
-    }
-
-    private *selectNodeEntries(): Iterable<[string, Node]> {
+    public *getNodeEntries(): Iterable<[string, Node]> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
             const title = selectNodeTitle(node) ?? "";
             const description = selectNodeDescription(node) ?? "";

@@ -15,12 +15,10 @@ export class SchemaContext implements SchemaStrategyInterface {
         this.strategies[metaSchemaId] = strategy;
     }
 
-    public getNodes(): Record<string, Node> {
-        const result = {} as Record<string, Node>;
+    public *getNodeEntries(): Iterable<[string, Node]> {
         for (const strategy of Object.values(this.strategies)) {
-            Object.assign(result, strategy.getNodes());
+            yield* strategy.getNodeEntries();
         }
-        return result;
     }
 
     public async loadFromUrl(

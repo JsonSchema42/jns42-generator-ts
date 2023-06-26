@@ -76,7 +76,7 @@ async function main(options: MainOptions) {
     context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
     await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
-    const nodes = context.getNodes();
+    const nodes = Object.fromEntries(context.getNodeEntries());
 
     const namer = new Namer(options.rootNamePart);
     for (const nodeId of Object.keys(nodes)) {
