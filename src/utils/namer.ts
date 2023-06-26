@@ -81,6 +81,13 @@ export class Namer {
             for (const [name, nodes] of nameMap) {
                 if (nodes.length === 1) continue;
 
+                const uniqueParentNameParts = new Set<string>();
+                for (const [currentNode, targetNode] of nodes) {
+                    if (currentNode.parent) {
+                        uniqueParentNameParts.add(currentNode.parent.part);
+                    }
+                }
+
                 nameMap.delete(name);
                 for (const [currentNode, targetNode] of nodes) {
                     let newNode = currentNode.parent;
@@ -88,7 +95,9 @@ export class Namer {
                     if (newNode == null) {
                         newNode = currentNode;
                     } else {
-                        newName = newNode.part + newName;
+                        if (uniqueParentNameParts.size > 1) {
+                            newName = newNode.part + newName;
+                        }
                     }
                     let newNodes = nameMap.get(newName);
                     if (newNodes == null) {
