@@ -1,3 +1,4 @@
+import camelcase from "camelcase";
 import cp from "child_process";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -128,6 +129,8 @@ async function runTest(schemaName: string, packageName: string) {
             env: process.env,
         });
     });
+
+    const rootNamespace = camelcase(`${packageName}.json`, { pascalCase: true });
 
     const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
     if (fs.existsSync(validDirectory)) {
