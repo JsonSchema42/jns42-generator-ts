@@ -20,15 +20,7 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
 
         yield f.createImportDeclaration(
             undefined,
-            f.createImportClause(
-                false,
-                undefined,
-                f.createNamedImports(
-                    Object.values(this.namespaces).map((namespace) =>
-                        f.createImportSpecifier(false, undefined, f.createIdentifier(namespace))
-                    )
-                )
-            ),
+            f.createImportClause(false, f.createIdentifier("main"), undefined),
             f.createStringLiteral("./main.js")
         );
 
@@ -69,7 +61,6 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
         const node = this.nodes[nodeId];
 
         const typeName = this.getTypeName(nodeId);
-        const typeNamespace = this.getTypeNamespace(nodeId);
 
         for (const example of node.examples) {
             yield f.createExpressionStatement(
@@ -80,14 +71,9 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
                     ),
                     undefined,
                     [
-                        f.createCallExpression(
-                            f.createPropertyAccessExpression(
-                                f.createIdentifier(typeNamespace),
-                                f.createIdentifier(`is${typeName}`)
-                            ),
-                            undefined,
-                            [generateLiteral(f, example)]
-                        ),
+                        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                            generateLiteral(f, example),
+                        ]),
                         f.createTrue(),
                     ]
                 )

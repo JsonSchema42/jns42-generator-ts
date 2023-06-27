@@ -17,8 +17,7 @@ export interface PackageOptions {
 export function generatePackage(
     factory: ts.NodeFactory,
     nodes: Record<string, Node>,
-    namespaces: Record<string, string>,
-    names: Record<string, Record<string, string>>,
+    names: Record<string, string>,
     options: PackageOptions
 ) {
     fs.mkdirSync(options.directoryPath, { recursive: true });
@@ -36,14 +35,14 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new MainTsCodeGenerator(factory, namespaces, names, nodes);
+        const codeGenerator = new MainTsCodeGenerator(factory, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const codeGenerator = new MainSpecsTsCodeGenerator(factory, namespaces, names, nodes);
+        const codeGenerator = new MainSpecsTsCodeGenerator(factory, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.spec.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));

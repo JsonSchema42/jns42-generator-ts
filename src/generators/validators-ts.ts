@@ -15,23 +15,8 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
-        const { factory: f } = this;
-
-        for (const [serverId, namespace] of Object.entries(this.namespaces)) {
-            yield f.createModuleDeclaration(
-                [f.createToken(ts.SyntaxKind.ExportKeyword)],
-                f.createIdentifier(namespace),
-                f.createModuleBlock([...this.getNamespaceStatements(serverId)]),
-                ts.NodeFlags.Namespace
-            );
-        }
-    }
-
-    public *getNamespaceStatements(serverId: string) {
-        const { factory: f } = this;
-
-        for (const [hash, name] of Object.entries(this.names[serverId])) {
-            yield* this.generateValidatorFunctionDeclarationStatements(serverId + hash);
+        for (const nodeId in this.nodes) {
+            yield* this.generateValidatorFunctionDeclarationStatements(nodeId);
         }
     }
 
@@ -125,21 +110,16 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const { factory: f } = this;
         const node = this.nodes[nodeId];
 
-        const typeNamespace = this.getTypeNamespace(nodeId);
         const typeName = this.getTypeName(nodeId);
 
         if (node.superNodeId != null) {
-            const referencingTypeNamespace = this.getTypeNamespace(node.superNodeId);
             const referencingTypeName = this.getTypeName(node.superNodeId);
 
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
                     f.createCallExpression(
-                        f.createPropertyAccessExpression(
-                            f.createIdentifier(referencingTypeNamespace),
-                            f.createIdentifier(`is${referencingTypeName}`)
-                        ),
+                        f.createIdentifier(`is${referencingTypeName}`),
                         undefined,
                         [f.createIdentifier("value")]
                     )
@@ -609,21 +589,15 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
         for (const elementIndex in type.itemTypeNodeIds) {
             const itemTypeNodeId = type.itemTypeNodeIds[elementIndex];
-            const typeNamespace = this.getTypeNamespace(itemTypeNodeId);
             const typeName = this.getTypeName(itemTypeNodeId);
 
             yield f.createCaseClause(f.createNumericLiteral(elementIndex), [
                 f.createIfStatement(
                     f.createPrefixUnaryExpression(
                         ts.SyntaxKind.ExclamationToken,
-                        f.createCallExpression(
-                            f.createPropertyAccessExpression(
-                                f.createIdentifier(typeNamespace),
-                                f.createIdentifier(`is${typeName}`)
-                            ),
-                            undefined,
-                            [f.createIdentifier("elementValue")]
-                        )
+                        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                            f.createIdentifier("elementValue"),
+                        ])
                     ),
                     f.createBlock([f.createReturnStatement(f.createFalse())], true)
                 ),
@@ -636,7 +610,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     protected *generateArrayTypeValidationStatements(type: ArrayType): Iterable<ts.Statement> {
         const { factory: f } = this;
-        const typeNamespace = this.getTypeNamespace(type.itemTypeNodeId);
         const typeName = this.getTypeName(type.itemTypeNodeId);
         const hasSeenSet = type.uniqueItems ?? false;
 
@@ -757,14 +730,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createIfStatement(
                         f.createPrefixUnaryExpression(
                             ts.SyntaxKind.ExclamationToken,
-                            f.createCallExpression(
-                                f.createPropertyAccessExpression(
-                                    f.createIdentifier(typeNamespace),
-                                    f.createIdentifier(`is${typeName}`)
-                                ),
-                                undefined,
-                                [f.createIdentifier("elementValue")]
-                            )
+                            f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                                f.createIdentifier("elementValue"),
+                            ])
                         ),
                         f.createBlock([f.createReturnStatement(f.createFalse())], true)
                     ),
@@ -875,21 +843,15 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
         for (const propertyName in type.propertyTypeNodeIds) {
             const propertyTypeNodeId = type.propertyTypeNodeIds[propertyName];
-            const typeNamespace = this.getTypeNamespace(propertyTypeNodeId);
             const typeName = this.getTypeName(propertyTypeNodeId);
 
             yield f.createCaseClause(f.createStringLiteral(propertyName), [
                 f.createIfStatement(
                     f.createPrefixUnaryExpression(
                         ts.SyntaxKind.ExclamationToken,
-                        f.createCallExpression(
-                            f.createPropertyAccessExpression(
-                                f.createIdentifier(typeNamespace),
-                                f.createIdentifier(`is${typeName}`)
-                            ),
-                            undefined,
-                            [f.createIdentifier("propertyValue")]
-                        )
+                        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                            f.createIdentifier("propertyValue"),
+                        ])
                     ),
                     f.createBlock([f.createReturnStatement(f.createFalse())], true)
                 ),
@@ -910,7 +872,6 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
     protected *generateRecordTypeValidationStatements(type: RecordType): Iterable<ts.Statement> {
         const { factory: f } = this;
-        const typeNamespace = this.getTypeNamespace(type.propertyTypeNodeId);
         const typeName = this.getTypeName(type.propertyTypeNodeId);
 
         const hasPropertyCounter = type.minimumProperties != null || type.maximumProperties != null;
@@ -1002,14 +963,9 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                     f.createIfStatement(
                         f.createPrefixUnaryExpression(
                             ts.SyntaxKind.ExclamationToken,
-                            f.createCallExpression(
-                                f.createPropertyAccessExpression(
-                                    f.createIdentifier(typeNamespace),
-                                    f.createIdentifier(`is${typeName}`)
-                                ),
-                                undefined,
-                                [f.createIdentifier("propertyValue")]
-                            )
+                            f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                                f.createIdentifier("propertyValue"),
+                            ])
                         ),
                         f.createBlock([f.createReturnStatement(f.createFalse())], true)
                     ),
@@ -1066,18 +1022,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         );
 
         for (const typeNodeId of typeNodeIds) {
-            const typeNamespace = this.getTypeNamespace(typeNodeId);
             const typeName = this.getTypeName(typeNodeId);
 
             yield f.createIfStatement(
-                f.createCallExpression(
-                    f.createPropertyAccessExpression(
-                        f.createIdentifier(typeNamespace),
-                        f.createIdentifier(`is${typeName}`)
-                    ),
-                    undefined,
-                    [f.createIdentifier("value")]
-                ),
+                f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                    f.createIdentifier("value"),
+                ]),
                 f.createBlock(
                     [
                         f.createExpressionStatement(
@@ -1109,18 +1059,12 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const { factory: f } = this;
 
         for (const typeNodeId of typeNodeIds) {
-            const typeNamespace = this.getTypeNamespace(typeNodeId);
             const typeName = this.getTypeName(typeNodeId);
 
             yield f.createIfStatement(
-                f.createCallExpression(
-                    f.createPropertyAccessExpression(
-                        f.createIdentifier(typeNamespace),
-                        f.createIdentifier(`is${typeName}`)
-                    ),
-                    undefined,
-                    [f.createIdentifier("value")]
-                ),
+                f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                    f.createIdentifier("value"),
+                ]),
                 f.createBlock([f.createReturnStatement(f.createTrue())], true)
             );
         }
@@ -1133,20 +1077,14 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         const { factory: f } = this;
 
         for (const typeNodeId of typeNodeIds) {
-            const typeNamespace = this.getTypeNamespace(typeNodeId);
             const typeName = this.getTypeName(typeNodeId);
 
             yield f.createIfStatement(
                 f.createPrefixUnaryExpression(
                     ts.SyntaxKind.ExclamationToken,
-                    f.createCallExpression(
-                        f.createPropertyAccessExpression(
-                            f.createIdentifier(typeNamespace),
-                            f.createIdentifier(`is${typeName}`)
-                        ),
-                        undefined,
-                        [f.createIdentifier("value")]
-                    )
+                    f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
+                        f.createIdentifier("value"),
+                    ])
                 ),
                 f.createBlock([f.createReturnStatement(f.createFalse())], true)
             );

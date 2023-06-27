@@ -4,23 +4,8 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
-        const { factory: f } = this;
-
-        for (const [serverId, namespace] of Object.entries(this.namespaces)) {
-            yield f.createModuleDeclaration(
-                [f.createToken(ts.SyntaxKind.ExportKeyword)],
-                f.createIdentifier(namespace),
-                f.createModuleBlock([...this.getNamespaceStatements(serverId)]),
-                ts.NodeFlags.Namespace
-            );
-        }
-    }
-
-    public *getNamespaceStatements(serverId: string) {
-        const { factory: f } = this;
-
-        for (const [hash, name] of Object.entries(this.names[serverId])) {
-            yield this.generateTypeDeclarationStatement(serverId + hash);
+        for (const nodeId in this.nodes) {
+            yield this.generateTypeDeclarationStatement(nodeId);
         }
     }
 

@@ -11,7 +11,7 @@ import * as schemaDraft06 from "../schema/draft-06/index.js";
 import * as schemaDraft07 from "../schema/draft-07/index.js";
 import * as schema201909 from "../schema/draft-2019-09/index.js";
 import * as schema202012 from "../schema/draft-2020-12/index.js";
-import { Node, SchemaContext } from "../schema/index.js";
+import { SchemaContext } from "../schema/index.js";
 import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
@@ -69,47 +69,19 @@ async function runTest(schemaName: string, packageName: string) {
 
         await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
 
-        const allNodes: Record<string, Node> = {};
-        const nodes: Record<string, Record<string, Node>> = {};
-        for (const [nodeId, node] of context.getNodeEntries()) {
-            allNodes[nodeId] = node;
+        const nodes = Object.fromEntries(context.getNodeEntries());
 
+        const namer = new Namer("schema");
+        for (const nodeId in nodes) {
             const nodeUrl = new URL(nodeId);
-            const serverId =
-                nodeUrl.protocol + "//" + nodeUrl.host + nodeUrl.pathname + nodeUrl.search;
-            const hash = nodeUrl.hash;
-            let nodesByHash = nodes[serverId];
-            if (nodesByHash == null) {
-                nodesByHash = {};
-                nodes[serverId] = nodesByHash;
-            }
-            nodesByHash[hash] = node;
+            const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
+            namer.registerPath(nodeId, path);
         }
 
-        const nameNamers: Record<string, Namer> = {};
-        for (const [serverId, nodesByHash] of Object.entries(nodes)) {
-            const namer = new Namer("root");
-            nameNamers[serverId] = namer;
-            for (const [hash, node] of Object.entries(nodesByHash)) {
-                const path = hash.replace(/^#/g, "");
-                namer.registerPath(hash, path);
-            }
-        }
-
-        const namespaceNamer = new Namer("schema");
-        for (const [serverId, nodesByHash] of Object.entries(nodes)) {
-            const serverUrl = new URL(serverId);
-            const path = serverUrl.pathname;
-            namespaceNamer.registerPath(serverId, path);
-        }
-
-        const names = Object.fromEntries(
-            Object.entries(nameNamers).map(([serverId, namer]) => [serverId, namer.getNames()])
-        );
-        const namespaces = namespaceNamer.getNames();
+        const names = namer.getNames();
 
         const factory = ts.factory;
-        generatePackage(factory, allNodes, namespaces, names, {
+        generatePackage(factory, nodes, names, {
             directoryPath: packageDirectoryPath,
             name: packageName,
             version: "v0.0.0",
