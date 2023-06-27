@@ -19,7 +19,8 @@ export interface PackageOptions {
 export function generatePackage(
     factory: ts.NodeFactory,
     nodes: Record<string, Node>,
-    names: Record<string, string>,
+    namespaces: Record<string, string>,
+    names: Record<string, Record<string, string>>,
     options: PackageOptions
 ) {
     fs.mkdirSync(options.directoryPath, { recursive: true });
@@ -37,28 +38,28 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new MainTsCodeGenerator(factory, names, nodes);
+        const codeGenerator = new MainTsCodeGenerator(factory, namespaces, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "main.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const codeGenerator = new TypesTsCodeGenerator(factory, names, nodes);
+        const codeGenerator = new TypesTsCodeGenerator(factory, namespaces, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "types.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const codeGenerator = new ValidatorsTsCodeGenerator(factory, names, nodes);
+        const codeGenerator = new ValidatorsTsCodeGenerator(factory, namespaces, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "validators.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 
     {
-        const codeGenerator = new ExamplesSpecsTsCodeGenerator(factory, names, nodes);
+        const codeGenerator = new ExamplesSpecsTsCodeGenerator(factory, namespaces, names, nodes);
         const statements = codeGenerator.getStatements();
         const filePath = path.join(options.directoryPath, "examples.spec.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));

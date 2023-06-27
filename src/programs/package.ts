@@ -7,7 +7,7 @@ import * as schemaDraft06 from "../schema/draft-06/index.js";
 import * as schemaDraft07 from "../schema/draft-07/index.js";
 import * as schema201909 from "../schema/draft-2019-09/index.js";
 import * as schema202012 from "../schema/draft-2020-12/index.js";
-import { SchemaContext } from "../schema/index.js";
+import { Node, SchemaContext } from "../schema/index.js";
 import { Namer } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
@@ -48,6 +48,11 @@ export function configurePackageProgram(argv: yargs.Argv) {
                     description: "root name of the schema",
                     type: "string",
                     default: "schema",
+                })
+                .option("root-namespace-part", {
+                    description: "root namespace of the schema",
+                    type: "string",
+                    default: "schema",
                 }),
         (argv) => main(argv as MainOptions)
     );
@@ -60,6 +65,7 @@ interface MainOptions {
     packageName: string;
     packageVersion: string;
     rootNamePart: string;
+    rootNamespacePart: string;
 }
 
 async function main(options: MainOptions) {
@@ -76,17 +82,46 @@ async function main(options: MainOptions) {
     context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
     await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
-    const nodes = Object.fromEntries(context.getNodeEntries());
+    const allNodes: Record<string, Node> = {};
+    const nodes: Record<string, Record<string, Node>> = {};
+    for (const [nodeId, node] of context.getNodeEntries()) {
+        allNodes[nodeId] = node;
 
-    const namer = new Namer(options.rootNamePart);
-    for (const nodeId in nodes) {
-        namer.registerId(nodeId);
+        const nodeUrl = new URL(nodeId);
+        const serverId = nodeUrl.origin + nodeUrl.pathname + nodeUrl.search;
+        const hash = nodeUrl.hash;
+        let nodesByHash = nodes[serverId];
+        if (nodesByHash == null) {
+            nodesByHash = {};
+            nodes[serverId] = nodesByHash;
+        }
+        nodesByHash[hash] = node;
     }
 
-    const names = namer.getNames();
+    const nameNamers: Record<string, Namer> = {};
+    for (const [serverId, nodesByHash] of Object.entries(nodes)) {
+        const namer = new Namer(options.rootNamePart);
+        nameNamers[serverId] = namer;
+        for (const [hash, node] of Object.entries(nodesByHash)) {
+            const path = hash.replace(/^#/g, "");
+            namer.registerPath(hash, path);
+        }
+    }
+
+    const namespaceNamer = new Namer(options.rootNamespacePart);
+    for (const [serverId, nodesByHash] of Object.entries(nodes)) {
+        const serverUrl = new URL(serverId);
+        const path = serverUrl.pathname;
+        namespaceNamer.registerPath(serverId, path);
+    }
+
+    const names = Object.fromEntries(
+        Object.entries(nameNamers).map(([serverId, namer]) => [serverId, namer.getNames()])
+    );
+    const namespaces = namespaceNamer.getNames();
 
     const factory = ts.factory;
-    generatePackage(factory, nodes, names, {
+    generatePackage(factory, allNodes, namespaces, names, {
         directoryPath: packageDirectoryPath,
         name: packageName,
         version: packageVersion,

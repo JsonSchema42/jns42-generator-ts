@@ -5,114 +5,114 @@ import { Namer } from "./namer.js";
 test("namer 1", () => {
     const namer = new Namer("o");
 
-    namer.registerId("http://www.com/#/A");
+    namer.registerPath("/A", "/A");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
+        "/A": "A",
     });
 
-    namer.registerId("http://www.com/#/B");
+    namer.registerPath("/B", "/B");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
-        "http://www.com/#/B": "B",
+        "/A": "A",
+        "/B": "B",
     });
 
-    namer.registerId("http://www.com/#/B/C");
+    namer.registerPath("/B/C", "/B/C");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "C",
+        "/A": "A",
+        "/B": "B",
+        "/B/C": "C",
     });
 
-    namer.registerId("http://www.com/#/A/C");
+    namer.registerPath("/A/C", "/A/C");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "A",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "BC",
-        "http://www.com/#/A/C": "AC",
+        "/A": "A",
+        "/B": "B",
+        "/B/C": "BC",
+        "/A/C": "AC",
     });
 
-    namer.registerId("http://www.com/#/C/A");
+    namer.registerPath("/C/A", "/C/A");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "OA",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "BC",
-        "http://www.com/#/A/C": "AC",
-        "http://www.com/#/C/A": "CA",
+        "/A": "OA",
+        "/B": "B",
+        "/B/C": "BC",
+        "/A/C": "AC",
+        "/C/A": "CA",
     });
 
-    namer.registerId("http://www.com/#/A/B/C");
+    namer.registerPath("/A/B/C", "/A/B/C");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "OA",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "OBC",
-        "http://www.com/#/A/C": "AC",
-        "http://www.com/#/C/A": "CA",
-        "http://www.com/#/A/B/C": "ABC",
+        "/A": "OA",
+        "/B": "B",
+        "/B/C": "OBC",
+        "/A/C": "AC",
+        "/C/A": "CA",
+        "/A/B/C": "ABC",
     });
 
-    namer.registerId("http://www.com/#/A/B/C/D/E/F");
+    namer.registerPath("/A/B/C/D/E/F", "/A/B/C/D/E/F");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "OA",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "OBC",
-        "http://www.com/#/A/C": "AC",
-        "http://www.com/#/C/A": "CA",
-        "http://www.com/#/A/B/C": "ABC",
-        "http://www.com/#/A/B/C/D/E/F": "F",
+        "/A": "OA",
+        "/B": "B",
+        "/B/C": "OBC",
+        "/A/C": "AC",
+        "/C/A": "CA",
+        "/A/B/C": "ABC",
+        "/A/B/C/D/E/F": "F",
     });
 
-    namer.registerId("http://www.com/#/X/Y/Z/D/E/F");
+    namer.registerPath("/X/Y/Z/D/E/F", "/X/Y/Z/D/E/F");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "OA",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "OBC",
-        "http://www.com/#/A/C": "AC",
-        "http://www.com/#/C/A": "CA",
-        "http://www.com/#/A/B/C": "ABC",
-        "http://www.com/#/A/B/C/D/E/F": "CF",
-        "http://www.com/#/X/Y/Z/D/E/F": "ZF",
+        "/A": "OA",
+        "/B": "B",
+        "/B/C": "OBC",
+        "/A/C": "AC",
+        "/C/A": "CA",
+        "/A/B/C": "ABC",
+        "/A/B/C/D/E/F": "CF",
+        "/X/Y/Z/D/E/F": "ZF",
     });
 
-    namer.registerId("http://www.com/#/X/Y/Z/D/E/1");
+    namer.registerPath("/X/Y/Z/D/E/1", "/X/Y/Z/D/E/1");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/A": "OA",
-        "http://www.com/#/B": "B",
-        "http://www.com/#/B/C": "OBC",
-        "http://www.com/#/A/C": "AC",
-        "http://www.com/#/C/A": "CA",
-        "http://www.com/#/A/B/C": "ABC",
-        "http://www.com/#/A/B/C/D/E/F": "CF",
-        "http://www.com/#/X/Y/Z/D/E/F": "ZF",
-        "http://www.com/#/X/Y/Z/D/E/1": "E1",
+        "/A": "OA",
+        "/B": "B",
+        "/B/C": "OBC",
+        "/A/C": "AC",
+        "/C/A": "CA",
+        "/A/B/C": "ABC",
+        "/A/B/C/D/E/F": "CF",
+        "/X/Y/Z/D/E/F": "ZF",
+        "/X/Y/Z/D/E/1": "E1",
     });
 });
 
 test("namer 2", () => {
     const namer = new Namer("o");
 
-    namer.registerId("http://www.com/#/");
+    namer.registerPath("/", "/");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/": "O",
+        "/": "O",
     });
 
-    namer.registerId("http://www.com/#/A");
+    namer.registerPath("/A", "/A");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/": "O",
-        "http://www.com/#/A": "A",
+        "/": "O",
+        "/A": "A",
     });
 });
 
 test("namer 3", () => {
     const namer = new Namer("o");
 
-    namer.registerId("http://www.com/#/");
+    namer.registerPath("/", "/");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/": "O",
+        "/": "O",
     });
 
-    namer.registerId("http://www.com/#/1");
+    namer.registerPath("/1", "/1");
     assert.deepStrictEqual(namer.getNames(), {
-        "http://www.com/#/": "O",
-        "http://www.com/#/1": "O1",
+        "/": "O",
+        "/1": "O1",
     });
 });

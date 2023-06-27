@@ -33,10 +33,8 @@ export class Namer {
     private rootNameNode: NameNode;
     private leafNodes: Record<string, NameNode> = {};
 
-    public registerId(id: string) {
-        const url = new URL(id);
-        const hash = url.hash.startsWith("#") ? url.hash.substring(1) : url.hash;
-        const nameParts = hash
+    public registerPath(id: string, path: string) {
+        const nameParts = path
             .split("/")
             .map(decodeURI)
             .map((part) => part.replace(nonIdentifierRe, ""))
