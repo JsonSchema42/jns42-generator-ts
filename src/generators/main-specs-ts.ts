@@ -20,7 +20,11 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
 
         yield f.createImportDeclaration(
             undefined,
-            f.createImportClause(false, f.createIdentifier("main"), undefined),
+            f.createImportClause(
+                false,
+                undefined,
+                f.createNamespaceImport(f.createIdentifier("main"))
+            ),
             f.createStringLiteral("./main.js")
         );
 
@@ -49,8 +53,6 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
-        const { factory: f } = this;
-
         for (const nodeId in this.nodes) {
             yield* this.generateAssertStatementsForNode(nodeId);
         }
@@ -71,9 +73,14 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
                     ),
                     undefined,
                     [
-                        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-                            generateLiteral(f, example),
-                        ]),
+                        f.createCallExpression(
+                            f.createPropertyAccessExpression(
+                                f.createIdentifier("main"),
+                                f.createIdentifier(`is${typeName}`)
+                            ),
+                            undefined,
+                            [generateLiteral(f, example)]
+                        ),
                         f.createTrue(),
                     ]
                 )

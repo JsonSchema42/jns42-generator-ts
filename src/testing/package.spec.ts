@@ -102,7 +102,7 @@ async function runTest(schemaName: string, packageName: string) {
         });
     });
 
-    const rootNamespace = camelcase(`${packageName}.json`, { pascalCase: true });
+    const rootTypeName = camelcase(`${packageName}.json`, { pascalCase: true });
 
     const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
     if (fs.existsSync(validDirectory)) {
@@ -117,7 +117,7 @@ async function runTest(schemaName: string, packageName: string) {
 
                     const data = fs.readFileSync(path.join(validDirectory, validFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(packageMain[rootNamespace].isRoot(instance), true);
+                    assert.equal(packageMain[`is${rootTypeName}`](instance), true);
                 });
             }
         });
@@ -136,7 +136,7 @@ async function runTest(schemaName: string, packageName: string) {
 
                     const data = fs.readFileSync(path.join(invalidDirectory, invalidFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(packageMain[rootNamespace].isRoot(instance), false);
+                    assert.equal(packageMain[`is${rootTypeName}`](instance), false);
                 });
             }
         });
