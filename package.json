@@ -17,8 +17,7 @@
     "test": "npm run spec-all",
     "lint": "prettier --check *",
     "spec-all": "node --test ./out/**/*.spec.js",
-    "coverage": "c8 --reporter lcov npm test",
-    "docs": "typedoc"
+    "coverage": "c8 --reporter lcov npm test"
   },
   "repository": {
     "type": "git",
@@ -36,9 +35,8 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
-    "c8": "^7.14.0",
-    "prettier": "^2.8.8",
-    "typedoc": "^0.23.28"
+    "c8": "^8.0.0",
+    "prettier": "^2.8.8"
   },
   "dependencies": {
     "@jns42/jns42-schema-draft-04": "^0.1.1",
@@ -46,13 +44,12 @@
     "@jns42/jns42-schema-draft-07": "^0.1.0",
     "@jns42/jns42-schema-draft-2019-09": "^0.1.0",
     "@jns42/jns42-schema-draft-2020-12": "^0.1.0",
-    "@types/node": "^18.16.16",
+    "@types/node": "^18.16.18",
     "@types/yargs": "^17.0.24",
     "camelcase": "^7.0.1",
-    "crc": "^4.3.2",
-    "tslib": "^2.5.3",
-    "type-fest": "^3.11.1",
-    "typescript": "^4.9.5",
+    "tslib": "^2.6.0",
+    "type-fest": "^3.12.0",
+    "typescript": "^5.1.3",
     "yargs": "^17.7.2"
   }
 }

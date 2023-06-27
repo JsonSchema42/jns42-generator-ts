@@ -1,9 +1,8 @@
 import ts from "typescript";
-import { Node } from "../schema/intermediate.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
+export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
         const { factory: f } = this;
 
@@ -24,14 +23,14 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
             f.createImportClause(
                 false,
                 undefined,
-                f.createNamespaceImport(f.createIdentifier("validators"))
+                f.createNamespaceImport(f.createIdentifier("main"))
             ),
-            f.createStringLiteral("./validators.js")
+            f.createStringLiteral("./main.js")
         );
 
         yield f.createExpressionStatement(
             f.createCallExpression(f.createIdentifier("test"), undefined, [
-                f.createStringLiteral("examples"),
+                f.createStringLiteral("main"),
                 f.createArrowFunction(
                     undefined,
                     undefined,
@@ -54,17 +53,16 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateAllAssertStatements(): Iterable<ts.Statement> {
-        const { factory: f } = this;
-
-        for (const node of this.context.selectNodes()) {
-            yield* this.generateAssertStatementsForNode(node);
+        for (const nodeId in this.nodes) {
+            yield* this.generateAssertStatementsForNode(nodeId);
         }
     }
 
-    protected *generateAssertStatementsForNode(node: Node): Iterable<ts.Statement> {
+    protected *generateAssertStatementsForNode(nodeId: string): Iterable<ts.Statement> {
         const { factory: f } = this;
+        const node = this.nodes[nodeId];
 
-        const typeName = this.getTypeName(node.nodeId);
+        const typeName = this.getTypeName(nodeId);
 
         for (const example of node.examples) {
             yield f.createExpressionStatement(
@@ -77,7 +75,7 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
                     [
                         f.createCallExpression(
                             f.createPropertyAccessExpression(
-                                f.createIdentifier("validators"),
+                                f.createIdentifier("main"),
                                 f.createIdentifier(`is${typeName}`)
                             ),
                             undefined,
@@ -88,10 +86,5 @@ export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
                 )
             );
         }
-    }
-
-    protected getTypeName(nodeId: string) {
-        const typeName = this.namer.getName(nodeId).join("_");
-        return typeName;
     }
 }

@@ -3,7 +3,6 @@ import { CompoundUnion, Node, TypeUnion } from "../intermediate.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import {
-    selectAllSubNodes,
     selectAllSubNodesAndSelf,
     selectNodeDescription,
     selectNodeEnum,
@@ -11,6 +10,7 @@ import {
     selectNodePropertyNamesEntries,
     selectNodeRef,
     selectNodeSchema,
+    selectNodeTitle,
     selectNodeTypes,
     selectSubNodeAdditionalItemsEntries,
     selectSubNodeAdditionalPropertiesEntries,
@@ -19,7 +19,6 @@ import {
     selectSubNodeItemsManyEntries,
     selectSubNodeItemsOneEntries,
     selectSubNodeOneOfEntries,
-    selectSubNodes,
     selectValidationMaximumExclusive,
     selectValidationMaximumInclusive,
     selectValidationMaximumItems,
@@ -70,20 +69,6 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    public selectSubNodeEntries(
-        nodePointer: string,
-        node: Schema | boolean
-    ): Iterable<readonly [string, Schema | boolean]> {
-        return selectSubNodes(nodePointer, node);
-    }
-
-    public selectAllSubNodeEntries(
-        nodePointer: string,
-        node: Schema
-    ): Iterable<readonly [string, boolean | Schema]> {
-        return selectAllSubNodes(nodePointer, node);
-    }
-
     public selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
         node: Schema
@@ -124,8 +109,9 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
     //#region strategy implementation
 
-    public *selectNodes(): Iterable<Node> {
+    public *getNodeEntries(): Iterable<[string, Node]> {
         for (const [nodeId, { node }] of this.getNodeItemEntries()) {
+            const title = selectNodeTitle(node) ?? "";
             const description = selectNodeDescription(node) ?? "";
             const deprecated = false;
             const examples = new Array<unknown>();
@@ -140,17 +126,25 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
                 superNodeId = resolvedNodeId;
             }
 
-            yield {
+            const types = [...this.selectNodeTypes(nodeId)];
+            const compounds = [...this.selectNodeCompounds(nodeId)];
+
+            yield [
                 nodeId,
-                superNodeId,
-                deprecated,
-                description,
-                examples,
-            };
+                {
+                    superNodeId,
+                    deprecated,
+                    title,
+                    description,
+                    examples,
+                    types,
+                    compounds,
+                },
+            ];
         }
     }
 
-    public *selectNodeTypes(nodeId: string): Iterable<TypeUnion> {
+    private *selectNodeTypes(nodeId: string): Iterable<TypeUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         if (nodeItem.node === true) {
@@ -209,7 +203,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
         }
     }
 
-    public *selectNodeCompounds(nodeId: string): Iterable<CompoundUnion> {
+    private *selectNodeCompounds(nodeId: string): Iterable<CompoundUnion> {
         const nodeItem = this.getNodeItem(nodeId);
 
         yield* this.makeNodeCompoundFromAllOf(
@@ -479,7 +473,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Schema | boolean> {
 
         const nodeRefRetrievalUrl = new URL(nodeRef, nodeRetrievalUrl);
         let hash = nodeRefRetrievalUrl.hash;
-        if (hash === "") {
+        if (hash.length === 0) {
             hash = "#";
         }
         nodeRefRetrievalUrl.hash = "";

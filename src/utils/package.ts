@@ -6,7 +6,6 @@ import { projectRoot } from "./root.js";
 export const packageInfo = readPackageInfo();
 
 function readPackageInfo() {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const content = fs.readFileSync(path.join(projectRoot, "package.json"), "utf8");
     return JSON.parse(content) as PackageJson;
 }

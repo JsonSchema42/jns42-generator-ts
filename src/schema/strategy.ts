@@ -1,11 +1,9 @@
 import assert from "assert";
 import { SchemaContext } from "./context.js";
-import { CompoundUnion, Node, TypeUnion } from "./intermediate.js";
+import { Node } from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-    selectNodes(): Iterable<Node>;
-    selectNodeTypes(nodeId: string): Iterable<TypeUnion>;
-    selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>;
+    getNodeEntries(): Iterable<[string, Node]>;
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -35,16 +33,6 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
         return [...this.getRootNodeItems()].map(({ nodeUrl, node }) => [nodeUrl, node]);
     }
 
-    public abstract selectSubNodeEntries(
-        nodePointer: string,
-        node: N
-    ): Iterable<readonly [string, N]>;
-
-    public abstract selectAllSubNodeEntries(
-        nodePointer: string,
-        node: N
-    ): Iterable<readonly [string, N]>;
-
     public abstract selectAllSubNodeEntriesAndSelf(
         nodePointer: string,
         node: N
@@ -58,11 +46,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
     public abstract selectNodeUrl(node: N): URL | undefined;
 
-    public abstract selectNodes(): Iterable<Node>;
-
-    public abstract selectNodeTypes(nodeId: string): Iterable<TypeUnion>;
-
-    public abstract selectNodeCompounds(nodeId: string): Iterable<CompoundUnion>;
+    public abstract getNodeEntries(): Iterable<[string, Node]>;
 
     private maybeContext?: SchemaContext;
     protected get context() {

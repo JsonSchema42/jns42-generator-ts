@@ -42,6 +42,12 @@ export function selectNodeDynamicRef(node: Core) {
 
 //#region metadata
 
+export function selectNodeTitle(node: MetaData) {
+    if (typeof node === "object") {
+        return node.title;
+    }
+}
+
 export function selectNodeDescription(node: MetaData) {
     if (typeof node === "object") {
         return node.description;

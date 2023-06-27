@@ -1,18 +1,20 @@
 import ts from "typescript";
-import { CompoundUnion, Node, TypeUnion } from "../schema/intermediate.js";
+import { CompoundUnion, TypeUnion } from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
-        for (const node of this.context.selectNodes()) {
-            yield this.generateTypeDeclarationStatement(node);
+        for (const nodeId in this.nodes) {
+            yield this.generateTypeDeclarationStatement(nodeId);
         }
     }
 
-    protected generateTypeDeclarationStatement(node: Node) {
-        const typeDefinition = this.generateTypeDefinition(node);
+    protected generateTypeDeclarationStatement(nodeId: string) {
+        const node = this.nodes[nodeId];
 
-        const typeName = this.getTypeName(node.nodeId);
+        const typeDefinition = this.generateTypeDefinition(nodeId);
+
+        const typeName = this.getTypeName(nodeId);
         const declaration = this.factory.createTypeAliasDeclaration(
             [this.factory.createToken(ts.SyntaxKind.ExportKeyword)],
             typeName,
@@ -20,7 +22,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
             typeDefinition
         );
 
-        const comments = [node.description, node.deprecated ? "@deprecated" : ""]
+        const comments = [node.title, node.description, node.deprecated ? "@deprecated" : ""]
             .map((line) => line.trim())
             .filter((line) => line.length > 0)
             .map((line) => line + "\n")
@@ -38,11 +40,12 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         return declaration;
     }
 
-    protected generateTypeDefinition(node: Node): ts.TypeNode {
+    protected generateTypeDefinition(nodeId: string): ts.TypeNode {
         const { factory: f } = this;
+        const node = this.nodes[nodeId];
 
-        const typeNodes = [...this.generateTypeDefinitionElements(node.nodeId)];
-        const compoundNodes = [...this.generateCompoundDefinitionElements(node.nodeId)];
+        const typeNodes = [...this.generateTypeDefinitionElements(nodeId)];
+        const compoundNodes = [...this.generateCompoundDefinitionElements(nodeId)];
 
         let typeDefinitionNode: ts.TypeNode | undefined;
         if (compoundNodes.length > 0) {
@@ -81,13 +84,15 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected *generateCompoundDefinitionElements(nodeId: string): Iterable<ts.TypeNode> {
-        for (const compound of this.context.selectNodeCompounds(nodeId)) {
+        const node = this.nodes[nodeId];
+        for (const compound of node.compounds) {
             yield this.generateCompoundDefinitionElement(compound);
         }
     }
 
     protected *generateTypeDefinitionElements(nodeId: string): Iterable<ts.TypeNode> {
-        for (const type of this.context.selectNodeTypes(nodeId)) {
+        const node = this.nodes[nodeId];
+        for (const type of node.types) {
             yield this.generateTypeDefinitionElement(type);
         }
     }
@@ -210,15 +215,5 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     protected generateAllOfCompoundDefinition(nodeIds: Array<string>) {
         const types = nodeIds.map((nodeId) => this.generateTypeReference(nodeId));
         return this.factory.createIntersectionTypeNode(types);
-    }
-
-    protected getTypeName(nodeId: string) {
-        const typeName = this.namer.getName(nodeId).join("_");
-        return typeName;
-    }
-
-    protected generateTypeReference(nodeId: string) {
-        const typeName = this.getTypeName(nodeId);
-        return this.factory.createTypeReferenceNode(this.factory.createIdentifier(typeName));
     }
 }

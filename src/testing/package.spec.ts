@@ -25,7 +25,7 @@ const packageNames = [
 
 const schemaNames = ["draft-2020-12", "draft-2019-09", "draft-07", "draft-06", "draft-04"];
 
-await test("testing fixtures", async () => {
+await test("testing package", async () => {
     for (const schemaName of schemaNames) {
         await test(schemaName, async () => {
             for (const packageName of packageNames) {
@@ -66,15 +66,22 @@ async function runTest(schemaName: string, packageName: string) {
         context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
         context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
         context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
+
         await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
 
-        const namer = new Namer(new Date().valueOf());
-        for (const [nodeId, typeName] of context.getTypeNames()) {
-            namer.registerName(nodeId, typeName);
+        const nodes = Object.fromEntries(context.getNodeEntries());
+
+        const namer = new Namer("schema");
+        for (const nodeId in nodes) {
+            const nodeUrl = new URL(nodeId);
+            const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
+            namer.registerPath(nodeId, path);
         }
 
+        const names = namer.getNames();
+
         const factory = ts.factory;
-        generatePackage(factory, context, namer, {
+        generatePackage(factory, nodes, names, {
             directoryPath: packageDirectoryPath,
             name: packageName,
             version: "v0.0.0",
@@ -95,7 +102,7 @@ async function runTest(schemaName: string, packageName: string) {
         });
     });
 
-    const typeName = camelcase(`${packageName}.json`, { pascalCase: true });
+    const rootTypeName = camelcase(`${packageName}.json`, { pascalCase: true });
 
     const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
     if (fs.existsSync(validDirectory)) {
@@ -106,11 +113,11 @@ async function runTest(schemaName: string, packageName: string) {
 
             for (const validFile of validFiles) {
                 await test(validFile, async () => {
-                    const schema = await import(path.join(packageDirectoryPath, "main.js"));
+                    const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
 
                     const data = fs.readFileSync(path.join(validDirectory, validFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(schema[`is${typeName}`](instance), true);
+                    assert.equal(packageMain[`is${rootTypeName}`](instance), true);
                 });
             }
         });
@@ -125,11 +132,11 @@ async function runTest(schemaName: string, packageName: string) {
 
             for (const invalidFile of invalidFiles) {
                 await test(invalidFile, async () => {
-                    const schema = await import(path.join(packageDirectoryPath, "main.js"));
+                    const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
 
                     const data = fs.readFileSync(path.join(invalidDirectory, invalidFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(schema[`is${typeName}`](instance), false);
+                    assert.equal(packageMain[`is${rootTypeName}`](instance), false);
                 });
             }
         });
