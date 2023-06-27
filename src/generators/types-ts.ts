@@ -4,8 +4,23 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
-        for (const nodeId in this.nodes) {
-            yield this.generateTypeDeclarationStatement(nodeId);
+        const { factory: f } = this;
+
+        for (const [serverId, namespace] of Object.entries(this.namespaces)) {
+            yield f.createModuleDeclaration(
+                [f.createToken(ts.SyntaxKind.ExportKeyword)],
+                f.createIdentifier(namespace),
+                f.createModuleBlock([...this.getNamespaceStatements(serverId)]),
+                ts.NodeFlags.Namespace
+            );
+        }
+    }
+
+    public *getNamespaceStatements(serverId: string) {
+        const { factory: f } = this;
+
+        for (const [hash, name] of Object.entries(this.names[serverId])) {
+            yield this.generateTypeDeclarationStatement(serverId + hash);
         }
     }
 
@@ -218,7 +233,12 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     protected generateTypeReference(nodeId: string) {
-        const typeName = this.getTypeName(nodeId);
-        return this.factory.createTypeReferenceNode(this.factory.createIdentifier(typeName));
+        const { factory: f } = this;
+
+        const namespace = this.getTypeNamespace(nodeId);
+        const name = this.getTypeName(nodeId);
+        return f.createTypeReferenceNode(
+            f.createQualifiedName(f.createIdentifier(namespace), f.createIdentifier(name))
+        );
     }
 }

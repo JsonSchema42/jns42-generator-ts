@@ -89,7 +89,7 @@ async function runTest(schemaName: string, packageName: string) {
         for (const [serverId, nodesByHash] of Object.entries(nodes)) {
             for (const [hash, node] of Object.entries(nodesByHash)) {
                 const path = hash.replace(/^#/g, "");
-                const namer = new Namer("schema");
+                const namer = new Namer("root");
                 namer.registerPath(hash, path);
             }
         }

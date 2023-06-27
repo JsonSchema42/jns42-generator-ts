@@ -1108,9 +1108,13 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     protected generateTypeReference(nodeId: string) {
         const { factory: f } = this;
 
-        const typeName = this.getTypeName(nodeId);
+        const namespace = this.getTypeNamespace(nodeId);
+        const name = this.getTypeName(nodeId);
         return f.createTypeReferenceNode(
-            f.createQualifiedName(f.createIdentifier("types"), f.createIdentifier(typeName))
+            f.createQualifiedName(
+                f.createQualifiedName(f.createIdentifier("types"), f.createIdentifier(namespace)),
+                f.createIdentifier(name)
+            )
         );
     }
 }
