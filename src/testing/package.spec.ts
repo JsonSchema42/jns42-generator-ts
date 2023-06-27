@@ -138,11 +138,11 @@ async function runTest(schemaName: string, packageName: string) {
 
             for (const validFile of validFiles) {
                 await test(validFile, async () => {
-                    const { Schema } = await import(path.join(packageDirectoryPath, "main.js"));
+                    const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
 
                     const data = fs.readFileSync(path.join(validDirectory, validFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(Schema.isRoot(instance), true);
+                    assert.equal(packageMain[rootNamespace].isRoot(instance), true);
                 });
             }
         });
@@ -157,11 +157,11 @@ async function runTest(schemaName: string, packageName: string) {
 
             for (const invalidFile of invalidFiles) {
                 await test(invalidFile, async () => {
-                    const { Schema } = await import(path.join(packageDirectoryPath, "main.js"));
+                    const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
 
                     const data = fs.readFileSync(path.join(invalidDirectory, invalidFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(Schema.isRoot(instance), false);
+                    assert.equal(packageMain[rootNamespace].isRoot(instance), false);
                 });
             }
         });
