@@ -199,13 +199,10 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
                             .map(
                                 (compound) =>
                                     f.createCallExpression(
-                                        f.createPropertyAccessExpression(
-                                            f.createIdentifier(typeNamespace),
-                                            f.createIdentifier(
-                                                `is${camelcase(compound.type, {
-                                                    pascalCase: true,
-                                                })}${typeName}`
-                                            )
+                                        f.createIdentifier(
+                                            `is${camelcase(compound.type, {
+                                                pascalCase: true,
+                                            })}${typeName}`
                                         ),
                                         undefined,
                                         [f.createIdentifier("value")]
