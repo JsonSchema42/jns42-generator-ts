@@ -3,12 +3,10 @@ import path from "node:path";
 import ts from "typescript";
 import { Node } from "../schema/intermediate.js";
 import { formatData, formatStatements } from "../utils/index.js";
-import { ExamplesSpecsTsCodeGenerator } from "./examples-specs-ts.js";
+import { MainSpecsTsCodeGenerator } from "./main-specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
-import { TypesTsCodeGenerator } from "./types-ts.js";
-import { ValidatorsTsCodeGenerator } from "./validators-ts.js";
 
 export interface PackageOptions {
     name: string;
@@ -45,23 +43,9 @@ export function generatePackage(
     }
 
     {
-        const codeGenerator = new TypesTsCodeGenerator(factory, namespaces, names, nodes);
+        const codeGenerator = new MainSpecsTsCodeGenerator(factory, namespaces, names, nodes);
         const statements = codeGenerator.getStatements();
-        const filePath = path.join(options.directoryPath, "types.ts");
-        fs.writeFileSync(filePath, formatStatements(factory, statements));
-    }
-
-    {
-        const codeGenerator = new ValidatorsTsCodeGenerator(factory, namespaces, names, nodes);
-        const statements = codeGenerator.getStatements();
-        const filePath = path.join(options.directoryPath, "validators.ts");
-        fs.writeFileSync(filePath, formatStatements(factory, statements));
-    }
-
-    {
-        const codeGenerator = new ExamplesSpecsTsCodeGenerator(factory, namespaces, names, nodes);
-        const statements = codeGenerator.getStatements();
-        const filePath = path.join(options.directoryPath, "examples.spec.ts");
+        const filePath = path.join(options.directoryPath, "main.spec.ts");
         fs.writeFileSync(filePath, formatStatements(factory, statements));
     }
 }

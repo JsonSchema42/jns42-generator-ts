@@ -16,17 +16,6 @@ import { CodeGeneratorBase } from "./code-generator-base.js";
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
         const { factory: f } = this;
-        const { factory } = this;
-
-        yield f.createImportDeclaration(
-            undefined,
-            f.createImportClause(
-                false,
-                undefined,
-                f.createNamespaceImport(f.createIdentifier("types"))
-            ),
-            f.createStringLiteral("./types.js")
-        );
 
         for (const [serverId, namespace] of Object.entries(this.namespaces)) {
             yield f.createModuleDeclaration(
@@ -1164,18 +1153,5 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
         }
 
         yield f.createReturnStatement(f.createTrue());
-    }
-
-    protected generateTypeReference(nodeId: string) {
-        const { factory: f } = this;
-
-        const namespace = this.getTypeNamespace(nodeId);
-        const name = this.getTypeName(nodeId);
-        return f.createTypeReferenceNode(
-            f.createQualifiedName(
-                f.createQualifiedName(f.createIdentifier("types"), f.createIdentifier(namespace)),
-                f.createIdentifier(name)
-            )
-        );
     }
 }

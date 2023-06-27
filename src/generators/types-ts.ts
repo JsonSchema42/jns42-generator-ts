@@ -231,14 +231,4 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         const types = nodeIds.map((nodeId) => this.generateTypeReference(nodeId));
         return this.factory.createIntersectionTypeNode(types);
     }
-
-    protected generateTypeReference(nodeId: string) {
-        const { factory: f } = this;
-
-        const namespace = this.getTypeNamespace(nodeId);
-        const name = this.getTypeName(nodeId);
-        return f.createTypeReferenceNode(
-            f.createQualifiedName(f.createIdentifier(namespace), f.createIdentifier(name))
-        );
-    }
 }

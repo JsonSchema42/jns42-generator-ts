@@ -23,4 +23,14 @@ export abstract class CodeGeneratorBase {
         const name = this.names[serverId][hash];
         return name;
     }
+
+    protected generateTypeReference(nodeId: string) {
+        const { factory: f } = this;
+
+        const namespace = this.getTypeNamespace(nodeId);
+        const name = this.getTypeName(nodeId);
+        return f.createTypeReferenceNode(
+            f.createQualifiedName(f.createIdentifier(namespace), f.createIdentifier(name))
+        );
+    }
 }

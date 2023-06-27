@@ -2,7 +2,7 @@ import ts from "typescript";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export class ExamplesSpecsTsCodeGenerator extends CodeGeneratorBase {
+export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
     public *getStatements() {
         const { factory: f } = this;
 
