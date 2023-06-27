@@ -74,7 +74,8 @@ async function runTest(schemaName: string, packageName: string) {
             allNodes[nodeId] = node;
 
             const nodeUrl = new URL(nodeId);
-            const serverId = nodeUrl.origin + nodeUrl.pathname + nodeUrl.search;
+            const serverId =
+                nodeUrl.protocol + "//" + nodeUrl.host + nodeUrl.pathname + nodeUrl.search;
             const hash = nodeUrl.hash;
             let nodesByHash = nodes[serverId];
             if (nodesByHash == null) {

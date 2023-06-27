@@ -11,14 +11,14 @@ export abstract class CodeGeneratorBase {
 
     protected getTypeNamespace(nodeId: string) {
         const nodeUrl = new URL(nodeId);
-        const serverId = nodeUrl.origin + nodeUrl.pathname + nodeUrl.search;
+        const serverId = nodeUrl.protocol + "//" + nodeUrl.host + nodeUrl.pathname + nodeUrl.search;
         const name = this.namespaces[serverId];
         return name;
     }
 
     protected getTypeName(nodeId: string) {
         const nodeUrl = new URL(nodeId);
-        const serverId = nodeUrl.origin + nodeUrl.pathname + nodeUrl.search;
+        const serverId = nodeUrl.protocol + "//" + nodeUrl.host + nodeUrl.pathname + nodeUrl.search;
         const hash = nodeUrl.hash;
         const name = this.names[serverId][hash];
         return name;

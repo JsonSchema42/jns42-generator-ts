@@ -37,9 +37,9 @@ export class Namer {
         const nameParts = path
             .split("/")
             .map(decodeURI)
+            .map((part) => camelcase(part, { pascalCase: true }))
             .map((part) => part.replace(nonIdentifierRe, ""))
-            .filter((part) => part.length > 0)
-            .map((part) => camelcase(part, { pascalCase: true }));
+            .filter((part) => part.length > 0);
         this.registerNameParts(id, nameParts);
     }
 
