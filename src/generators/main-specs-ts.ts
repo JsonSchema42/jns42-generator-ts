@@ -23,14 +23,18 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
             f.createImportClause(
                 false,
                 undefined,
-                f.createNamespaceImport(f.createIdentifier("validators"))
+                f.createNamedImports(
+                    Object.values(this.namespaces).map((namespace) =>
+                        f.createImportSpecifier(false, undefined, f.createIdentifier(namespace))
+                    )
+                )
             ),
-            f.createStringLiteral("./validators.js")
+            f.createStringLiteral("./main.js")
         );
 
         yield f.createExpressionStatement(
             f.createCallExpression(f.createIdentifier("test"), undefined, [
-                f.createStringLiteral("examples"),
+                f.createStringLiteral("main"),
                 f.createArrowFunction(
                     undefined,
                     undefined,
@@ -65,6 +69,7 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
         const node = this.nodes[nodeId];
 
         const typeName = this.getTypeName(nodeId);
+        const typeNamespace = this.getTypeNamespace(nodeId);
 
         for (const example of node.examples) {
             yield f.createExpressionStatement(
@@ -77,7 +82,7 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
                     [
                         f.createCallExpression(
                             f.createPropertyAccessExpression(
-                                f.createIdentifier("validators"),
+                                f.createIdentifier(typeNamespace),
                                 f.createIdentifier(`is${typeName}`)
                             ),
                             undefined,
