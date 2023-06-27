@@ -1,30 +1,30 @@
 {
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "description": "A very simple object",
-  "type": ["object"],
-  "required": ["id"],
-  "properties": {
-    "id": {
-      "description": "An identity",
-      "type": "integer",
-      "exclusiveMinimum": 0,
-      "examples": [1, 2, 3]
-    },
-    "name": {
-      "description": "A name",
-      "type": "string",
-      "minLength": 2,
-      "maxLength": 20,
-      "examples": ["Jack", "John", "Elmer"]
-    }
-  },
-  "examples": [
-    {
-      "id": 1
-    },
-    {
-      "id": 2,
-      "name": "hi"
-    }
-  ]
+	"$schema": "https://json-schema.org/draft/2019-09/schema",
+	"description": "A very simple object",
+	"type": ["object"],
+	"required": ["id"],
+	"properties": {
+		"id": {
+			"description": "An identity",
+			"type": "integer",
+			"exclusiveMinimum": 0,
+			"examples": [1, 2, 3]
+		},
+		"name": {
+			"description": "A name",
+			"type": "string",
+			"minLength": 2,
+			"maxLength": 20,
+			"examples": ["Jack", "John", "Elmer"]
+		}
+	},
+	"examples": [
+		{
+			"id": 1
+		},
+		{
+			"id": 2,
+			"name": "hi"
+		}
+	]
 }

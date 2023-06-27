@@ -1,55 +1,55 @@
 {
-  "name": "@jns42/jns42-generator",
-  "version": "0.0.0",
-  "description": "generate interfaces and validators from a json schema",
-  "type": "module",
-  "bin": "out/program.js",
-  "main": "out/main.js",
-  "types": "out/main.d.ts",
-  "files": [
-    "out/*",
-    "src/*"
-  ],
-  "scripts": {
-    "prepare": "npm run compile ; chmod +x out/program.js",
-    "compile": "tsc",
-    "clean": "rm -rf out",
-    "test": "npm run spec-all",
-    "lint": "prettier --check *",
-    "spec-all": "node --test ./out/**/*.spec.js",
-    "coverage": "c8 --reporter lcov npm test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:JsonSchema42/jns42-generator-ts"
-  },
-  "author": "LuvDaSun Software B.V.",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/JsonSchema42/jns42-generator-ts/issues"
-  },
-  "keywords": [
-    "json",
-    "schema",
-    "generator"
-  ],
-  "homepage": "https://www.JsonSchema42.org",
-  "devDependencies": {
-    "c8": "^8.0.0",
-    "prettier": "^2.8.8"
-  },
-  "dependencies": {
-    "@jns42/jns42-schema-draft-04": "^0.1.1",
-    "@jns42/jns42-schema-draft-06": "^0.1.0",
-    "@jns42/jns42-schema-draft-07": "^0.1.0",
-    "@jns42/jns42-schema-draft-2019-09": "^0.1.0",
-    "@jns42/jns42-schema-draft-2020-12": "^0.1.0",
-    "@types/node": "^18.16.18",
-    "@types/yargs": "^17.0.24",
-    "camelcase": "^7.0.1",
-    "tslib": "^2.6.0",
-    "type-fest": "^3.12.0",
-    "typescript": "^5.1.3",
-    "yargs": "^17.7.2"
-  }
+	"name": "@jns42/jns42-generator",
+	"version": "0.0.0",
+	"description": "generate interfaces and validators from a json schema",
+	"type": "module",
+	"bin": "out/program.js",
+	"main": "out/main.js",
+	"types": "out/main.d.ts",
+	"files": [
+		"out/*",
+		"src/*"
+	],
+	"scripts": {
+		"prepare": "npm run compile ; chmod +x out/program.js",
+		"compile": "tsc",
+		"clean": "rm -rf out",
+		"test": "npm run spec-all",
+		"lint": "prettier --check *",
+		"spec-all": "node --test ./out/**/*.spec.js",
+		"coverage": "c8 --reporter lcov npm test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:JsonSchema42/jns42-generator-ts"
+	},
+	"author": "LuvDaSun Software B.V.",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/JsonSchema42/jns42-generator-ts/issues"
+	},
+	"keywords": [
+		"json",
+		"schema",
+		"generator"
+	],
+	"homepage": "https://www.JsonSchema42.org",
+	"devDependencies": {
+		"c8": "^8.0.0",
+		"prettier": "^2.8.8"
+	},
+	"dependencies": {
+		"@jns42/jns42-schema-draft-04": "^0.1.1",
+		"@jns42/jns42-schema-draft-06": "^0.1.0",
+		"@jns42/jns42-schema-draft-07": "^0.1.0",
+		"@jns42/jns42-schema-draft-2019-09": "^0.1.0",
+		"@jns42/jns42-schema-draft-2020-12": "^0.1.0",
+		"@types/node": "^18.16.18",
+		"@types/yargs": "^17.0.24",
+		"camelcase": "^7.0.1",
+		"tslib": "^2.6.0",
+		"type-fest": "^3.12.0",
+		"typescript": "^5.1.3",
+		"yargs": "^17.7.2"
+	}
 }

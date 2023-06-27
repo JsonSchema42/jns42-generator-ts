@@ -15,130 +15,178 @@ import { SchemaContext } from "../schema/index.js";
 import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
-    "string-or-boolean",
-    "simple-object",
-    "array-with-ref",
-    "all-of-object",
-    "any-of-object",
-    "one-of-object",
+	"string-or-boolean",
+	"simple-object",
+	"array-with-ref",
+	"all-of-object",
+	"any-of-object",
+	"one-of-object",
 ];
 
-const schemaNames = ["draft-2020-12", "draft-2019-09", "draft-07", "draft-06", "draft-04"];
+const schemaNames = [
+	"draft-2020-12",
+	"draft-2019-09",
+	"draft-07",
+	"draft-06",
+	"draft-04",
+];
 
 await test("testing package", async () => {
-    for (const schemaName of schemaNames) {
-        await test(schemaName, async () => {
-            for (const packageName of packageNames) {
-                await test(packageName, async () => {
-                    await runTest(schemaName, packageName);
-                });
-            }
-        });
-    }
+	for (const schemaName of schemaNames) {
+		await test(schemaName, async () => {
+			for (const packageName of packageNames) {
+				await test(packageName, async () => {
+					await runTest(schemaName, packageName);
+				});
+			}
+		});
+	}
 });
 
 async function runTest(schemaName: string, packageName: string) {
-    const packageDirectoryPath = path.join(
-        projectRoot,
-        ".package",
-        "testing",
-        schemaName,
-        packageName
-    );
-    const schemaPath = path.join(
-        projectRoot,
-        "fixtures",
-        "testing",
-        "schema",
-        schemaName,
-        `${packageName}.json`
-    );
-    const schemaUrl = new URL(`file://${schemaPath}`);
+	const packageDirectoryPath = path.join(
+		projectRoot,
+		".package",
+		"testing",
+		schemaName,
+		packageName
+	);
+	const schemaPath = path.join(
+		projectRoot,
+		"fixtures",
+		"testing",
+		"schema",
+		schemaName,
+		`${packageName}.json`
+	);
+	const schemaUrl = new URL(`file://${schemaPath}`);
 
-    if (!fs.existsSync(schemaPath)) {
-        return;
-    }
+	if (!fs.existsSync(schemaPath)) {
+		return;
+	}
 
-    await test("generate package", async () => {
-        const context = new SchemaContext();
-        context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
-        context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaStrategy());
-        context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
-        context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
-        context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
+	await test("generate package", async () => {
+		const context = new SchemaContext();
+		context.registerStrategy(
+			schema202012.metaSchemaId,
+			new schema202012.SchemaStrategy()
+		);
+		context.registerStrategy(
+			schema201909.metaSchemaId,
+			new schema201909.SchemaStrategy()
+		);
+		context.registerStrategy(
+			schemaDraft07.metaSchemaId,
+			new schemaDraft07.SchemaStrategy()
+		);
+		context.registerStrategy(
+			schemaDraft06.metaSchemaId,
+			new schemaDraft06.SchemaStrategy()
+		);
+		context.registerStrategy(
+			schemaDraft04.metaSchemaId,
+			new schemaDraft04.SchemaStrategy()
+		);
 
-        await context.loadFromUrl(schemaUrl, schemaUrl, null, schema202012.metaSchemaId);
+		await context.loadFromUrl(
+			schemaUrl,
+			schemaUrl,
+			null,
+			schema202012.metaSchemaId
+		);
 
-        const nodes = Object.fromEntries(context.getNodeEntries());
+		const nodes = Object.fromEntries(context.getNodeEntries());
 
-        const namer = new Namer("schema");
-        for (const nodeId in nodes) {
-            const nodeUrl = new URL(nodeId);
-            const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
-            namer.registerPath(nodeId, path);
-        }
+		const namer = new Namer("schema");
+		for (const nodeId in nodes) {
+			const nodeUrl = new URL(nodeId);
+			const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
+			namer.registerPath(nodeId, path);
+		}
 
-        const names = namer.getNames();
+		const names = namer.getNames();
 
-        const factory = ts.factory;
-        generatePackage(factory, nodes, names, {
-            directoryPath: packageDirectoryPath,
-            name: packageName,
-            version: "v0.0.0",
-        });
-    });
+		const factory = ts.factory;
+		generatePackage(factory, nodes, names, {
+			directoryPath: packageDirectoryPath,
+			name: packageName,
+			version: "v0.0.0",
+		});
+	});
 
-    await test("install package", () => {
-        cp.execSync("npm install", {
-            cwd: packageDirectoryPath,
-            env: process.env,
-        });
-    });
+	await test("install package", () => {
+		cp.execSync("npm install", {
+			cwd: packageDirectoryPath,
+			env: process.env,
+		});
+	});
 
-    await test("test package", () => {
-        cp.execSync("test package", {
-            cwd: packageDirectoryPath,
-            env: process.env,
-        });
-    });
+	await test("test package", () => {
+		cp.execSync("test package", {
+			cwd: packageDirectoryPath,
+			env: process.env,
+		});
+	});
 
-    const rootTypeName = camelcase(`${packageName}.json`, { pascalCase: true });
+	const rootTypeName = camelcase(`${packageName}.json`, { pascalCase: true });
 
-    const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
-    if (fs.existsSync(validDirectory)) {
-        await test("valid", async () => {
-            const validFiles = fs
-                .readdirSync(validDirectory)
-                .filter((file) => /\.json$/.test(file));
+	const validDirectory = path.join(
+		projectRoot,
+		"fixtures",
+		"testing",
+		"valid",
+		packageName
+	);
+	if (fs.existsSync(validDirectory)) {
+		await test("valid", async () => {
+			const validFiles = fs
+				.readdirSync(validDirectory)
+				.filter((file) => /\.json$/.test(file));
 
-            for (const validFile of validFiles) {
-                await test(validFile, async () => {
-                    const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
+			for (const validFile of validFiles) {
+				await test(validFile, async () => {
+					const packageMain = await import(
+						path.join(packageDirectoryPath, "main.js")
+					);
 
-                    const data = fs.readFileSync(path.join(validDirectory, validFile), "utf-8");
-                    const instance = JSON.parse(data);
-                    assert.equal(packageMain[`is${rootTypeName}`](instance), true);
-                });
-            }
-        });
-    }
+					const data = fs.readFileSync(
+						path.join(validDirectory, validFile),
+						"utf-8"
+					);
+					const instance = JSON.parse(data);
+					assert.equal(packageMain[`is${rootTypeName}`](instance), true);
+				});
+			}
+		});
+	}
 
-    const invalidDirectory = path.join(projectRoot, "fixtures", "testing", "invalid", packageName);
-    if (fs.existsSync(invalidDirectory)) {
-        await test("invalid", async () => {
-            const invalidFiles = fs
-                .readdirSync(invalidDirectory)
-                .filter((file) => /\.json$/.test(file));
+	const invalidDirectory = path.join(
+		projectRoot,
+		"fixtures",
+		"testing",
+		"invalid",
+		packageName
+	);
+	if (fs.existsSync(invalidDirectory)) {
+		await test("invalid", async () => {
+			const invalidFiles = fs
+				.readdirSync(invalidDirectory)
+				.filter((file) => /\.json$/.test(file));
 
-            for (const invalidFile of invalidFiles) {
-                await test(invalidFile, async () => {
-                    const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
+			for (const invalidFile of invalidFiles) {
+				await test(invalidFile, async () => {
+					const packageMain = await import(
+						path.join(packageDirectoryPath, "main.js")
+					);
 
-                    const data = fs.readFileSync(path.join(invalidDirectory, invalidFile), "utf-8");
-                    const instance = JSON.parse(data);
-                    assert.equal(packageMain[`is${rootTypeName}`](instance), false);
-                });
-            }
-        });
-    }
+					const data = fs.readFileSync(
+						path.join(invalidDirectory, invalidFile),
+						"utf-8"
+					);
+					const instance = JSON.parse(data);
+					assert.equal(packageMain[`is${rootTypeName}`](instance), false);
+				});
+			}
+		});
+	}
 }

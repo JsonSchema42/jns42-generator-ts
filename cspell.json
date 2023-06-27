@@ -1,24 +1,24 @@
 {
-  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
-  "version": "0.2",
-  "language": "en",
-  "useGitignore": true,
-  "enableGlobDot": true,
-  "words": [
-    "camelcase",
-    "cobertura",
-    "dbaeumer",
-    "endregion",
-    "goodschema",
-    "lcov",
-    "NOTPARALLEL",
-    "npmjs",
-    "npmrc",
-    "openapi",
-    "patsubst",
-    "ryanluker",
-    "unflattened",
-    "esbenp"
-  ],
-  "enableFiletypes": ["makefile"]
+	"$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+	"version": "0.2",
+	"language": "en",
+	"useGitignore": true,
+	"enableGlobDot": true,
+	"words": [
+		"camelcase",
+		"cobertura",
+		"dbaeumer",
+		"endregion",
+		"goodschema",
+		"lcov",
+		"NOTPARALLEL",
+		"npmjs",
+		"npmrc",
+		"openapi",
+		"patsubst",
+		"ryanluker",
+		"unflattened",
+		"esbenp"
+	],
+	"enableFiletypes": ["makefile"]
 }

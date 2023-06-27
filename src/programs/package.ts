@@ -11,87 +11,106 @@ import { SchemaContext } from "../schema/index.js";
 import { Namer } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
-    return argv.command(
-        "package [schema-url]",
-        "create package from schema-url",
-        (yargs) =>
-            yargs
-                .positional("schema-url", {
-                    description: "url to download schema from",
-                    type: "string",
-                })
-                .option("default-meta-schema-url", {
-                    description: "the default meta schema to use",
-                    type: "string",
-                    choices: [
-                        schema202012.metaSchemaId,
-                        schema201909.metaSchemaId,
-                        schemaDraft07.metaSchemaId,
-                        schemaDraft06.metaSchemaId,
-                        schemaDraft04.metaSchemaId,
-                    ] as const,
-                    default: schema202012.metaSchemaId,
-                })
-                .option("package-directory", {
-                    description: "where to output the package",
-                    type: "string",
-                })
-                .option("package-name", {
-                    description: "name of the package",
-                    type: "string",
-                })
-                .option("package-version", {
-                    description: "version of the package",
-                    type: "string",
-                })
-                .option("root-name-part", {
-                    description: "root name of the schema",
-                    type: "string",
-                    default: "schema",
-                }),
-        (argv) => main(argv as MainOptions)
-    );
+	return argv.command(
+		"package [schema-url]",
+		"create package from schema-url",
+		(yargs) =>
+			yargs
+				.positional("schema-url", {
+					description: "url to download schema from",
+					type: "string",
+				})
+				.option("default-meta-schema-url", {
+					description: "the default meta schema to use",
+					type: "string",
+					choices: [
+						schema202012.metaSchemaId,
+						schema201909.metaSchemaId,
+						schemaDraft07.metaSchemaId,
+						schemaDraft06.metaSchemaId,
+						schemaDraft04.metaSchemaId,
+					] as const,
+					default: schema202012.metaSchemaId,
+				})
+				.option("package-directory", {
+					description: "where to output the package",
+					type: "string",
+				})
+				.option("package-name", {
+					description: "name of the package",
+					type: "string",
+				})
+				.option("package-version", {
+					description: "version of the package",
+					type: "string",
+				})
+				.option("root-name-part", {
+					description: "root name of the schema",
+					type: "string",
+					default: "schema",
+				}),
+		(argv) => main(argv as MainOptions)
+	);
 }
 
 interface MainOptions {
-    schemaUrl: string;
-    defaultMetaSchemaUrl: string;
-    packageDirectory: string;
-    packageName: string;
-    packageVersion: string;
-    rootNamePart: string;
+	schemaUrl: string;
+	defaultMetaSchemaUrl: string;
+	packageDirectory: string;
+	packageName: string;
+	packageVersion: string;
+	rootNamePart: string;
 }
 
 async function main(options: MainOptions) {
-    const schemaUrl = new URL(options.schemaUrl);
-    const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-    const packageDirectoryPath = path.resolve(options.packageDirectory);
-    const { packageName, packageVersion, rootNamePart: defaultTypeName } = options;
+	const schemaUrl = new URL(options.schemaUrl);
+	const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
+	const packageDirectoryPath = path.resolve(options.packageDirectory);
+	const {
+		packageName,
+		packageVersion,
+		rootNamePart: defaultTypeName,
+	} = options;
 
-    const context = new SchemaContext();
-    context.registerStrategy(schema202012.metaSchemaId, new schema202012.SchemaStrategy());
-    context.registerStrategy(schema201909.metaSchemaId, new schema201909.SchemaStrategy());
-    context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
-    context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
-    context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
+	const context = new SchemaContext();
+	context.registerStrategy(
+		schema202012.metaSchemaId,
+		new schema202012.SchemaStrategy()
+	);
+	context.registerStrategy(
+		schema201909.metaSchemaId,
+		new schema201909.SchemaStrategy()
+	);
+	context.registerStrategy(
+		schemaDraft07.metaSchemaId,
+		new schemaDraft07.SchemaStrategy()
+	);
+	context.registerStrategy(
+		schemaDraft06.metaSchemaId,
+		new schemaDraft06.SchemaStrategy()
+	);
+	context.registerStrategy(
+		schemaDraft04.metaSchemaId,
+		new schemaDraft04.SchemaStrategy()
+	);
 
-    await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
+	await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
-    const nodes = Object.fromEntries(context.getNodeEntries());
+	const nodes = Object.fromEntries(context.getNodeEntries());
 
-    const namer = new Namer(options.rootNamePart);
-    for (const nodeId in nodes) {
-        const nodeUrl = new URL(nodeId);
-        const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
-        namer.registerPath(nodeId, path);
-    }
+	const namer = new Namer(options.rootNamePart);
+	for (const nodeId in nodes) {
+		const nodeUrl = new URL(nodeId);
+		const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
+		namer.registerPath(nodeId, path);
+	}
 
-    const names = namer.getNames();
+	const names = namer.getNames();
 
-    const factory = ts.factory;
-    generatePackage(factory, nodes, names, {
-        directoryPath: packageDirectoryPath,
-        name: packageName,
-        version: packageVersion,
-    });
+	const factory = ts.factory;
+	generatePackage(factory, nodes, names, {
+		directoryPath: packageDirectoryPath,
+		name: packageName,
+		version: packageVersion,
+	});
 }

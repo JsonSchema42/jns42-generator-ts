@@ -1,137 +1,137 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "run file",
-      "program": "${file}",
-      "args": [],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch",
-      "outputCapture": "std"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package file",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${file}",
-        "--package-directory",
-        ".package/file",
-        "--package-name",
-        "file",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package draft-2020-12",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/draft-2020-12/schema",
-        "--package-directory",
-        ".package/schema/draft-2020-12",
-        "--package-name",
-        "draft-2020-12",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package draft-2019-09",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/draft-2019-09/schema",
-        "--package-directory",
-        ".package/schema/draft-2019-09",
-        "--package-name",
-        "draft-2019-09",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package draft-07",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/draft-07/schema",
-        "--package-directory",
-        ".package/schema/draft-07",
-        "--package-name",
-        "draft-07",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package draft-06",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/draft-06/schema",
-        "--package-directory",
-        ".package/schema/draft-06",
-        "--package-name",
-        "draft-06",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package draft-04",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "file://${workspaceFolder}/fixtures/schema/draft-04/schema",
-        "--package-directory",
-        ".package/schema/draft-04",
-        "--package-name",
-        "draft-04",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "watch"
-    }
-  ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "run file",
+			"program": "${file}",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch",
+			"outputCapture": "std"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package file",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${file}",
+				"--package-directory",
+				".package/file",
+				"--package-name",
+				"file",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package draft-2020-12",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${workspaceFolder}/fixtures/schema/draft-2020-12/schema",
+				"--package-directory",
+				".package/schema/draft-2020-12",
+				"--package-name",
+				"draft-2020-12",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package draft-2019-09",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${workspaceFolder}/fixtures/schema/draft-2019-09/schema",
+				"--package-directory",
+				".package/schema/draft-2019-09",
+				"--package-name",
+				"draft-2019-09",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package draft-07",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${workspaceFolder}/fixtures/schema/draft-07/schema",
+				"--package-directory",
+				".package/schema/draft-07",
+				"--package-name",
+				"draft-07",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package draft-06",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${workspaceFolder}/fixtures/schema/draft-06/schema",
+				"--package-directory",
+				".package/schema/draft-06",
+				"--package-name",
+				"draft-06",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package draft-04",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${workspaceFolder}/fixtures/schema/draft-04/schema",
+				"--package-directory",
+				".package/schema/draft-04",
+				"--package-name",
+				"draft-04",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
+		}
+	]
 }
