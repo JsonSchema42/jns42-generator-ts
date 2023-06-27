@@ -1,4 +1,3 @@
-import camelcase from "camelcase";
 import cp from "child_process";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -87,9 +86,10 @@ async function runTest(schemaName: string, packageName: string) {
 
         const nameNamers: Record<string, Namer> = {};
         for (const [serverId, nodesByHash] of Object.entries(nodes)) {
+            const namer = new Namer("root");
+            nameNamers[serverId] = namer;
             for (const [hash, node] of Object.entries(nodesByHash)) {
                 const path = hash.replace(/^#/g, "");
-                const namer = new Namer("root");
                 namer.registerPath(hash, path);
             }
         }
@@ -128,8 +128,6 @@ async function runTest(schemaName: string, packageName: string) {
         });
     });
 
-    const typeName = camelcase("schema", { pascalCase: true });
-
     const validDirectory = path.join(projectRoot, "fixtures", "testing", "valid", packageName);
     if (fs.existsSync(validDirectory)) {
         await test("valid", async () => {
@@ -139,11 +137,11 @@ async function runTest(schemaName: string, packageName: string) {
 
             for (const validFile of validFiles) {
                 await test(validFile, async () => {
-                    const schema = await import(path.join(packageDirectoryPath, "main.js"));
+                    const { Schema } = await import(path.join(packageDirectoryPath, "main.js"));
 
                     const data = fs.readFileSync(path.join(validDirectory, validFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(schema[`is${typeName}`](instance), true);
+                    assert.equal(Schema.isRoot(instance), true);
                 });
             }
         });
@@ -158,11 +156,11 @@ async function runTest(schemaName: string, packageName: string) {
 
             for (const invalidFile of invalidFiles) {
                 await test(invalidFile, async () => {
-                    const schema = await import(path.join(packageDirectoryPath, "main.js"));
+                    const { Schema } = await import(path.join(packageDirectoryPath, "main.js"));
 
                     const data = fs.readFileSync(path.join(invalidDirectory, invalidFile), "utf-8");
                     const instance = JSON.parse(data);
-                    assert.equal(schema[`is${typeName}`](instance), false);
+                    assert.equal(Schema.isRoot(instance), false);
                 });
             }
         });

@@ -80,6 +80,7 @@ async function main(options: MainOptions) {
     context.registerStrategy(schemaDraft07.metaSchemaId, new schemaDraft07.SchemaStrategy());
     context.registerStrategy(schemaDraft06.metaSchemaId, new schemaDraft06.SchemaStrategy());
     context.registerStrategy(schemaDraft04.metaSchemaId, new schemaDraft04.SchemaStrategy());
+
     await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
     const allNodes: Record<string, Node> = {};
