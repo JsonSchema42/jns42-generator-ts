@@ -28,9 +28,23 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
 			f.createStringLiteral("./main.js")
 		);
 
+		for (const nodeId in this.nodes) {
+			yield* this.generateTestStatement(nodeId);
+		}
+	}
+
+	protected *generateTestStatement(nodeId: string) {
+		const { factory: f } = this;
+
+		const typeName = this.getTypeName(nodeId);
+
+		const assertStatements = [...this.generateAssertStatements(nodeId)];
+
+		if (assertStatements.length === 0) return;
+
 		yield f.createExpressionStatement(
 			f.createCallExpression(f.createIdentifier("test"), undefined, [
-				f.createStringLiteral("main"),
+				f.createStringLiteral(typeName),
 				f.createArrowFunction(
 					undefined,
 					undefined,
@@ -46,21 +60,13 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
 					],
 					undefined,
 					f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-					f.createBlock([...this.generateAllAssertStatements()], true)
+					f.createBlock(assertStatements, true)
 				),
 			])
 		);
 	}
 
-	protected *generateAllAssertStatements(): Iterable<ts.Statement> {
-		for (const nodeId in this.nodes) {
-			yield* this.generateAssertStatementsForNode(nodeId);
-		}
-	}
-
-	protected *generateAssertStatementsForNode(
-		nodeId: string
-	): Iterable<ts.Statement> {
+	protected *generateAssertStatements(nodeId: string): Iterable<ts.Statement> {
 		const { factory: f } = this;
 		const node = this.nodes[nodeId];
 
