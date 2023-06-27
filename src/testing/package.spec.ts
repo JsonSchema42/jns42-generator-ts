@@ -24,7 +24,7 @@ const packageNames = [
 
 const schemaNames = ["draft-2020-12", "draft-2019-09", "draft-07", "draft-06", "draft-04"];
 
-await test("testing fixtures", async () => {
+await test("testing package", async () => {
     for (const schemaName of schemaNames) {
         await test(schemaName, async () => {
             for (const packageName of packageNames) {
