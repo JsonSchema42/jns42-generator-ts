@@ -1,0 +1,141 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://JsonSchema42.org/jns42-intermediate/schema.json",
+	"title": "JsonSchema42 intermediate node",
+	"type": ["object"],
+	"required": [
+		"deprecated",
+		"title",
+		"description",
+		"examples",
+		"types",
+		"compounds"
+	],
+	"properties": {
+		"superNodeId": { "type": "string" },
+		"deprecated": { "type": "boolean" },
+		"title": { "type": "string" },
+		"description": { "type": "string" },
+		"examples": {
+			"type": "array",
+			"items": true
+		},
+		"types": { "$ref": "#/$defs/type-union" },
+		"compounds": { "$ref": "#/$defs/compound-union" }
+	},
+
+	"$defs": {
+		"type-union": {
+			"one-of": []
+		},
+
+		"null-type": {
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "null"
+				}
+			}
+		},
+		"any-type": {
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "any"
+				}
+			}
+		},
+		"never-type": {
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "never"
+				}
+			}
+		},
+		"boolean-type": {
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "boolean"
+				},
+				"options": {
+					"type": "array",
+					"items": {
+						"type": "boolean"
+					}
+				}
+			}
+		},
+		"number-type": {
+			"required": ["type", "numberType"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "number"
+				},
+				"numberType": {
+					"type": "string",
+					"enum": ["integer", "float"]
+				},
+				"options": {
+					"type": "array",
+					"items": {
+						"type": "number"
+					}
+				},
+				"minimumInclusive": {
+					"type": "number"
+				},
+				"minimumExclusive": {
+					"type": "number"
+				},
+				"maximumInclusive": {
+					"type": "number"
+				},
+				"maximumExclusive": {
+					"type": "number"
+				},
+				"multipleOf": {
+					"type": "number"
+				}
+			}
+		},
+		"string-type": {
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "string"
+				},
+				"options": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"minimumLength": {
+					"type": "number"
+				},
+				"maximumLength": {
+					"type": "number"
+				},
+				"valuePattern": {
+					"type": "string"
+				}
+			}
+		},
+		"tuple-type": {},
+		"array-type": {},
+		"interface-type": {},
+		"record-type;": {},
+
+		"compound-union": {
+			"one-of": []
+		}
+	}
+}
