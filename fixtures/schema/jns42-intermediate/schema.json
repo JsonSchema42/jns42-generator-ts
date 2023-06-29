@@ -26,10 +26,30 @@
 
 	"$defs": {
 		"type-union": {
-			"one-of": []
+			"one-of": [
+				{ "$ref": "#/$defs/null-type" },
+				{ "$ref": "#/$defs/any-type" },
+				{ "$ref": "#/$defs/never-type" },
+				{ "$ref": "#/$defs/boolean-type" },
+				{ "$ref": "#/$defs/number-type" },
+				{ "$ref": "#/$defs/string-type" },
+				{ "$ref": "#/$defs/tuple-type" },
+				{ "$ref": "#/$defs/array-type" },
+				{ "$ref": "#/$defs/interface-type" },
+				{ "$ref": "#/$defs/record-type" }
+			]
+		},
+
+		"compound-union": {
+			"one-of": [
+				{ "$ref": "#/$defs/one-of-compound" },
+				{ "$ref": "#/$defs/any-of-compound" },
+				{ "$ref": "#/$defs/all-of-compound" }
+			]
 		},
 
 		"null-type": {
+			"type": "object",
 			"required": ["type"],
 			"properties": {
 				"type": {
@@ -39,6 +59,7 @@
 			}
 		},
 		"any-type": {
+			"type": "object",
 			"required": ["type"],
 			"properties": {
 				"type": {
@@ -48,6 +69,7 @@
 			}
 		},
 		"never-type": {
+			"type": "object",
 			"required": ["type"],
 			"properties": {
 				"type": {
@@ -57,6 +79,7 @@
 			}
 		},
 		"boolean-type": {
+			"type": "object",
 			"required": ["type"],
 			"properties": {
 				"type": {
@@ -72,6 +95,7 @@
 			}
 		},
 		"number-type": {
+			"type": "object",
 			"required": ["type", "numberType"],
 			"properties": {
 				"type": {
@@ -106,6 +130,7 @@
 			}
 		},
 		"string-type": {
+			"type": "object",
 			"required": ["type"],
 			"properties": {
 				"type": {
@@ -129,13 +154,139 @@
 				}
 			}
 		},
-		"tuple-type": {},
-		"array-type": {},
-		"interface-type": {},
-		"record-type;": {},
+		"tuple-type": {
+			"type": "object",
+			"required": ["type", "itemTypeNodeIds"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "tuple"
+				},
+				"itemTypeNodeIds": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"array-type": {
+			"type": "object",
+			"required": ["type", "itemTypeNodeId"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "array"
+				},
+				"minimumItems": {
+					"type": "number"
+				},
+				"maximumItems": {
+					"type": "number"
+				},
+				"uniqueItems": {
+					"type": "boolean"
+				},
+				"itemTypeNodeId": {
+					"type": "string"
+				}
+			}
+		},
+		"interface-type": {
+			"type": "object",
+			"required": ["type", "requiredProperties", "propertyTypeNodeIds"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "interface"
+				},
+				"requiredProperties": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"propertyTypeNodeIds": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"record-type;": {
+			"type": "object",
+			"required": ["type", "requiredProperties", "propertyTypeNodeId"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "record"
+				},
+				"requiredProperties": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"minimumProperties": {
+					"type": "number"
+				},
+				"maximumProperties": {
+					"type": "number"
+				},
+				"propertyTypeNodeId": {
+					"type": "string"
+				}
+			}
+		},
 
-		"compound-union": {
-			"one-of": []
+		"one-of-compound": {
+			"type": "object",
+			"required": ["type", "typeNodeIds"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "one-of"
+				},
+				"typeNodeIds": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"any-of-compound": {
+			"type": "object",
+			"required": ["type", "typeNodeIds"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "any-of"
+				},
+				"typeNodeIds": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"all-of-compound": {
+			"type": "object",
+			"required": ["type", "typeNodeIds"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "all-of"
+				},
+				"typeNodeIds": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
 		}
 	}
 }

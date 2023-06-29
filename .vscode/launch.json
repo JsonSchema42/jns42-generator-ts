@@ -132,6 +132,26 @@
 			"sourceMaps": true,
 			"outFiles": ["${workspaceFolder}/out/**/*.js"],
 			"preLaunchTask": "watch"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "package jns42-intermediate",
+			"program": "${workspaceFolder}/src/program.ts",
+			"args": [
+				"package",
+				"file://${workspaceFolder}/fixtures/schema/jns42-intermediate/schema.json",
+				"--package-directory",
+				".package/schema/jns42-intermediate",
+				"--package-name",
+				"jns42-intermediate",
+				"--package-version",
+				"0.0.0"
+			],
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "watch"
 		}
 	]
 }
