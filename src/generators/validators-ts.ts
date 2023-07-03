@@ -322,7 +322,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 	}
 
 	protected *generateNumberTypeValidationStatements(
-		type: intermediate.NumberType
+		type: intermediate.DefsNumberType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 
