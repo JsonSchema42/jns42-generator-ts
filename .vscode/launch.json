@@ -136,15 +136,15 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "package jns42-intermediate",
+			"name": "package jns42-intermediate-a",
 			"program": "${workspaceFolder}/src/program.ts",
 			"args": [
 				"package",
-				"file://${workspaceFolder}/fixtures/schema/jns42-intermediate/schema.json",
+				"file://${workspaceFolder}/fixtures/schema/jns42-intermediate-a/schema.json",
 				"--package-directory",
-				".package/schema/jns42-intermediate",
+				".package/schema/jns42-intermediate-a",
 				"--package-name",
-				"jns42-intermediate",
+				"jns42-intermediate-a",
 				"--package-version",
 				"0.0.0"
 			],
