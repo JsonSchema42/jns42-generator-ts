@@ -125,13 +125,13 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 				return this.generateNullTypeDefinition();
 
 			case "boolean":
-				return this.generateBooleanTypeDefinition();
+				return this.generateBooleanTypeDefinition(type.options);
 
 			case "number":
-				return this.generateNumberTypeDefinition();
+				return this.generateNumberTypeDefinition(type.options);
 
 			case "string":
-				return this.generateStringTypeDefinition();
+				return this.generateStringTypeDefinition(type.options);
 
 			case "tuple":
 				return this.generateTupleTypeDefinition(type.itemTypeNodeIds);
@@ -180,14 +180,44 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 	protected generateNullTypeDefinition(): ts.TypeNode {
 		return this.factory.createLiteralTypeNode(this.factory.createNull());
 	}
-	protected generateBooleanTypeDefinition(): ts.TypeNode {
-		return this.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
+	protected generateBooleanTypeDefinition(options?: boolean[]): ts.TypeNode {
+		if (options == null) {
+			return this.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
+		}
+
+		return this.factory.createIntersectionTypeNode(
+			options.map((option) =>
+				this.factory.createLiteralTypeNode(
+					option ? this.factory.createTrue() : this.factory.createFalse()
+				)
+			)
+		);
 	}
-	protected generateNumberTypeDefinition(): ts.TypeNode {
-		return this.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+	protected generateNumberTypeDefinition(options?: number[]): ts.TypeNode {
+		if (options == null) {
+			return this.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+		}
+
+		return this.factory.createIntersectionTypeNode(
+			options.map((option) =>
+				this.factory.createLiteralTypeNode(
+					this.factory.createNumericLiteral(option)
+				)
+			)
+		);
 	}
-	protected generateStringTypeDefinition(): ts.TypeNode {
-		return this.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+	protected generateStringTypeDefinition(options?: string[]): ts.TypeNode {
+		if (options == null) {
+			return this.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+		}
+
+		return this.factory.createIntersectionTypeNode(
+			options.map((option) =>
+				this.factory.createLiteralTypeNode(
+					this.factory.createStringLiteral(option)
+				)
+			)
+		);
 	}
 	protected generateTupleTypeDefinition(nodeIds: Array<string>): ts.TypeNode {
 		const elements = nodeIds.map((nodeId) =>
