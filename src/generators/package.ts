@@ -29,6 +29,12 @@ export function generatePackage(
 	}
 
 	{
+		const data = names;
+		const filePath = path.join(options.directoryPath, "names.json");
+		fs.writeFileSync(filePath, formatData(data));
+	}
+
+	{
 		const data = getTsconfigJsonData();
 		const filePath = path.join(options.directoryPath, "tsconfig.json");
 		fs.writeFileSync(filePath, formatData(data));
