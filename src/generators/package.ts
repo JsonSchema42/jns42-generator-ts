@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
-import { Node } from "../schema/intermediate.js";
+import * as intermediate from "../schema/intermediate.js";
 import { formatData, formatStatements } from "../utils/index.js";
 import { MainSpecsTsCodeGenerator } from "./main-specs-ts.js";
 import { MainTsCodeGenerator } from "./main-ts.js";
@@ -16,7 +16,7 @@ export interface PackageOptions {
 
 export function generatePackage(
 	factory: ts.NodeFactory,
-	nodes: Record<string, Node>,
+	nodes: Record<string, intermediate.Node>,
 	names: Record<string, string>,
 	options: PackageOptions
 ) {

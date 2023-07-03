@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { CompoundUnion, TypeUnion } from "../schema/intermediate.js";
+import * as intermediate from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
@@ -111,7 +111,9 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 		}
 	}
 
-	protected generateTypeDefinitionElement(type: TypeUnion): ts.TypeNode {
+	protected generateTypeDefinitionElement(
+		type: intermediate.TypeUnion
+	): ts.TypeNode {
 		switch (type.type) {
 			case "never":
 				return this.generateNeverTypeDefinition();
@@ -152,7 +154,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 	}
 
 	protected generateCompoundDefinitionElement(
-		compound: CompoundUnion
+		compound: intermediate.CompoundUnion
 	): ts.TypeNode {
 		switch (compound.type) {
 			case "one-of":

@@ -1,9 +1,9 @@
 import assert from "assert";
 import { SchemaContext } from "./context.js";
-import { Node } from "./intermediate.js";
+import * as intermediate from "./intermediate.js";
 
 export interface SchemaStrategyInterface {
-	getNodeEntries(): Iterable<[string, Node]>;
+	getNodeEntries(): Iterable<[string, intermediate.Node]>;
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -57,7 +57,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
 	public abstract selectNodeUrl(node: N): URL | undefined;
 
-	public abstract getNodeEntries(): Iterable<[string, Node]>;
+	public abstract getNodeEntries(): Iterable<[string, intermediate.Node]>;
 
 	private maybeContext?: SchemaContext;
 	protected get context() {

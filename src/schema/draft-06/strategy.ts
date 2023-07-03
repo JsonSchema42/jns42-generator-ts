@@ -1,5 +1,5 @@
 import { Draft06Schema, isDraft06Schema } from "@jns42/jns42-schema-draft-06";
-import { CompoundUnion, Node, TypeUnion } from "../intermediate.js";
+import * as intermediate from "../intermediate.js";
 import { SchemaStrategyBase } from "../strategy.js";
 import { metaSchemaId } from "./meta.js";
 import {
@@ -125,7 +125,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 
 	//#region strategy implementation
 
-	public *getNodeEntries(): Iterable<[string, Node]> {
+	public *getNodeEntries(): Iterable<[string, intermediate.Node]> {
 		for (const [nodeId, { node }] of this.getNodeItemEntries()) {
 			const title = selectNodeTitle(node) ?? "";
 			const description = selectNodeDescription(node) ?? "";
@@ -160,7 +160,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		}
 	}
 
-	private *selectNodeTypes(nodeId: string): Iterable<TypeUnion> {
+	private *selectNodeTypes(nodeId: string): Iterable<intermediate.TypeUnion> {
 		const nodeItem = this.getNodeItem(nodeId);
 
 		if (nodeItem.node === true) {
@@ -219,7 +219,9 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		}
 	}
 
-	private *selectNodeCompounds(nodeId: string): Iterable<CompoundUnion> {
+	private *selectNodeCompounds(
+		nodeId: string
+	): Iterable<intermediate.CompoundUnion> {
 		const nodeItem = this.getNodeItem(nodeId);
 
 		yield* this.makeNodeCompoundFromAllOf(
@@ -239,13 +241,15 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		);
 	}
 
-	private *makeNodeTypeFromNull(): Iterable<TypeUnion> {
+	private *makeNodeTypeFromNull(): Iterable<intermediate.TypeUnion> {
 		yield {
 			type: "null",
 		};
 	}
 
-	private *makeNodeTypeFromBoolean(node: Draft06Schema): Iterable<TypeUnion> {
+	private *makeNodeTypeFromBoolean(
+		node: Draft06Schema
+	): Iterable<intermediate.TypeUnion> {
 		const enumValues = selectNodeEnum(node) as unknown[];
 
 		let options: Array<boolean> | undefined;
@@ -263,7 +267,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 	private *makeNodeTypeFromNumber(
 		node: Draft06Schema,
 		numberType: "integer" | "float"
-	): Iterable<TypeUnion> {
+	): Iterable<intermediate.TypeUnion> {
 		const enumValues = selectNodeEnum(node) as unknown[];
 
 		let options: Array<number> | undefined;
@@ -290,7 +294,9 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		};
 	}
 
-	private *makeNodeTypeFromString(node: Draft06Schema): Iterable<TypeUnion> {
+	private *makeNodeTypeFromString(
+		node: Draft06Schema
+	): Iterable<intermediate.TypeUnion> {
 		const enumValues = selectNodeEnum(node) as unknown[];
 
 		let options: Array<string> | undefined;
@@ -316,7 +322,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		node: Draft06Schema,
 		nodeRootUrl: URL,
 		nodePointer: string
-	): Iterable<TypeUnion> {
+	): Iterable<intermediate.TypeUnion> {
 		const itemsOne = [...selectSubNodeItemsOneEntries(nodePointer, node)];
 		const itemsMany = [...selectSubNodeItemsManyEntries(nodePointer, node)];
 		const additionalItems = [
@@ -376,7 +382,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		node: Draft06Schema,
 		nodeRootUrl: URL,
 		nodePointer: string
-	): Iterable<TypeUnion> {
+	): Iterable<intermediate.TypeUnion> {
 		const propertyNames = [
 			...selectNodePropertyNamesEntries(nodePointer, node),
 		];
@@ -433,7 +439,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		node: Draft06Schema,
 		nodeRootUrl: URL,
 		nodePointer: string
-	): Iterable<CompoundUnion> {
+	): Iterable<intermediate.CompoundUnion> {
 		const allOf = [...selectSubNodeAllOfEntries(nodePointer, node)];
 		if (allOf.length > 0) {
 			const typeNodeIds = allOf.map(([typeNodePointer]) => {
@@ -453,7 +459,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		node: Draft06Schema,
 		nodeRootUrl: URL,
 		nodePointer: string
-	): Iterable<CompoundUnion> {
+	): Iterable<intermediate.CompoundUnion> {
 		const allOf = [...selectSubNodeAnyOfEntries(nodePointer, node)];
 		if (allOf.length > 0) {
 			const typeNodeIds = allOf.map(([typeNodePointer]) => {
@@ -473,7 +479,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft06Schema> {
 		node: Draft06Schema,
 		nodeRootUrl: URL,
 		nodePointer: string
-	): Iterable<CompoundUnion> {
+	): Iterable<intermediate.CompoundUnion> {
 		const allOf = [...selectSubNodeOneOfEntries(nodePointer, node)];
 		if (allOf.length > 0) {
 			const typeNodeIds = allOf.map(([typeNodePointer]) => {

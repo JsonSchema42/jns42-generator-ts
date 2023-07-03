@@ -1,16 +1,6 @@
 import camelcase from "camelcase";
 import ts from "typescript";
-import {
-	ArrayType,
-	BooleanType,
-	CompoundUnion,
-	InterfaceType,
-	NumberType,
-	RecordType,
-	StringType,
-	TupleType,
-	TypeUnion,
-} from "../schema/intermediate.js";
+import * as intermediate from "../schema/intermediate.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
@@ -201,7 +191,10 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		yield f.createReturnStatement(f.createTrue());
 	}
 
-	protected generateTypeValidationStatements(nodeId: string, type: TypeUnion) {
+	protected generateTypeValidationStatements(
+		nodeId: string,
+		type: intermediate.TypeUnion
+	) {
 		switch (type.type) {
 			case "never":
 				return this.generateNeverTypeValidationStatements();
@@ -240,7 +233,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 
 	protected generateCompoundValidationStatements(
 		nodeId: string,
-		compound: CompoundUnion
+		compound: intermediate.CompoundUnion
 	) {
 		switch (compound.type) {
 			case "one-of":
@@ -291,7 +284,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		);
 	}
 	protected *generateBooleanTypeValidationStatements(
-		type: BooleanType
+		type: intermediate.BooleanType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 
@@ -329,7 +322,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 	}
 
 	protected *generateNumberTypeValidationStatements(
-		type: NumberType
+		type: intermediate.NumberType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 
@@ -456,7 +449,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		yield f.createReturnStatement(f.createTrue());
 	}
 	protected *generateStringTypeValidationStatements(
-		type: StringType
+		type: intermediate.StringType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 
@@ -538,7 +531,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		yield f.createReturnStatement(f.createTrue());
 	}
 	protected *generateTupleTypeValidationStatements(
-		type: TupleType
+		type: intermediate.TupleType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 
@@ -608,7 +601,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		yield f.createReturnStatement(f.createTrue());
 	}
 	private *generateTupleTypeCaseClausesValidationStatements(
-		type: TupleType
+		type: intermediate.TupleType
 	): Iterable<ts.CaseOrDefaultClause> {
 		const { factory: f } = this;
 
@@ -636,7 +629,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 	}
 
 	protected *generateArrayTypeValidationStatements(
-		type: ArrayType
+		type: intermediate.ArrayType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 		const typeName = this.getTypeName(type.itemTypeNodeId);
@@ -775,7 +768,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		yield f.createReturnStatement(f.createTrue());
 	}
 	protected *generateInterfaceTypeValidationStatements(
-		type: InterfaceType
+		type: intermediate.InterfaceType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 
@@ -870,7 +863,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 		yield f.createReturnStatement(f.createTrue());
 	}
 	private *generateInterfaceTypeCaseClausesValidationStatements(
-		type: InterfaceType
+		type: intermediate.InterfaceType
 	): Iterable<ts.CaseOrDefaultClause> {
 		const { factory: f } = this;
 
@@ -906,7 +899,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
 	}
 
 	protected *generateRecordTypeValidationStatements(
-		type: RecordType
+		type: intermediate.RecordType
 	): Iterable<ts.Statement> {
 		const { factory: f } = this;
 		const typeName = this.getTypeName(type.propertyTypeNodeId);

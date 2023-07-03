@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { Node } from "./intermediate.js";
+import * as intermediate from "./intermediate.js";
 import { SchemaStrategyBase, SchemaStrategyInterface } from "./strategy.js";
 
 export class SchemaContext implements SchemaStrategyInterface {
@@ -18,7 +18,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 		this.strategies[metaSchemaId] = strategy;
 	}
 
-	public *getNodeEntries(): Iterable<[string, Node]> {
+	public *getNodeEntries(): Iterable<[string, intermediate.Node]> {
 		for (const strategy of Object.values(this.strategies)) {
 			yield* strategy.getNodeEntries();
 		}
