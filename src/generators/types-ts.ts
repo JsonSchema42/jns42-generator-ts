@@ -185,7 +185,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 			return this.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 		}
 
-		return this.factory.createIntersectionTypeNode(
+		return this.factory.createUnionTypeNode(
 			options.map((option) =>
 				this.factory.createLiteralTypeNode(
 					option ? this.factory.createTrue() : this.factory.createFalse()
@@ -198,7 +198,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 			return this.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
 		}
 
-		return this.factory.createIntersectionTypeNode(
+		return this.factory.createUnionTypeNode(
 			options.map((option) =>
 				this.factory.createLiteralTypeNode(
 					this.factory.createNumericLiteral(option)
@@ -211,7 +211,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 			return this.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
 		}
 
-		return this.factory.createIntersectionTypeNode(
+		return this.factory.createUnionTypeNode(
 			options.map((option) =>
 				this.factory.createLiteralTypeNode(
 					this.factory.createStringLiteral(option)
