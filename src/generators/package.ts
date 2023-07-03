@@ -16,7 +16,7 @@ export interface PackageOptions {
 
 export function generatePackage(
 	factory: ts.NodeFactory,
-	nodes: Record<string, intermediate.Node>,
+	nodes: Record<string, intermediate.SchemaJson>,
 	names: Record<string, string>,
 	options: PackageOptions
 ) {

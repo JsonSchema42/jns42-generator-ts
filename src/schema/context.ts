@@ -18,7 +18,7 @@ export class SchemaContext implements SchemaStrategyInterface {
 		this.strategies[metaSchemaId] = strategy;
 	}
 
-	public *getNodeEntries(): Iterable<[string, intermediate.Node]> {
+	public *getNodeEntries(): Iterable<[string, intermediate.SchemaJson]> {
 		for (const strategy of Object.values(this.strategies)) {
 			yield* strategy.getNodeEntries();
 		}

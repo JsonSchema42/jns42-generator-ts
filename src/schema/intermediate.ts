@@ -1,4 +1,4 @@
-export interface Node {
+export interface SchemaJson {
 	superNodeId?: string;
 	deprecated: boolean;
 	title: string;
