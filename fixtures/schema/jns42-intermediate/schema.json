@@ -20,13 +20,23 @@
 			"type": "array",
 			"items": true
 		},
-		"types": { "$ref": "#/$defs/type-union" },
-		"compounds": { "$ref": "#/$defs/compound-union" }
+		"types": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/type-union"
+			}
+		},
+		"compounds": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/compound-union"
+			}
+		}
 	},
 
 	"$defs": {
 		"type-union": {
-			"one-of": [
+			"oneOf": [
 				{ "$ref": "#/$defs/null-type" },
 				{ "$ref": "#/$defs/any-type" },
 				{ "$ref": "#/$defs/never-type" },
@@ -41,7 +51,7 @@
 		},
 
 		"compound-union": {
-			"one-of": [
+			"oneOf": [
 				{ "$ref": "#/$defs/one-of-compound" },
 				{ "$ref": "#/$defs/any-of-compound" },
 				{ "$ref": "#/$defs/all-of-compound" }
@@ -214,7 +224,7 @@
 				}
 			}
 		},
-		"record-type;": {
+		"record-type": {
 			"type": "object",
 			"required": ["type", "requiredProperties", "propertyTypeNodeId"],
 			"properties": {
