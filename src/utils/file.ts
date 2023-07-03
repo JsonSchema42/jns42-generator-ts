@@ -15,9 +15,6 @@ export function formatStatements(
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 //                                 -- www.JsonSchema42.org
-    
-/* eslint-disable */
-/* spellchecker: disable */
 `.trim();
 
 	const printer = ts.createPrinter({

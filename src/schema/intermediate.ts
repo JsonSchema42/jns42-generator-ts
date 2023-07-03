@@ -5,11 +5,8 @@
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 //                                 -- www.JsonSchema42.org
 
-/* eslint-disable */
-/* spellchecker: disable */
-
 /**
-JsonSchema42 intermediate node
+JsonSchema42 intermediate schema
 */
 export type SchemaJson = {
 	superNodeId?: SuperNodeId;

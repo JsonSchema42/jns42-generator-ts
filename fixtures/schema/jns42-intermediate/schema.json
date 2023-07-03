@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://JsonSchema42.org/jns42-intermediate/schema.json",
-	"title": "JsonSchema42 intermediate node",
+	"$id": "https://schema.JsonSchema42.org/jns42-intermediate-a/schema.json",
+	"title": "JsonSchema42 intermediate schema",
 	"type": ["object"],
 	"required": [
 		"deprecated",
