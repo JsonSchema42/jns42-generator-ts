@@ -44,7 +44,7 @@
 		"@jns42/jns42-schema-draft-07": "^0.2.0",
 		"@jns42/jns42-schema-draft-2019-09": "^0.2.0",
 		"@jns42/jns42-schema-draft-2020-12": "^0.2.0",
-		"@jns42/jns42-schema-intermediate-a": "^0.1.1",
+		"@jns42/jns42-schema-intermediate-a": "^0.2.0",
 		"@types/node": "^18.16.18",
 		"@types/yargs": "^17.0.24",
 		"camelcase": "^7.0.1",
