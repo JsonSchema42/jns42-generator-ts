@@ -132,7 +132,7 @@ export class SchemaStrategy extends SchemaStrategyBase<Draft202012Schema> {
 
 	//#region strategy implementation
 
-	public *getNodeEntries(): Iterable<[string, intermediate.SchemaJson]> {
+	public *getNodeEntries(): Iterable<[string, intermediate.Node]> {
 		for (const [nodeId, { node }] of this.getNodeItemEntries()) {
 			const title = selectNodeTitle(node) ?? "";
 			const description = selectNodeDescription(node) ?? "";

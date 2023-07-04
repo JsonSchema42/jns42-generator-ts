@@ -3,7 +3,7 @@ import assert from "assert";
 import { SchemaContext } from "./context.js";
 
 export interface SchemaStrategyInterface {
-	getNodeEntries(): Iterable<[string, intermediate.SchemaJson]>;
+	getNodeEntries(): Iterable<[string, intermediate.Node]>;
 }
 
 export interface SchemaStrategyRootNodeItem<N> {
@@ -57,7 +57,7 @@ export abstract class SchemaStrategyBase<N> implements SchemaStrategyInterface {
 
 	public abstract selectNodeUrl(node: N): URL | undefined;
 
-	public abstract getNodeEntries(): Iterable<[string, intermediate.SchemaJson]>;
+	public abstract getNodeEntries(): Iterable<[string, intermediate.Node]>;
 
 	private maybeContext?: SchemaContext;
 	protected get context() {
