@@ -92,10 +92,10 @@ async function main(options: MainOptions) {
 
 	await context.loadFromUrl(schemaUrl, schemaUrl, null, defaultMetaSchemaId);
 
-	const nodes = Object.fromEntries(context.getNodeEntries());
+	const intermediateData = context.getIntermediateData();
 
 	const namer = new Namer(rootNamePart);
-	for (const nodeId in nodes) {
+	for (const nodeId in intermediateData.nodes) {
 		const nodeUrl = new URL(nodeId);
 		const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
 		namer.registerPath(nodeId, path);
@@ -104,7 +104,7 @@ async function main(options: MainOptions) {
 	const names = namer.getNames();
 
 	const factory = ts.factory;
-	generatePackage(factory, nodes, names, {
+	generatePackage(factory, intermediateData.nodes, names, {
 		directoryPath: packageDirectoryPath,
 		name: packageName,
 		version: packageVersion,

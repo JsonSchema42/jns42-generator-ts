@@ -18,6 +18,14 @@ export class SchemaContext implements SchemaStrategyInterface {
 		this.strategies[metaSchemaId] = strategy;
 	}
 
+	public getIntermediateData(): intermediate.SchemaJson {
+		return {
+			$schema:
+				"https://schema.JsonSchema42.org/jns42-intermediate-a/schema.json",
+			nodes: Object.fromEntries(this.getNodeEntries()),
+		};
+	}
+
 	public *getNodeEntries(): Iterable<[string, intermediate.Node]> {
 		for (const strategy of Object.values(this.strategies)) {
 			yield* strategy.getNodeEntries();
